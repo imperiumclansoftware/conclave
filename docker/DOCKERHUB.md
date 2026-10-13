@@ -23,7 +23,8 @@ servis par [FrankenPHP](https://frankenphp.dev) sur le port 80. Il lui faut seul
 | Tag | Contenu |
 |---|---|
 | `latest` | Dernière version publiée |
-| `0.1.1` | Version 0.1.1 (tag `v0.1.1` du dépôt GitHub) |
+| `0.1.2` | Démarrage plus lisible (raison d'un échec de connexion à la base) et plus tolérant |
+| `0.1.1` | Première image publiée |
 
 Plateforme : `linux/amd64`.
 
@@ -103,7 +104,7 @@ pour les coller d'un bloc). Générez chaque secret avec `openssl rand -hex 32` 
 CONCLAVE_URL=http://192.168.1.10:8080
 # Port publié sur la machine (doit correspondre à CONCLAVE_URL)
 CONCLAVE_PORT=8080
-# Tag de l'image : latest, ou une version comme 0.1.1
+# Tag de l'image : latest, ou une version comme 0.1.2
 CONCLAVE_VERSION=latest
 
 # Secrets : à conserver précieusement
@@ -171,7 +172,17 @@ Les migrations de la base s'appliquent au démarrage. Pour rester sur une versio
 - Base `dunglas/frankenphp` (PHP 8.4, Alpine), utilisateur non root, port 80.
 - Au démarrage : attente de la base, migrations, génération des clés si besoin, affichage du code
   d'installation tant que l'application n'est pas installée. Une variable obligatoire manquante arrête
-  le conteneur avec un message explicite.
+  le conteneur avec un message explicite, et un échec de connexion à la base affiche sa raison.
+- Contrôle de santé : `GET /api/health`, avec 3 minutes de délai au premier démarrage.
+
+## Dépannage
+
+- **`container conclave-conclave-1 is unhealthy`** : consultez les journaux du conteneur `conclave`. Si
+  la base refuse le mot de passe, `POSTGRES_PASSWORD` a changé depuis la création du volume de la base :
+  PostgreSQL garde le premier. Remettez l'ancienne valeur, ou supprimez le volume de la base (ses données
+  avec) et redéployez.
+- **Messagerie sans temps réel** : `CONCLAVE_URL` doit être exactement l'adresse tapée dans le navigateur,
+  port compris.
 - Contrôle de santé : `GET /api/health`.
 - Le worker Discord s'arrête proprement (`docker compose stop`). N'en lancez qu'un seul : chaque événement
   Discord serait sinon traité en double.
