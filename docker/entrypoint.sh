@@ -27,14 +27,21 @@ mkdir -p /data/avatars /data/news-images /data/setup /data/jwt /data/caddy /data
 
 echo 'Conclave : attente de la base de données…'
 tries=0
-until php bin/console dbal:run-sql -q 'SELECT 1' > /dev/null 2>&1; do
+until error=$(php bin/console dbal:run-sql -q 'SELECT 1' 2>&1); do
 	tries=$((tries + 1))
+	# The reason (password refused, host unknown…), without waiting for the end
+	reason=$(printf '%s\n' "$error" | grep -Eo 'FATAL: .*|could not translate host name .*|Connection refused|timeout expired' | head -n 1 | cut -c1-200 | sed 's/""$/"/')
 	if [ "$tries" -ge 60 ]; then
-		echo 'Conclave : base de données injoignable (DATABASE_URL).' >&2
+		echo "Conclave : base de données injoignable après 2 minutes : ${reason:-$error}" >&2
+		echo 'Vérifiez POSTGRES_PASSWORD : il ne doit pas avoir changé depuis la création du volume de la base.' >&2
 		exit 1
+	fi
+	if [ $((tries % 5)) -eq 1 ]; then
+		echo "Conclave : base de données pas encore prête (${reason:-réponse inattendue}), nouvel essai…"
 	fi
 	sleep 2
 done
+echo 'Conclave : base de données prête.'
 
 # The web container prepares the database and the keys; the worker only uses them
 if [ "$1" = 'frankenphp' ]; then

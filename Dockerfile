@@ -60,7 +60,8 @@ USER www-data
 VOLUME /data
 EXPOSE 80
 
-HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
+# First start: database creation and migrations can take a few minutes on a small server
+HEALTHCHECK --interval=15s --timeout=5s --start-period=180s --retries=5 \
     CMD curl -fsS http://localhost/api/health > /dev/null || exit 1
 
 ENTRYPOINT ["conclave-entrypoint"]
