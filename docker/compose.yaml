@@ -1,0 +1,56 @@
+# Conclave with its database and its Discord worker.
+#   cp .env.example .env   (then fill it in)
+#   docker compose up -d
+#   docker compose exec conclave php bin/console app:setup:code   (code of the installation wizard)
+
+services:
+  conclave:
+    image: iemperor/conclave:${CONCLAVE_VERSION:-latest}
+    restart: unless-stopped
+    ports:
+      - "${CONCLAVE_PORT:-8080}:80"
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://conclave:${POSTGRES_PASSWORD}@database:5432/conclave?serverVersion=16&charset=utf8
+    volumes:
+      - conclave_data:/data
+    depends_on:
+      database:
+        condition: service_healthy
+
+  # Discord presences and video calls (optional: configure Discord in the administration)
+  discord-worker:
+    image: iemperor/conclave:${CONCLAVE_VERSION:-latest}
+    restart: unless-stopped
+    command: ["php", "bin/console", "app:discord:gateway"]
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://conclave:${POSTGRES_PASSWORD}@database:5432/conclave?serverVersion=16&charset=utf8
+      # Publishes the real-time events through the hub of the web container
+      MERCURE_URL: http://conclave/.well-known/mercure
+    healthcheck:
+      disable: true
+    volumes:
+      - conclave_data:/data
+    depends_on:
+      conclave:
+        condition: service_healthy
+
+  database:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: conclave
+      POSTGRES_USER: conclave
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in .env}
+    healthcheck:
+      test: ["CMD", "pg_isready", "-d", "conclave", "-U", "conclave"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - database_data:/var/lib/postgresql/data
+
+volumes:
+  conclave_data:
+  database_data:

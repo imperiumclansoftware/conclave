@@ -83,11 +83,51 @@ En dev, le navigateur ne parle qu'à `localhost:4200` : le proxy Angular (`front
 transmet `/api` à Symfony et `/.well-known/mercure` au hub, ce qui permet au cookie Mercure de
 fonctionner sans configuration CORS.
 
-## Prérequis
+## Installation avec Docker
+
+L'image [`iemperor/conclave`](https://hub.docker.com/r/iemperor/conclave) contient toute l'application :
+l'interface Angular, l'API Symfony et le hub temps réel Mercure, servis par
+[FrankenPHP](https://frankenphp.dev) en HTTP sur le port 80. Il lui faut une base PostgreSQL ; le worker
+Discord (facultatif) tourne avec la même image.
+
+```bash
+mkdir conclave && cd conclave
+curl -O https://raw.githubusercontent.com/imperiumclansoftware/conclave/main/docker/compose.yaml
+curl -o .env https://raw.githubusercontent.com/imperiumclansoftware/conclave/main/docker/.env.example
+# Renseigner .env : CONCLAVE_URL, CONCLAVE_PORT et les secrets (openssl rand -hex 32)
+docker compose up -d
+docker compose exec conclave php bin/console app:setup:code
+```
+
+Ouvrir ensuite `CONCLAVE_URL` : l'assistant d'installation demande le code affiché par la dernière commande
+(il figure aussi dans `docker compose logs conclave`).
+
+| Variable | Rôle |
+|---|---|
+| `CONCLAVE_URL` | Adresse à laquelle les membres joignent Conclave, par ex. `http://192.168.1.10:8080` (sert au hub temps réel et aux liens des e-mails) |
+| `CONCLAVE_PORT` | Port publié sur la machine hôte (doit correspondre à `CONCLAVE_URL`) |
+| `APP_SECRET` | Clé de l'application ; chiffre aussi les secrets saisis dans l'administration : **à conserver** |
+| `JWT_PASSPHRASE` | Protège les clés de connexion, générées au premier démarrage |
+| `MERCURE_JWT_SECRET` | Signe les jetons du hub temps réel |
+| `POSTGRES_PASSWORD` | Mot de passe de la base PostgreSQL |
+
+- **Données** : le volume `/data` conserve avatars, images des news, clés de connexion et historique du hub ;
+  la base est dans son propre volume. Sauvegarder les deux, plus le fichier `.env`.
+- **Démarrage** : le conteneur attend la base, applique les migrations, génère les clés si besoin et affiche
+  le code d'installation tant que l'application n'est pas installée. Il tourne en utilisateur non root.
+- **HTTPS** : l'image sert du HTTP. Pour un accès depuis Internet, la placer derrière un reverse proxy
+  (Traefik, Caddy, Nginx Proxy Manager…) et indiquer l'adresse `https://…` dans `CONCLAVE_URL`.
+- **Mise à jour** : `docker compose pull && docker compose up -d` (les migrations s'appliquent au démarrage).
+- **Construire l'image** : `docker build -t iemperor/conclave .` à la racine du dépôt (`Dockerfile`, fichiers
+  dans `docker/`).
+
+## Développement
+
+### Prérequis
 
 PHP 8.4+, Composer, Symfony CLI, Node 24+, Docker.
 
-## Démarrage
+### Démarrage
 
 ```bash
 # Backend
@@ -120,7 +160,7 @@ Si Docker ne tourne pas sur `localhost` (Docker distant, DinD…), surcharger le
 `DATABASE_URL` et `MERCURE_URL` dans `backend/.env.local` (et `.env.test.local` pour les tests),
 et `MERCURE_HUB_URL=http://<hôte>:3000 npm start` côté frontend.
 
-### Derrière code-server
+#### Derrière code-server
 
 Le proxy `/proxy/4200/` de code-server retire le préfixe d'URL, ce qui empêche l'application de
 charger ses scripts (page vide). Utiliser `/absproxy/4200/`, qui le conserve :

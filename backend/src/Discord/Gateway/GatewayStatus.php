@@ -3,10 +3,11 @@
 namespace App\Discord\Gateway;
 
 use Psr\Cache\CacheItemPoolInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
- * State of the gateway worker, shared with the web process through the cache
- * (shown in the administration).
+ * State of the gateway worker, shared with the web process through the database cache
+ * (shown in the administration; the worker may run in another container).
  */
 final readonly class GatewayStatus
 {
@@ -15,6 +16,7 @@ final readonly class GatewayStatus
     private const STALE_AFTER = 120;
 
     public function __construct(
+        #[Autowire(service: 'cache.shared')]
         private CacheItemPoolInterface $cache,
     ) {
     }

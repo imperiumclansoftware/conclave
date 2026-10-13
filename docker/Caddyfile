@@ -1,0 +1,45 @@
+{
+	# HTTP only: put a reverse proxy in front for HTTPS
+	auto_https off
+	admin off
+	frankenphp
+}
+
+:80 {
+	root * /app/public
+	encode zstd br gzip
+
+	# Real-time hub, on the same address as the app (the browser is authorised by a cookie)
+	# Tokens are checked strictly: signed by the app, for this issuer and this hub
+	mercure {
+		transport bolt {
+			path /data/mercure.db
+		}
+		issuer {$MERCURE_ISSUER} {
+			publisher {
+				jwt {$MERCURE_JWT_SECRET} HS256
+			}
+			subscriber {
+				jwt {$MERCURE_JWT_SECRET} HS256
+			}
+		}
+		resource_identifier {$MERCURE_AUDIENCE}
+		cookie_name mercure_access_token
+	}
+
+	# API: Symfony
+	@api path /api/* /bundles/*
+	handle @api {
+		php_server
+	}
+
+	# Angular application: files, or index.html for its routes
+	handle {
+		@html path / /index.html
+		header @html Cache-Control "no-cache"
+		header /*.js Cache-Control "public, max-age=31536000, immutable"
+		header /*.css Cache-Control "public, max-age=31536000, immutable"
+		try_files {path} /index.html
+		file_server
+	}
+}

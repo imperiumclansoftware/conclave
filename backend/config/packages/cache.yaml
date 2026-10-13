@@ -1,5 +1,10 @@
 framework:
     cache:
+        pools:
+            # Shared by the processes of the app (web server, Discord worker), which may run in
+            # separate containers: stored in the database
+            cache.shared:
+                adapter: cache.adapter.doctrine_dbal
         # Unique name of your app: used to compute stable namespaces for cache keys.
         #prefix_seed: your_vendor_name/app_name
 

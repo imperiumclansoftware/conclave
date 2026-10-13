@@ -3,6 +3,9 @@ mercure:
         default:
             url: '%env(default::MERCURE_URL)%'
             public_url: '%env(default::MERCURE_BROWSER_URL)%'
+            # Same name as in the hubs (dev and image): the default of production, "__Secure-…",
+            # needs HTTPS, while Conclave can be served over plain HTTP
+            cookie_name: mercure_access_token
             jwt:
                 secret: '%env(MERCURE_JWT_SECRET)%'
                 publish: '*'
