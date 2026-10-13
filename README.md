@@ -102,6 +102,9 @@ docker compose exec conclave php bin/console app:setup:code
 Ouvrir ensuite `CONCLAVE_URL` : l'assistant d'installation demande le code affiché par la dernière commande
 (il figure aussi dans `docker compose logs conclave`).
 
+Avec **Portainer** : *Stacks > Add stack*, coller `docker/compose.yaml` dans l'éditeur web et saisir les
+variables de `docker/.env.example` dans *Environment variables* (le fichier ne dépend d'aucun `.env`).
+
 | Variable | Rôle |
 |---|---|
 | `CONCLAVE_URL` | Adresse à laquelle les membres joignent Conclave, par ex. `http://192.168.1.10:8080` (sert au hub temps réel et aux liens des e-mails) |

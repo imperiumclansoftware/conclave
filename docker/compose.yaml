@@ -1,7 +1,15 @@
 # Conclave with its database and its Discord worker.
-#   cp .env.example .env   (then fill it in)
-#   docker compose up -d
-#   docker compose exec conclave php bin/console app:setup:code   (code of the installation wizard)
+#   Command line: cp .env.example .env (then fill it in), docker compose up -d
+#   Portainer: paste this file as a stack and enter the variables of .env.example in "Environment variables"
+#   Installation code: docker compose exec conclave php bin/console app:setup:code (or the container logs)
+
+# Settings of both Conclave containers, taken from the variables of the stack (.env or Portainer)
+x-conclave-environment: &conclave-environment
+  CONCLAVE_URL: ${CONCLAVE_URL:?CONCLAVE_URL must be set, e.g. http://192.168.1.10:8080}
+  APP_SECRET: ${APP_SECRET:?APP_SECRET must be set (openssl rand -hex 32)}
+  JWT_PASSPHRASE: ${JWT_PASSPHRASE:?JWT_PASSPHRASE must be set (openssl rand -hex 32)}
+  MERCURE_JWT_SECRET: ${MERCURE_JWT_SECRET:?MERCURE_JWT_SECRET must be set (openssl rand -hex 32)}
+  DATABASE_URL: postgresql://conclave:${POSTGRES_PASSWORD}@database:5432/conclave?serverVersion=16&charset=utf8
 
 services:
   conclave:
@@ -9,9 +17,7 @@ services:
     restart: unless-stopped
     ports:
       - "${CONCLAVE_PORT:-8080}:80"
-    env_file: .env
-    environment:
-      DATABASE_URL: postgresql://conclave:${POSTGRES_PASSWORD}@database:5432/conclave?serverVersion=16&charset=utf8
+    environment: *conclave-environment
     volumes:
       - conclave_data:/data
     depends_on:
@@ -23,9 +29,8 @@ services:
     image: iemperor/conclave:${CONCLAVE_VERSION:-latest}
     restart: unless-stopped
     command: ["php", "bin/console", "app:discord:gateway"]
-    env_file: .env
     environment:
-      DATABASE_URL: postgresql://conclave:${POSTGRES_PASSWORD}@database:5432/conclave?serverVersion=16&charset=utf8
+      <<: *conclave-environment
       # Publishes the real-time events through the hub of the web container
       MERCURE_URL: http://conclave/.well-known/mercure
     healthcheck:
@@ -42,7 +47,7 @@ services:
     environment:
       POSTGRES_DB: conclave
       POSTGRES_USER: conclave
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set in .env}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD must be set}
     healthcheck:
       test: ["CMD", "pg_isready", "-d", "conclave", "-U", "conclave"]
       interval: 5s
