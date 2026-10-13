@@ -1,0 +1,222 @@
+@use '../auth-layout';
+
+.card {
+  width: min(100%, 31rem);
+}
+
+.kicker {
+  margin: 0;
+  color: var(--text-muted);
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+h1:focus {
+  outline: none;
+}
+
+// Progress through the steps
+.stepper {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin: 0 0 1.5rem;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+
+  li {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: 0.3rem;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    text-align: center;
+
+    // Line to the previous step
+    & + li::before {
+      content: '';
+      position: absolute;
+      top: 0.85rem;
+      right: 50%;
+      width: 100%;
+      height: 2px;
+      background: var(--border);
+      z-index: 0;
+    }
+
+    &.done + li::before,
+    &.done::before {
+      background: var(--accent);
+    }
+  }
+
+  .dot {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border: 2px solid var(--border);
+    border-radius: 50%;
+    background: var(--surface-solid);
+    font-family: var(--font-display);
+    font-weight: 700;
+  }
+
+  .current {
+    color: var(--accent-text);
+    font-weight: 600;
+
+    .dot {
+      border-color: var(--accent);
+      color: var(--accent-text);
+    }
+  }
+
+  .done .dot {
+    border-color: var(--accent);
+    color: var(--accent-contrast);
+    background: var(--accent);
+  }
+}
+
+.command {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-muted);
+
+  code {
+    overflow-wrap: anywhere;
+    font-size: 0.9rem;
+  }
+}
+
+.hint {
+  display: block;
+  margin: 0.4rem 0 1rem;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.code-input {
+  font-family: ui-monospace, monospace;
+  font-size: 1.3rem;
+  letter-spacing: 0.2em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.optional {
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.6rem;
+
+  .btn {
+    width: auto;
+  }
+}
+
+.recap {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0 0 1.5rem;
+
+  div {
+    display: grid;
+    grid-template-columns: 6rem 1fr;
+    gap: 0.75rem;
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  dt {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+  }
+
+  dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+}
+
+.link {
+  margin-left: 0.4rem;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--accent-text);
+  font-size: 0.85rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.next-title {
+  margin: 0 0 0.5rem;
+  font-weight: 600;
+}
+
+.next {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+
+  button {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: none;
+    color: var(--text);
+    text-align: left;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      border-color: var(--accent);
+      background: color-mix(in srgb, var(--accent) 8%, transparent);
+    }
+  }
+
+  app-icon {
+    color: var(--accent-text);
+    font-size: 1.4rem;
+  }
+
+  span {
+    display: grid;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+  }
+
+  strong {
+    color: var(--text);
+    font-size: 0.95rem;
+  }
+}
+
+.invite {
+  margin-bottom: 1.25rem;
+}

@@ -1,0 +1,109 @@
+<main class="card">
+  <header class="crest">
+    <app-emblem [size]="88" />
+    <p class="app-name">Conclave</p>
+    <p class="motto">
+      <span class="only-assassin">« Dans l'ombre, nous veillons sur la liberté. »</span>
+      <span class="only-templar">« Par l'ordre et la discipline, la paix. »</span>
+    </p>
+  </header>
+
+  @if (requested()) {
+    <h1>Demande envoyée</h1>
+    <p class="subtitle" role="status">
+      Votre demande pour rejoindre <strong>{{ setup()?.clanName }}</strong> a été transmise aux
+      dirigeants. Vous recevrez un e-mail dès qu'elle sera validée ; vous pourrez alors vous
+      connecter.
+    </p>
+    <a class="btn" routerLink="/login">Retour à la connexion</a>
+  } @else if (setup(); as s) {
+    <h1>Rejoindre {{ s.clanName }}</h1>
+    <p class="subtitle">Votre compte sera actif dès qu'un dirigeant aura validé votre demande.</p>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      @if (error()) {
+        <p class="error" role="alert">{{ error() }}</p>
+      }
+
+      <div class="field">
+        <label for="display-name">Votre pseudo</label>
+        <input
+          id="display-name"
+          name="display-name"
+          formControlName="displayName"
+          required
+          autocomplete="nickname"
+        />
+      </div>
+
+      <div class="field">
+        <label for="email">Adresse e-mail</label>
+        <input
+          id="email"
+          name="email"
+          type="email"
+          formControlName="email"
+          required
+          autocomplete="email"
+          aria-describedby="email-hint"
+        />
+        <span class="hint" id="email-hint"
+          >Pour être prévenu de la validation et retrouver votre mot de passe.</span
+        >
+      </div>
+
+      <div class="field">
+        <label for="username">Identifiant de connexion</label>
+        <input
+          id="username"
+          name="username"
+          formControlName="username"
+          required
+          aria-describedby="username-hint"
+          autocomplete="username"
+          autocapitalize="none"
+          autocorrect="off"
+          spellcheck="false"
+        />
+        <span class="hint" id="username-hint">{{ usernameHint }}</span>
+      </div>
+
+      <div class="field">
+        <label for="new-password">Mot de passe</label>
+        <input
+          id="new-password"
+          name="new-password"
+          formControlName="password"
+          required
+          aria-describedby="password-hint"
+          [type]="showPassword() ? 'text' : 'password'"
+          autocomplete="new-password"
+          [attr.minlength]="passwordMinLength"
+        />
+        <span class="hint" id="password-hint">Au moins {{ passwordMinLength }} caractères.</span>
+      </div>
+      <label class="show-password">
+        <input
+          type="checkbox"
+          [checked]="showPassword()"
+          (change)="showPassword.set(!showPassword())"
+        />
+        Afficher le mot de passe
+      </label>
+
+      <p class="consent">
+        En créant un compte, vous acceptez les
+        <a routerLink="/conditions-utilisation" target="_blank">conditions d'utilisation</a> et
+        prenez connaissance de la
+        <a routerLink="/politique-confidentialite" target="_blank">politique de confidentialité</a>.
+      </p>
+      <button class="btn" type="submit" [disabled]="pending()">
+        {{ pending() ? 'Envoi…' : 'Demander à rejoindre' }}
+      </button>
+    </form>
+
+    <p class="switch">Déjà un compte ? <a routerLink="/login">Se connecter</a></p>
+  } @else if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+</main>

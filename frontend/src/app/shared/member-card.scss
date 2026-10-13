@@ -1,0 +1,130 @@
+.member-card {
+  position: fixed;
+  z-index: 50;
+  display: grid;
+  gap: 0.75rem;
+  width: 19rem;
+  max-width: calc(100vw - 1rem);
+  padding: 1rem;
+  background: var(--surface-solid);
+  box-shadow: 0 10px 30px rgb(0 0 0 / 0.3);
+  animation: appear 0.12s ease-out;
+}
+
+@keyframes appear {
+  from {
+    opacity: 0;
+    translate: 0 4px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .member-card {
+    animation: none;
+  }
+}
+
+header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.who {
+  display: grid;
+  min-width: 0;
+}
+
+.name {
+  overflow: hidden;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.meta {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.branches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.1rem 0.55rem 0.1rem 0.25rem;
+    border: 1px solid color-mix(in srgb, var(--accent-text) 35%, transparent);
+    border-radius: 999px;
+    color: var(--accent-text);
+    font-size: 0.82rem;
+  }
+}
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.4rem;
+  margin: 0;
+
+  div {
+    display: grid;
+    justify-items: center;
+    padding: 0.45rem 0.25rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface-muted);
+  }
+
+  dt {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  dd {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-weight: 700;
+  }
+}
+
+footer {
+  display: grid;
+  gap: 0.4rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--border);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.9rem;
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--accent-text);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}

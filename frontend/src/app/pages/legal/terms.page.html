@@ -1,0 +1,315 @@
+<main class="card terms">
+  <header>
+    <p class="back">
+      <a [routerLink]="loggedIn ? '/' : '/login'"
+        >← {{ loggedIn ? 'Retour à l’application' : 'Retour à la connexion' }}</a
+      >
+    </p>
+    <h1>Conditions d'utilisation</h1>
+    <p class="meta">
+      Application privée du clan <strong>{{ clanName() }}</strong> · Dernière mise à jour :
+      {{ updatedAt }}
+    </p>
+  </header>
+
+  <nav aria-label="Sommaire">
+    <ol>
+      <li><a [routerLink]="[]" fragment="objet">Objet</a></li>
+      <li><a [routerLink]="[]" fragment="acces">Accès et inscription</a></li>
+      <li><a [routerLink]="[]" fragment="prive">Caractère privé</a></li>
+      <li><a [routerLink]="[]" fragment="conduite">Règles de conduite</a></li>
+      <li><a [routerLink]="[]" fragment="contenus">Contenus publiés</a></li>
+      <li><a [routerLink]="[]" fragment="moderation">Modération et sanctions</a></li>
+      <li><a [routerLink]="[]" fragment="donnees">Données personnelles</a></li>
+      <li><a [routerLink]="[]" fragment="cookies">Cookies et stockage local</a></li>
+      <li><a [routerLink]="[]" fragment="services">Services tiers</a></li>
+      <li><a [routerLink]="[]" fragment="disponibilite">Disponibilité et responsabilité</a></li>
+      <li><a [routerLink]="[]" fragment="propriete">Propriété intellectuelle</a></li>
+      <li><a [routerLink]="[]" fragment="modifications">Modification des conditions</a></li>
+      <li><a [routerLink]="[]" fragment="droit">Droit applicable et contact</a></li>
+    </ol>
+  </nav>
+
+  <section id="objet">
+    <h2>1. Objet</h2>
+    <p>
+      Les présentes conditions encadrent l'utilisation de l'application du clan
+      <strong>{{ clanName() }}</strong> (ci-après « l'application »). Il s'agit d'un espace
+      <strong>100 % privé</strong>, à usage non commercial, réservé aux membres du clan :
+      messagerie, présence, visioconférences, partage des jeux pratiqués et profils.
+    </p>
+    <p>
+      L'application est administrée bénévolement par les <strong>dirigeants</strong> du clan. Créer
+      un compte ou utiliser l'application vaut acceptation sans réserve des présentes conditions.
+    </p>
+  </section>
+
+  <section id="acces">
+    <h2>2. Accès et inscription</h2>
+    <ul>
+      <li>
+        L'accès est réservé aux personnes dont l'inscription a été
+        <strong>validée par un dirigeant</strong>. Les dirigeants sont libres d'accepter ou de
+        refuser une demande, sans avoir à se justifier ; une demande refusée entraîne la suppression
+        du compte.
+      </li>
+      <li>
+        Vous vous engagez à fournir des informations exactes, notamment une adresse e-mail valide
+        dont vous êtes titulaire.
+      </li>
+      <li>
+        Le compte est <strong>strictement personnel</strong>. Vous êtes responsable de la
+        confidentialité de votre mot de passe et de toute utilisation faite avec vos identifiants.
+        Signalez sans délai à un dirigeant toute utilisation non autorisée.
+      </li>
+      <li>
+        Les mineurs de moins de 15 ans doivent avoir l'accord d'un titulaire de l'autorité parentale
+        pour s'inscrire. L'utilisation de Discord, facultative, est soumise à l'âge minimum fixé par
+        Discord.
+      </li>
+    </ul>
+  </section>
+
+  <section id="prive">
+    <h2>3. Caractère privé et confidentialité</h2>
+    <p>
+      Tout ce qui est échangé dans l'application (messages, profils, identifiants de jeu, listes de
+      membres, visios…) est destiné aux seuls membres du clan. Il est interdit de le diffuser à
+      l'extérieur, notamment par des captures d'écran publiées, sans l'accord des personnes
+      concernées.
+    </p>
+    <p>
+      L'application n'est pas indexée par les moteurs de recherche et ne contient aucune publicité.
+    </p>
+  </section>
+
+  <section id="conduite">
+    <h2>4. Règles de conduite</h2>
+    <p>Chaque membre s'engage à adopter un comportement respectueux. Sont notamment interdits :</p>
+    <ul>
+      <li>les propos injurieux, diffamatoires, discriminatoires, haineux ou harcelants ;</li>
+      <li>
+        les contenus illicites, violents, pornographiques ou contraires à la dignité humaine ;
+      </li>
+      <li>l'usurpation d'identité, la collecte des données d'autres membres et le spam ;</li>
+      <li>
+        toute tentative d'accès non autorisé, de contournement des protections ou de perturbation du
+        service ;
+      </li>
+      <li>
+        le partage de contenus portant atteinte aux droits de tiers (droit d'auteur, droit à
+        l'image, vie privée).
+      </li>
+    </ul>
+  </section>
+
+  <section id="contenus">
+    <h2>5. Contenus publiés</h2>
+    <p>
+      Vous restez responsable des contenus que vous publiez (messages, avatar, présentation…). En
+      les publiant, vous autorisez leur affichage aux membres du clan, dans le seul cadre de
+      l'application. Vous pouvez à tout moment modifier votre profil ; la suppression de votre
+      compte entraîne celle de vos contenus.
+    </p>
+  </section>
+
+  <section id="moderation">
+    <h2>6. Modération et sanctions</h2>
+    <p>
+      Les dirigeants peuvent, en cas de manquement aux présentes conditions ou de comportement
+      nuisible au clan, supprimer des contenus, modifier le rôle d'un membre ou
+      <strong>retirer un membre</strong> du clan, ce qui supprime son compte. Dans la mesure du
+      possible, le membre concerné est informé au préalable.
+    </p>
+  </section>
+
+  <section id="donnees">
+    <h2>7. Données personnelles</h2>
+    <p>
+      Les données sont traitées par les dirigeants du clan, responsables du traitement, dans le
+      respect du Règlement général sur la protection des données (RGPD) et de la loi « Informatique
+      et libertés ». Le détail figure dans la
+      <a routerLink="/politique-confidentialite">politique de confidentialité</a> ; en voici
+      l'essentiel.
+    </p>
+
+    <h3>Données collectées</h3>
+    <ul>
+      <li>
+        <strong>Compte</strong> : identifiant, pseudo, adresse e-mail, mot de passe (stocké
+        uniquement sous forme chiffrée irréversible), rôle, dates d'inscription et de validation ;
+      </li>
+      <li>
+        <strong>Profil</strong> (facultatif) : avatar, présentation, identifiants de jeu (PSN, Xbox,
+        Steam, Nintendo, Epic, Battle.net), jeux pratiqués et plateformes ;
+      </li>
+      <li>
+        <strong>Utilisation</strong> : messages échangés, état de lecture, présence dans
+        l'application (en ligne, absent), participation aux visios ;
+      </li>
+      <li>
+        <strong>Discord</strong> (uniquement si vous liez votre compte) : identifiant, pseudo et
+        avatar Discord, statut et activité en cours ;
+      </li>
+      <li>
+        <strong>Gravatar</strong> (uniquement si vous l'utilisez) : une empreinte de votre adresse
+        e-mail ; l'adresse saisie n'est pas conservée.
+      </li>
+    </ul>
+
+    <h3>Finalités et base légale</h3>
+    <p>
+      Ces données servent exclusivement au fonctionnement de l'application : gestion des comptes,
+      messagerie, présence, visios, ludothèque du clan et envoi des e-mails de service (validation
+      d'inscription, mot de passe oublié, alertes aux dirigeants). Le traitement repose sur
+      l'exécution des présentes conditions et, pour les fonctions facultatives (Discord, Gravatar),
+      sur votre choix de les activer.
+      <strong
+        >Aucune donnée n'est vendue, louée, ni utilisée à des fins publicitaires ou de
+        profilage.</strong
+      >
+    </p>
+
+    <h3>Destinataires</h3>
+    <p>
+      Votre profil, votre présence et vos jeux sont visibles des membres du clan. Votre adresse
+      e-mail n'est visible que des dirigeants. Les messages privés ne sont visibles que des
+      participants à la conversation.
+    </p>
+
+    <h3>Durée de conservation</h3>
+    <p>
+      Les données sont conservées tant que votre compte existe. Elles sont supprimées lorsque vous
+      quittez le clan, lorsqu'un dirigeant retire votre compte ou refuse votre inscription.
+    </p>
+
+    <h3>Vos droits</h3>
+    <p>
+      Vous disposez d'un droit d'accès, de rectification, d'effacement, de limitation, d'opposition
+      et de portabilité de vos données. La plupart des informations sont modifiables directement
+      depuis votre profil ; pour les autres demandes (dont la suppression de votre compte),
+      adressez-vous à un dirigeant du clan. Vous pouvez également introduire une réclamation auprès
+      de la CNIL (<a href="https://www.cnil.fr" target="_blank" rel="noopener noreferrer"
+        >cnil.fr ↗</a
+      >).
+    </p>
+  </section>
+
+  <section id="cookies">
+    <h2>8. Cookies et stockage local</h2>
+    <p>
+      L'application n'utilise <strong>aucun cookie publicitaire ni de mesure d'audience</strong>.
+      Seuls des éléments strictement nécessaires à son fonctionnement sont enregistrés, ce qui ne
+      requiert pas de consentement :
+    </p>
+    <ul>
+      <li>
+        votre jeton de connexion et votre choix de thème (Assassins / Templiers), dans le stockage
+        local de votre navigateur ;
+      </li>
+      <li>un cookie technique permettant de recevoir les messages en temps réel.</li>
+    </ul>
+    <p>
+      Les images hébergées par des services externes (Gravatar, Discord, Steam, RAWG) ne sont
+      affichées qu'avec votre accord, recueilli par une bannière et modifiable à tout moment :
+      <app-manage-cookies />. Le détail figure dans la
+      <a routerLink="/politique-confidentialite" fragment="cookies">politique de confidentialité</a
+      >.
+    </p>
+  </section>
+
+  <section id="services">
+    <h2>9. Services tiers</h2>
+    <p>
+      Certaines fonctions s'appuient sur des services extérieurs, soumis à leurs propres conditions
+      et politiques de confidentialité :
+    </p>
+    <ul>
+      <li>
+        <strong>Discord</strong> : présence, visioconférences dans des salons privés du serveur du
+        clan (si vous liez votre compte) ;
+      </li>
+      <li>
+        <strong>Gravatar</strong> : affichage de votre avatar, chargé depuis gravatar.com (si vous
+        l'utilisez) ;
+      </li>
+      <li>
+        <strong>Steam</strong> et <strong>RAWG</strong> : informations, jaquettes et captures
+        d'écran des jeux ; seuls les termes de recherche leur sont transmis ;
+      </li>
+      <li>
+        le <strong>service d'envoi d'e-mails</strong> choisi par les dirigeants, pour les e-mails de
+        service.
+      </li>
+    </ul>
+  </section>
+
+  <section id="disponibilite">
+    <h2>10. Disponibilité et responsabilité</h2>
+    <p>
+      L'application est fournie gracieusement, « en l'état ». Les dirigeants s'efforcent d'en
+      assurer le bon fonctionnement et la sécurité, sans garantie de disponibilité permanente ni
+      d'absence d'erreur. Elle peut être interrompue pour maintenance, modifiée ou arrêtée à tout
+      moment. Il vous appartient de conserver ailleurs les informations qui vous sont importantes.
+    </p>
+    <p>
+      Dans les limites permises par la loi, les dirigeants ne sauraient être tenus responsables des
+      dommages indirects liés à l'utilisation de l'application, ni des contenus publiés par les
+      membres ou des services tiers.
+    </p>
+  </section>
+
+  <section id="propriete">
+    <h2>11. Propriété intellectuelle</h2>
+    <p>
+      L'application est un projet de fans, privé et non officiel. <em>Assassin's Creed</em> est une
+      marque d'Ubisoft Entertainment ; l'application n'est ni affiliée à Ubisoft, ni approuvée par
+      Ubisoft. Les emblèmes et décors de l'interface sont des créations originales inspirées de cet
+      univers. Les noms, jaquettes et captures d'écran des jeux appartiennent à leurs éditeurs
+      respectifs ; ils sont affichés à titre informatif. Discord, Steam, Gravatar et RAWG sont des
+      marques de leurs propriétaires.
+    </p>
+    <p>
+      Les icônes de l'interface proviennent de
+      <a href="https://game-icons.net" target="_blank" rel="noopener noreferrer"
+        >game-icons.net ↗</a
+      >
+      (Lorc, Delapouite et contributeurs), sous licence
+      <a
+        href="https://creativecommons.org/licenses/by/3.0/deed.fr"
+        target="_blank"
+        rel="noopener noreferrer"
+        >CC BY 3.0 ↗</a
+      >.
+    </p>
+  </section>
+
+  <section id="modifications">
+    <h2>12. Modification des conditions</h2>
+    <p>
+      Les présentes conditions peuvent évoluer. La date de dernière mise à jour figure en haut de
+      cette page ; en cas de changement important, les membres en sont informés dans l'application.
+      Continuer à utiliser l'application après une modification vaut acceptation des nouvelles
+      conditions.
+    </p>
+  </section>
+
+  <section id="droit">
+    <h2>13. Droit applicable et contact</h2>
+    <p>
+      Les présentes conditions sont régies par le droit français. En cas de différend, une solution
+      amiable sera recherchée en priorité.
+    </p>
+    <p>
+      Pour toute question, contactez un dirigeant du clan via la messagerie de l'application
+      @if (loggedIn) {
+        ou depuis la page <a routerLink="/clan">Le clan</a>
+      }
+      .
+    </p>
+  </section>
+
+  <p class="related">
+    Voir aussi la <a routerLink="/politique-confidentialite">politique de confidentialité</a>.
+  </p>
+</main>

@@ -1,0 +1,13 @@
+mercure:
+    hubs:
+        default:
+            url: '%env(default::MERCURE_URL)%'
+            public_url: '%env(default::MERCURE_BROWSER_URL)%'
+            jwt:
+                secret: '%env(MERCURE_JWT_SECRET)%'
+                publish: '*'
+                claims:
+                    iss: '%env(MERCURE_ISSUER)%'
+                    aud: '%env(MERCURE_AUDIENCE)%'
+                    sub: 'clan-app'
+                    client_id: 'clan-app'

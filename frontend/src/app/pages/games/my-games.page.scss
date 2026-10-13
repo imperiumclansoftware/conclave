@@ -1,0 +1,109 @@
+@use 'games-shared';
+
+:host {
+  display: block;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.add {
+  margin-bottom: 2rem;
+
+  h2 {
+    margin-bottom: 0.75rem;
+    font-size: 1.1rem;
+  }
+
+  input[type='search'] {
+    width: 100%;
+    padding: 0.7rem 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: color-mix(in srgb, var(--surface-solid) 70%, var(--bg));
+    font-size: 1.05rem;
+  }
+}
+
+.status {
+  min-height: 1.5em;
+  margin: 0.5rem 0;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+
+  .error {
+    margin: 0;
+  }
+}
+
+.results {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.result {
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+
+  &.selected {
+    border-color: var(--border);
+    background: var(--surface-muted);
+  }
+}
+
+.result-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.4rem;
+
+  img,
+  .no-cover {
+    flex: none;
+    width: 6.5rem;
+    aspect-ratio: 231 / 87;
+    border-radius: 3px;
+    background: var(--surface-muted);
+    object-fit: cover;
+  }
+}
+
+.result-info {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+
+  strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.owned {
+  font-style: italic;
+}
+
+.add-form {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0.25rem 0.6rem 0.75rem;
+}
+
+.tabs {
+  margin-bottom: 1rem;
+}
+
+.tab-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.4rem;
+  margin-left: 0.25rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  background: var(--surface-muted);
+  color: var(--text-muted);
+  font-size: 0.7rem;
+}

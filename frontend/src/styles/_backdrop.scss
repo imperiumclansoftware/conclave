@@ -1,0 +1,211 @@
+@use 'faction';
+
+// Decorative, fixed background of each faction (markup in shared/backdrop)
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+  background-color: var(--bg);
+  background-image: var(--vignette), var(--bg-layers);
+  background-size:
+    cover,
+    320px 320px,
+    cover;
+
+  > div {
+    position: absolute;
+    inset: 0;
+  }
+
+  svg {
+    position: absolute;
+  }
+}
+
+// ---- Assassins: Leonardo-style codex sketches, Renaissance skyline, a gliding eagle ----
+.bd-assassin {
+  color: #5a3d1e;
+
+  .codex {
+    width: min(560px, 70vw);
+    opacity: 0.11;
+
+    &.top {
+      top: -40px;
+      right: -60px;
+      rotate: 8deg;
+    }
+
+    &.bottom {
+      bottom: 120px;
+      left: -90px;
+      width: min(420px, 60vw);
+      rotate: -14deg;
+      opacity: 0.08;
+    }
+  }
+
+  .skyline {
+    bottom: 0;
+    left: 0;
+    width: max(100%, 1100px);
+    height: auto;
+
+    .far {
+      fill: #5a3d1e;
+      opacity: 0.13;
+    }
+
+    .near {
+      fill: #3a2a18;
+      opacity: 0.2;
+    }
+  }
+
+  .eagle {
+    top: 13vh;
+    left: 0;
+    width: 74px;
+    color: #2a1f15;
+    opacity: 0.5;
+    animation: eagle-glide 48s linear infinite;
+    animation-delay: -12s;
+    --animation-reduced: none;
+  }
+}
+
+@keyframes eagle-glide {
+  0% {
+    translate: -120px 0;
+    rotate: 2deg;
+  }
+  25% {
+    translate: 25vw 4vh;
+    rotate: -3deg;
+  }
+  50% {
+    translate: 50vw -2vh;
+    rotate: 3deg;
+  }
+  75% {
+    translate: 75vw 3vh;
+    rotate: -2deg;
+  }
+  100% {
+    translate: calc(100vw + 120px) 0;
+    rotate: 2deg;
+  }
+}
+
+// ---- Templars: watermark cross, hanging banners, candle glow, rising embers ----
+.bd-templar {
+  .cross {
+    top: 50%;
+    left: 50%;
+    width: min(78vmin, 720px);
+    translate: -50% -50%;
+    opacity: 0.07;
+  }
+
+  .banner {
+    position: absolute;
+    top: 0;
+    width: 88px;
+    height: 44vh;
+    background: linear-gradient(180deg, #7a0c12, #4b070b);
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 86%, 0 100%);
+    box-shadow: inset 0 0 0 3px rgb(212 175 55 / 0.35);
+    opacity: 0.4;
+    transform-origin: top center;
+    animation: banner-sway 9s ease-in-out infinite alternate;
+    --animation-reduced: none;
+
+    &.left {
+      left: 3vw;
+    }
+
+    &.right {
+      right: 3vw;
+      animation-delay: -4s;
+    }
+
+    svg {
+      top: 14vh;
+      left: 50%;
+      width: 46px;
+      translate: -50% 0;
+    }
+
+    @media (max-width: 56rem) {
+      display: none;
+    }
+  }
+
+  .glow {
+    background:
+      radial-gradient(ellipse 45vw 38vh at 0% 100%, rgb(255 120 30 / 0.22), transparent 70%),
+      radial-gradient(ellipse 45vw 38vh at 100% 100%, rgb(255 120 30 / 0.2), transparent 70%),
+      radial-gradient(ellipse 60vw 30vh at 50% 0%, rgb(179 18 27 / 0.12), transparent 70%);
+    animation: candle-flicker 5s ease-in-out infinite;
+    --animation-reduced: none;
+  }
+
+  .ember {
+    position: absolute;
+    bottom: -12px;
+    left: var(--x);
+    width: var(--size);
+    height: var(--size);
+    border-radius: 50%;
+    background: #ffb347;
+    box-shadow: 0 0 6px 2px rgb(255 120 30 / 0.7);
+    opacity: 0;
+    animation: ember-rise var(--duration) linear var(--delay) infinite;
+    --animation-reduced: none;
+  }
+}
+
+@keyframes banner-sway {
+  from {
+    rotate: -0.8deg;
+  }
+  to {
+    rotate: 0.8deg;
+  }
+}
+
+// Slow, low-amplitude changes: no flashing
+@keyframes candle-flicker {
+  0%,
+  100% {
+    opacity: 0.85;
+  }
+  20% {
+    opacity: 0.7;
+  }
+  45% {
+    opacity: 0.95;
+  }
+  70% {
+    opacity: 0.75;
+  }
+}
+
+@keyframes ember-rise {
+  0% {
+    opacity: 0;
+    translate: 0 0;
+  }
+  10% {
+    opacity: 0.9;
+  }
+  60% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 0;
+    translate: var(--drift) -75vh;
+  }
+}

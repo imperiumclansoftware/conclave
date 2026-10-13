@@ -1,0 +1,302 @@
+@let m = mail();
+<div class="columns">
+  <div class="stack">
+    <form
+      class="card"
+      [formGroup]="form"
+      (ngSubmit)="save()"
+      novalidate
+      aria-labelledby="mail-title"
+    >
+      <h2 id="mail-title">Service de mail</h2>
+      <p class="meta state">
+        État :
+        <strong>{{
+          m.configured ? 'configuré' : m.server.mode === 'disabled' ? 'désactivé' : 'non configuré'
+        }}</strong>
+        @if (m.source === 'env') {
+          <span class="source">.env</span>
+        }
+        @if (m.source === 'admin' && m.envServer) {
+          ·
+          <button class="link" type="button" (click)="resetToEnv()" [disabled]="busy()">
+            Revenir au fichier .env
+          </button>
+        }
+      </p>
+
+      <fieldset class="modes">
+        <legend>Mode d'envoi</legend>
+        @for (mo of modes; track mo.id) {
+          <label class="mode" [class.selected]="mode() === mo.id">
+            <input type="radio" formControlName="mode" [value]="mo.id" /> {{ mo.label }}
+          </label>
+        }
+      </fieldset>
+
+      @switch (mode()) {
+        @case ('smtp') {
+          <div class="field">
+            <label for="mail-provider">Fournisseur</label>
+            <select
+              id="mail-provider"
+              formControlName="provider"
+              aria-describedby="mail-provider-hint"
+            >
+              <option value="">Autre serveur</option>
+              @for (p of providers; track p.id) {
+                <option [value]="p.id">{{ p.label }}</option>
+              }
+            </select>
+            @if (provider(); as p) {
+              <span class="hint" id="mail-provider-hint"
+                >{{ p.hint }}
+                @if (p.link) {
+                  <a [href]="p.link.url" target="_blank" rel="noopener noreferrer"
+                    >{{ p.link.label }} ↗</a
+                  >
+                }
+              </span>
+            } @else {
+              <span class="hint" id="mail-provider-hint"
+                >Les réglages sont indiqués par votre hébergeur ou fournisseur de messagerie.</span
+              >
+            }
+          </div>
+
+          <div class="row">
+            <div class="field host">
+              <label for="mail-host">Serveur</label>
+              <input
+                id="mail-host"
+                formControlName="host"
+                placeholder="smtp.exemple.fr"
+                autocomplete="off"
+                autocapitalize="none"
+                spellcheck="false"
+              />
+            </div>
+            <div class="field port">
+              <label for="mail-port">Port</label>
+              <input
+                id="mail-port"
+                type="number"
+                formControlName="port"
+                min="1"
+                max="65535"
+                inputmode="numeric"
+              />
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="mail-security">Chiffrement</label>
+            <select id="mail-security" formControlName="security">
+              <option value="starttls">STARTTLS (port 587, le plus courant)</option>
+              <option value="tls">SSL/TLS (port 465)</option>
+              <option value="none">Aucun (serveur local ou de test)</option>
+            </select>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label for="mail-username">Identifiant</label>
+              <input
+                id="mail-username"
+                formControlName="username"
+                autocomplete="off"
+                autocapitalize="none"
+                spellcheck="false"
+                placeholder="Souvent l'adresse e-mail"
+              />
+            </div>
+            <div class="field">
+              <label for="mail-password">Mot de passe</label>
+              <div class="password">
+                <input
+                  id="mail-password"
+                  [type]="showPassword() ? 'text' : 'password'"
+                  formControlName="password"
+                  autocomplete="new-password"
+                  spellcheck="false"
+                  aria-describedby="mail-password-hint"
+                  [placeholder]="passwordKept() ? 'Enregistré, laisser vide pour le garder' : ''"
+                />
+                <button
+                  class="reveal"
+                  type="button"
+                  (click)="showPassword.set(!showPassword())"
+                  [attr.aria-pressed]="showPassword()"
+                  aria-label="Afficher le mot de passe"
+                >
+                  {{ showPassword() ? 'Masquer' : 'Afficher' }}
+                </button>
+              </div>
+              <span class="hint" id="mail-password-hint">
+                @if (passwordKept()) {
+                  <button class="link" type="button" (click)="removePassword()">
+                    Supprimer le mot de passe enregistré
+                  </button>
+                } @else if (passwordDropped()) {
+                  Le mot de passe enregistré n'est pas réutilisé pour un autre serveur ou
+                  identifiant.
+                } @else if (clearPassword()) {
+                  Le mot de passe sera supprimé à l'enregistrement.
+                }
+              </span>
+            </div>
+          </div>
+
+          <label class="check">
+            <input type="checkbox" formControlName="acceptAnyCertificate" />
+            Accepter un certificat non vérifié
+            <span class="hint">(serveur auto-hébergé uniquement)</span>
+          </label>
+        }
+        @case ('sendmail') {
+          <p class="meta">
+            Les e-mails sont confiés au programme <code>sendmail</code> du serveur qui héberge
+            l'application (Postfix, Exim…).
+          </p>
+        }
+        @case ('custom') {
+          <div class="field">
+            <label for="mail-dsn">DSN du transport</label>
+            <input
+              id="mail-dsn"
+              type="password"
+              formControlName="dsn"
+              autocomplete="new-password"
+              spellcheck="false"
+              aria-describedby="mail-dsn-hint"
+              [placeholder]="
+                m.server.customDsn
+                  ? 'Enregistré (' + m.server.customDsn.hint + '), laisser vide pour le garder'
+                  : 'ses+smtp://…, brevo+api://…'
+              "
+            />
+            <span class="hint" id="mail-dsn-hint"
+              >Pour un transport de la
+              <a
+                href="https://symfony.com/doc/current/mailer.html#using-a-3rd-party-transport"
+                target="_blank"
+                rel="noopener noreferrer"
+                >liste de Symfony Mailer ↗</a
+              >
+              (le paquet correspondant doit être installé). Encodez les caractères spéciaux (<code
+                >&#64;</code
+              >
+              → <code>%40</code>).</span
+            >
+          </div>
+        }
+        @case ('disabled') {
+          <p class="meta">
+            Aucun e-mail n'est envoyé. Les inscriptions fonctionnent, mais personne n'en est prévenu
+            par e-mail et le mot de passe oublié est indisponible.
+          </p>
+        }
+      }
+
+      @if (mode() !== 'disabled') {
+        <fieldset class="sender">
+          <legend>Expéditeur</legend>
+          <div class="row">
+            <div class="field">
+              <label for="mail-from">Adresse</label>
+              <input
+                id="mail-from"
+                type="email"
+                formControlName="from"
+                autocomplete="off"
+                placeholder="clan@exemple.fr"
+              />
+            </div>
+            <div class="field">
+              <label for="mail-from-name">Nom affiché</label>
+              <input
+                id="mail-from-name"
+                formControlName="fromName"
+                maxlength="100"
+                [placeholder]="clanName()"
+              />
+            </div>
+          </div>
+          @if (m.from.source === 'env') {
+            <p class="hint">Adresse actuelle issue du fichier .env.</p>
+          }
+        </fieldset>
+      }
+
+      @if (status(); as st) {
+        <p [class]="st.kind" [attr.role]="st.kind === 'error' ? 'alert' : 'status'">
+          {{ st.message }}
+        </p>
+      }
+      <div class="actions">
+        <button class="btn" type="submit" [disabled]="busy()">Enregistrer</button>
+      </div>
+    </form>
+
+    @if (mode() !== 'disabled') {
+      <section class="card" aria-labelledby="mail-test-title" [formGroup]="form">
+        <h2 id="mail-test-title">Tester</h2>
+        <p class="meta">
+          Envoie un e-mail avec les réglages ci-dessus, <strong>même non enregistrés</strong>, en
+          vérifiant chaque étape.
+        </p>
+        <div class="test">
+          <div class="field">
+            <label for="mail-recipient">Destinataire</label>
+            <input
+              id="mail-recipient"
+              type="email"
+              formControlName="recipient"
+              autocomplete="email"
+              placeholder="vous@exemple.fr"
+            />
+          </div>
+          <button class="btn btn-ghost" type="button" (click)="test()" [disabled]="busy()">
+            {{ busy() === 'test' ? 'Test en cours…' : 'Envoyer un e-mail de test' }}
+          </button>
+        </div>
+        @if (check(); as c) {
+          <ul class="checks" aria-live="polite">
+            @for (item of c.checks; track item.label) {
+              <li [class.ok]="item.ok">
+                <span aria-hidden="true">{{ item.ok ? '✓' : '✗' }}</span>
+                <strong>{{ item.label }}</strong>
+                @if (item.detail) {
+                  : {{ item.detail }}
+                }
+              </li>
+            }
+          </ul>
+        }
+      </section>
+    }
+  </div>
+
+  <aside class="card help">
+    <h2>Bon à savoir</h2>
+    <ul>
+      <li>
+        <strong>Port 587</strong> avec STARTTLS ou <strong>465</strong> avec SSL/TLS : le port 25
+        est souvent bloqué par les hébergeurs.
+      </li>
+      <li>
+        Gmail, Outlook et Yahoo refusent le mot de passe habituel : créez un
+        <strong>mot de passe d'application</strong>.
+      </li>
+      <li>
+        Utilisez une adresse d'expédition du compte SMTP, sinon le serveur peut refuser l'envoi ou
+        les e-mails finir en indésirables.
+      </li>
+      <li>Le mot de passe est chiffré en base et n'est jamais renvoyé au navigateur.</li>
+    </ul>
+    <h3>E-mails envoyés</h3>
+    <p class="meta">
+      Alerte aux dirigeants à chaque inscription, réponse à l'inscrit, mot de passe oublié.
+    </p>
+  </aside>
+</div>

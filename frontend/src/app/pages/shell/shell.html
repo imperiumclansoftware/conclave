@@ -1,0 +1,95 @@
+<header class="topbar">
+  <a class="brand" routerLink="/">
+    <app-emblem [size]="34" />
+    <span>{{ auth.user()?.clan?.name ?? 'Clan' }}</span>
+  </a>
+
+  <nav aria-label="Navigation principale">
+    <a routerLink="/news" routerLinkActive="active"
+      ><app-icon name="news" /><span class="label">News</span></a
+    >
+    <a routerLink="/games" routerLinkActive="active"
+      ><app-icon name="games" /><span class="label">Jeux</span></a
+    >
+    <a routerLink="/clan" routerLinkActive="active"
+      ><app-icon name="clan" /><span class="label">Le clan</span></a
+    >
+  </nav>
+
+  <div class="account">
+    <app-faction-toggle />
+    <span
+      class="status"
+      [class]="chat.status()"
+      [title]="chat.status() === 'connected' ? 'Synchronisé' : 'Désynchronisé, reconnexion…'"
+    >
+      <span class="visually-hidden">{{
+        chat.status() === 'connected' ? 'Synchronisé' : 'Désynchronisé'
+      }}</span>
+    </span>
+    <app-user-menu (logout)="logout()" />
+  </div>
+</header>
+
+<div class="workspace">
+  <main class="content">
+    <router-outlet />
+  </main>
+  @switch (panels.active()) {
+    @case ('chat') {
+      <app-chat-panel
+        id="chat-panel"
+        class="side-panel"
+        role="complementary"
+        aria-labelledby="chat-panel-title"
+        (keydown.escape)="panels.close('chat')"
+      />
+    }
+    @case ('links') {
+      <app-links-panel
+        id="links-panel"
+        class="side-panel"
+        role="complementary"
+        aria-labelledby="links-panel-title"
+        (keydown.escape)="panels.close('links')"
+      />
+    }
+  }
+  <!-- One tab per sidebar on the right edge: open, close, or switch -->
+  <nav class="edge-tabs" aria-label="Panneaux latéraux">
+    <button
+      #chatTab
+      class="edge-tab"
+      type="button"
+      aria-controls="chat-panel"
+      [attr.aria-expanded]="panels.active() === 'chat'"
+      [class.active]="panels.active() === 'chat'"
+      [title]="panels.active() === 'chat' ? 'Fermer la messagerie' : 'Ouvrir la messagerie'"
+      (click)="panels.toggle('chat')"
+    >
+      <app-icon name="messages" /><span class="label">Messages</span>
+      @if (chat.totalUnread() > 0) {
+        <span class="badge"
+          >{{ chat.totalUnread() }}<span class="visually-hidden"> non lus</span></span
+        >
+      }
+    </button>
+    <button
+      #linksTab
+      class="edge-tab"
+      type="button"
+      aria-controls="links-panel"
+      [attr.aria-expanded]="panels.active() === 'links'"
+      [class.active]="panels.active() === 'links'"
+      [title]="
+        panels.active() === 'links' ? 'Fermer les liens' : 'Ouvrir les liens de mes branches'
+      "
+      (click)="panels.toggle('links')"
+    >
+      <app-icon name="links" /><span class="label">Liens</span>
+    </button>
+  </nav>
+</div>
+
+<app-call-invitations />
+<app-member-card />

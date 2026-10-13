@@ -1,0 +1,134 @@
+@if (status(); as s) {
+  <p [class]="s.kind" [attr.role]="s.kind === 'error' ? 'alert' : 'status'">{{ s.message }}</p>
+}
+
+@if (view() === 'signups') {
+  <section class="card">
+    <h2>Demandes d'inscription</h2>
+    @if (loaded() && signups().length === 0) {
+      <p class="meta">Aucune demande en attente.</p>
+    }
+    <ul class="people">
+      @for (user of signups(); track user.id) {
+        <li>
+          <app-avatar [member]="user" [size]="40" />
+          <span class="who">
+            <strong>{{ user.displayName }}</strong>
+            <span class="meta">{{ user.username }} · {{ user.email }}</span>
+            <span class="meta">Demande du {{ since(user.createdAt) }}</span>
+          </span>
+          <span class="actions">
+            <button class="btn" type="button" (click)="approve(user)" [disabled]="busy() !== null">
+              <app-icon name="approve" /> Valider
+            </button>
+            <button
+              class="btn btn-ghost"
+              type="button"
+              (click)="reject(user)"
+              [disabled]="busy() !== null"
+            >
+              <app-icon name="reject" /> Refuser
+            </button>
+          </span>
+        </li>
+      }
+    </ul>
+  </section>
+} @else {
+  <section class="card">
+    <h2>Membres du clan ({{ members().length }})</h2>
+    <ul class="people">
+      @for (user of members(); track user.id) {
+        <li>
+          <app-avatar [member]="user" [size]="40" />
+          <span class="who">
+            <a [routerLink]="['/members', user.id]" [appMemberCard]="user.id"
+              ><strong>{{ user.displayName }}</strong></a
+            >
+            <span class="meta">{{ user.username }} · {{ user.email ?? 'pas d’e-mail' }}</span>
+          </span>
+          <span class="actions">
+            <label class="visually-hidden" [for]="'role-' + user.id"
+              >Rôle de {{ user.displayName }}</label
+            >
+            <select
+              [id]="'role-' + user.id"
+              [value]="user.role"
+              (change)="changeRole(user, roleSelect)"
+              #roleSelect
+              [disabled]="busy() !== null"
+            >
+              <option value="member">Membre</option>
+              <option value="leader">Dirigeant</option>
+            </select>
+            @if (user.id !== me()?.id) {
+              <button
+                class="link danger"
+                type="button"
+                (click)="remove(user)"
+                [disabled]="busy() !== null"
+              >
+                <app-icon name="remove" /> Retirer
+              </button>
+            }
+          </span>
+        </li>
+      }
+    </ul>
+  </section>
+
+  <form class="card" [formGroup]="addForm" (ngSubmit)="add()" novalidate>
+    <h2>Ajouter un membre</h2>
+    <p class="meta">
+      Le compte est actif tout de suite, sans validation. Communiquez-lui son identifiant et son mot
+      de passe.
+    </p>
+    <div class="grid">
+      <div class="field">
+        <label for="add-name">Pseudo</label>
+        <input id="add-name" formControlName="displayName" required autocomplete="off" />
+      </div>
+      <div class="field">
+        <label for="add-username">Identifiant de connexion</label>
+        <input
+          id="add-username"
+          formControlName="username"
+          required
+          aria-describedby="add-username-hint"
+          autocomplete="off"
+          autocapitalize="none"
+          spellcheck="false"
+        />
+        <span class="hint" id="add-username-hint">{{ usernameHint }}</span>
+      </div>
+      <div class="field">
+        <label for="add-email">E-mail (facultatif)</label>
+        <input id="add-email" type="email" formControlName="email" autocomplete="off" />
+      </div>
+      <div class="field">
+        <label for="add-password">Mot de passe</label>
+        <input
+          id="add-password"
+          type="text"
+          formControlName="password"
+          required
+          autocomplete="new-password"
+          spellcheck="false"
+          [attr.minlength]="passwordMinLength"
+          aria-describedby="add-password-hint"
+        />
+        <span class="hint" id="add-password-hint"
+          >Au moins {{ passwordMinLength }} caractères, affiché pour le noter.</span
+        >
+      </div>
+      <div class="field">
+        <label for="add-role">Rôle</label>
+        <select id="add-role" formControlName="role">
+          <option value="member">Membre</option>
+          <option value="leader">Dirigeant</option>
+        </select>
+      </div>
+    </div>
+    <button class="btn" type="submit" [disabled]="busy() !== null">Ajouter</button>
+  </form>
+}

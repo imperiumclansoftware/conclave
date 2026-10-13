@@ -1,0 +1,343 @@
+<div class="page admin">
+  <h1>Administration</h1>
+
+  <div
+    class="tabs"
+    role="tablist"
+    aria-label="Sections de l'administration"
+    (keydown)="onTabKey($event)"
+  >
+    @for (t of tabs; track t.id) {
+      <button
+        [id]="'tab-' + t.id"
+        role="tab"
+        type="button"
+        [attr.aria-selected]="tab() === t.id"
+        [attr.aria-controls]="'panel-' + t.id"
+        [tabindex]="tab() === t.id ? 0 : -1"
+        [class.active]="tab() === t.id"
+        (click)="selectTab(t.id)"
+      >
+        <app-icon [name]="t.icon" /> {{ t.label }}
+        @if (t.id === 'signups' && signups.count() > 0) {
+          <span class="badge">{{ signups.count() }}</span>
+        }
+      </button>
+    }
+  </div>
+
+  @let s = settings();
+
+  <!-- Members -->
+  @if (tab() === 'signups' || tab() === 'members') {
+    <section [id]="'panel-' + tab()" role="tabpanel" [attr.aria-labelledby]="'tab-' + tab()">
+      <app-admin-members [view]="tab() === 'signups' ? 'signups' : 'members'" />
+      @if (tab() === 'signups') {
+        <app-admin-branch-requests />
+      }
+    </section>
+  }
+
+  <!-- Branches -->
+  @if (tab() === 'branches') {
+    <section id="panel-branches" role="tabpanel" aria-labelledby="tab-branches">
+      <app-admin-branches />
+    </section>
+  }
+
+  <!-- General -->
+  <section
+    id="panel-general"
+    role="tabpanel"
+    aria-labelledby="tab-general"
+    [hidden]="tab() !== 'general'"
+  >
+    @if (s) {
+      <form class="card narrow" [formGroup]="generalForm" (ngSubmit)="saveGeneral()" novalidate>
+        <h2>Général</h2>
+        <div class="field">
+          <label for="clan-name">Nom du clan</label>
+          <input
+            id="clan-name"
+            formControlName="clanName"
+            required
+            maxlength="100"
+            autocomplete="off"
+          />
+        </div>
+        <div class="field">
+          <label for="app-url"
+            >Adresse publique de l'application
+            @if (s.general.appUrl.source === 'env') {
+              <span class="source">.env</span>
+            }
+          </label>
+          <input
+            id="app-url"
+            type="url"
+            formControlName="appUrl"
+            autocomplete="off"
+            spellcheck="false"
+            aria-describedby="app-url-hint"
+          />
+          <span class="hint" id="app-url-hint"
+            >Utilisée pour les liens des e-mails (connexion, mot de passe oublié…).</span
+          >
+          @if (generalForm.controls.appUrl.value !== suggestedAppUrl) {
+            <button class="link" type="button" (click)="useSuggestedAppUrl()">
+              Utiliser {{ suggestedAppUrl }}
+            </button>
+          }
+        </div>
+        @if (generalStatus(); as st) {
+          <p [class]="st.kind" [attr.role]="st.kind === 'error' ? 'alert' : 'status'">
+            {{ st.message }}
+          </p>
+        }
+        <button class="btn" type="submit" [disabled]="busy()">Enregistrer</button>
+      </form>
+    }
+  </section>
+
+  <!-- Mail -->
+  <section id="panel-mail" role="tabpanel" aria-labelledby="tab-mail" [hidden]="tab() !== 'mail'">
+    @if (s) {
+      <app-admin-mail [mail]="s.mail" (saved)="apply($event)" />
+    }
+  </section>
+
+  <!-- Discord -->
+  <section
+    id="panel-discord"
+    role="tabpanel"
+    aria-labelledby="tab-discord"
+    [hidden]="tab() !== 'discord'"
+  >
+    @if (s) {
+      <div class="card gateway" [attr.data-state]="s.discord.gateway.state">
+        <span class="state-dot" aria-hidden="true"></span>
+        <div>
+          <strong>Worker Discord : {{ gatewayLabel(s.discord.gateway) }}</strong>
+          @if (s.discord.gateway.state === 'stopped') {
+            <p class="meta">
+              Il écoute les présences et l'occupation des salons de visio. Lancez-le sur le serveur
+              : <code>php bin/console app:discord:gateway</code>
+            </p>
+          } @else if (s.discord.gateway.state === 'waiting-config') {
+            <p class="meta">Il démarrera dès que la configuration ci-dessous sera complète.</p>
+          }
+        </div>
+      </div>
+
+      <div class="columns">
+        <form class="card" [formGroup]="discordForm" (ngSubmit)="saveDiscord()" novalidate>
+          <h2>Application Discord</h2>
+
+          <div class="field">
+            <label for="client-id"
+              >Application ID (Client ID)
+              @if (s.discord.clientId.source === 'env') {
+                <span class="source">.env</span>
+              }
+            </label>
+            <input
+              id="client-id"
+              formControlName="clientId"
+              inputmode="numeric"
+              autocomplete="off"
+              spellcheck="false"
+            />
+          </div>
+
+          <div class="field">
+            <label for="client-secret"
+              >Client Secret
+              @if (s.discord.clientSecret.source === 'env') {
+                <span class="source">.env</span>
+              }
+            </label>
+            <input
+              id="client-secret"
+              type="password"
+              formControlName="clientSecret"
+              autocomplete="new-password"
+              [placeholder]="
+                s.discord.clientSecret.set
+                  ? 'Enregistré (' + s.discord.clientSecret.hint + '), laisser vide pour conserver'
+                  : ''
+              "
+            />
+            @if (s.discord.clientSecret.source === 'admin') {
+              <button class="link" type="button" (click)="clearSecret('clientSecret')">
+                Effacer
+              </button>
+            }
+          </div>
+
+          <div class="field">
+            <label for="bot-token"
+              >Bot Token
+              @if (s.discord.botToken.source === 'env') {
+                <span class="source">.env</span>
+              }
+            </label>
+            <input
+              id="bot-token"
+              type="password"
+              formControlName="botToken"
+              autocomplete="new-password"
+              [placeholder]="
+                s.discord.botToken.set
+                  ? 'Enregistré (' + s.discord.botToken.hint + '), laisser vide pour conserver'
+                  : ''
+              "
+            />
+            @if (s.discord.botToken.source === 'admin') {
+              <button class="link" type="button" (click)="clearSecret('botToken')">Effacer</button>
+            }
+          </div>
+
+          <div class="field">
+            <label for="redirect-uri"
+              >URL de redirection OAuth2
+              @if (s.discord.redirectUri.source === 'env') {
+                <span class="source">.env</span>
+              }
+            </label>
+            <input
+              id="redirect-uri"
+              type="url"
+              formControlName="redirectUri"
+              autocomplete="off"
+              spellcheck="false"
+            />
+            @if (discordForm.controls.redirectUri.value !== suggestedRedirectUri) {
+              <button class="link" type="button" (click)="useSuggestedRedirect()">
+                Utiliser {{ suggestedRedirectUri }}
+              </button>
+            }
+          </div>
+
+          @if (discordStatus(); as st) {
+            <p [class]="st.kind" [attr.role]="st.kind === 'error' ? 'alert' : 'status'">
+              {{ st.message }}
+            </p>
+          }
+          <div class="actions">
+            <button class="btn" type="submit" [disabled]="busy()">Enregistrer</button>
+            <button class="btn btn-ghost" type="button" (click)="testDiscord()" [disabled]="busy()">
+              Tester la connexion
+            </button>
+          </div>
+
+          @if (discordCheck(); as check) {
+            <ul class="checks" aria-label="Résultat du test">
+              @for (c of check.checks; track c.label) {
+                <li [class.ok]="c.ok">
+                  <span aria-hidden="true">{{ c.ok ? '✓' : '✗' }}</span>
+                  <strong>{{ c.label }}</strong>
+                  @if (c.detail) {
+                    : {{ c.detail }}
+                  }
+                  <span class="visually-hidden">{{ c.ok ? 'réussi' : 'échec' }}</span>
+                </li>
+              }
+            </ul>
+          }
+        </form>
+
+        <aside class="card steps">
+          <h2>Mise en place</h2>
+          <ol>
+            <li>
+              Créez une application sur le
+              <a
+                href="https://discord.com/developers/applications"
+                target="_blank"
+                rel="noopener noreferrer"
+                >portail développeur Discord ↗</a
+              >.
+            </li>
+            <li>
+              <strong>OAuth2</strong> : copiez le <em>Client ID</em> et le <em>Client Secret</em>,
+              ajoutez la redirection <code>{{ suggestedRedirectUri }}</code
+              >.
+            </li>
+            <li>
+              <strong>Bot</strong> : générez le <em>Token</em> et activez
+              <em>Presence Intent</em> (Privileged Gateway Intents).
+            </li>
+            <li>Enregistrez ici, puis « Tester la connexion ».</li>
+            <li>Connectez ensuite le serveur Discord du clan ci-dessous.</li>
+          </ol>
+        </aside>
+      </div>
+      <app-discord-card scope="server" />
+    }
+  </section>
+
+  <!-- Game catalog -->
+  <section
+    id="panel-catalog"
+    role="tabpanel"
+    aria-labelledby="tab-catalog"
+    [hidden]="tab() !== 'catalog'"
+  >
+    @if (s) {
+      <form class="card narrow" [formGroup]="rawgForm" (ngSubmit)="saveRawg()" novalidate>
+        <h2>RAWG (toutes plateformes)</h2>
+        <p class="meta">
+          Sans clé, la recherche de jeux utilise Steam : descriptions en français mais jeux PC
+          uniquement. Une clé gratuite
+          <a href="https://rawg.io/apidocs" target="_blank" rel="noopener noreferrer">RAWG ↗</a>
+          ajoute les consoles.
+        </p>
+        <div class="field">
+          <label for="rawg-key"
+            >Clé API
+            @if (s.rawg.apiKey.source === 'env') {
+              <span class="source">.env</span>
+            }
+          </label>
+          <input
+            id="rawg-key"
+            type="password"
+            formControlName="apiKey"
+            autocomplete="new-password"
+            spellcheck="false"
+            [placeholder]="
+              s.rawg.apiKey.set ? 'Enregistrée (' + s.rawg.apiKey.hint + ')' : '32 caractères'
+            "
+          />
+        </div>
+        @if (rawgStatus(); as st) {
+          <p [class]="st.kind" [attr.role]="st.kind === 'error' ? 'alert' : 'status'">
+            {{ st.message }}
+          </p>
+        }
+        <div class="actions">
+          <button class="btn" type="submit" [disabled]="busy()">Enregistrer</button>
+          <button class="btn btn-ghost" type="button" (click)="testRawg()" [disabled]="busy()">
+            Tester
+          </button>
+          @if (s.rawg.apiKey.source === 'admin') {
+            <button class="link" type="button" (click)="saveRawg(true)">Retirer la clé</button>
+          }
+        </div>
+        @if (rawgCheck(); as check) {
+          <ul class="checks">
+            @for (c of check.checks; track c.label) {
+              <li [class.ok]="c.ok">
+                <span aria-hidden="true">{{ c.ok ? '✓' : '✗' }}</span>
+                <strong>{{ c.label }}</strong>
+                @if (c.detail) {
+                  : {{ c.detail }}
+                }
+              </li>
+            }
+          </ul>
+        }
+      </form>
+    }
+  </section>
+</div>

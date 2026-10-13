@@ -1,0 +1,442 @@
+<main class="card terms">
+  <header>
+    <p class="back">
+      <a [routerLink]="loggedIn ? '/' : '/login'"
+        >← {{ loggedIn ? 'Retour à l’application' : 'Retour à la connexion' }}</a
+      >
+    </p>
+    <h1>Politique de confidentialité</h1>
+    <p class="meta">
+      Application privée du clan <strong>{{ clanName() }}</strong> · Dernière mise à jour :
+      {{ updatedAt }}
+    </p>
+  </header>
+
+  <p>
+    Cette politique explique quelles données personnelles l'application du clan
+    <strong>{{ clanName() }}</strong> traite, pourquoi, avec qui elles sont partagées, combien de
+    temps elles sont conservées et comment exercer vos droits, conformément au Règlement général sur
+    la protection des données (RGPD) et à la loi « Informatique et libertés ».
+  </p>
+  <p>
+    <strong>En bref :</strong> l'application est privée, gratuite et sans publicité. Elle ne
+    collecte que ce qui est nécessaire à son fonctionnement, ne vend ni ne loue aucune donnée, et
+    n'utilise aucun outil de suivi ou de mesure d'audience.
+  </p>
+
+  <nav aria-label="Sommaire">
+    <ol>
+      <li><a [routerLink]="[]" fragment="responsable">Responsable du traitement</a></li>
+      <li><a [routerLink]="[]" fragment="donnees">Données collectées</a></li>
+      <li><a [routerLink]="[]" fragment="finalites">Finalités et bases légales</a></li>
+      <li><a [routerLink]="[]" fragment="destinataires">Destinataires et services tiers</a></li>
+      <li><a [routerLink]="[]" fragment="transferts">Transferts hors de l'Union européenne</a></li>
+      <li><a [routerLink]="[]" fragment="conservation">Durées de conservation</a></li>
+      <li><a [routerLink]="[]" fragment="securite">Sécurité</a></li>
+      <li><a [routerLink]="[]" fragment="cookies">Cookies et stockage local</a></li>
+      <li><a [routerLink]="[]" fragment="droits">Vos droits</a></li>
+      <li><a [routerLink]="[]" fragment="mineurs">Mineurs</a></li>
+      <li><a [routerLink]="[]" fragment="modifications">Modifications</a></li>
+    </ol>
+  </nav>
+
+  <section id="responsable">
+    <h2>1. Responsable du traitement</h2>
+    <p>
+      Les données sont traitées par les <strong>dirigeants du clan {{ clanName() }}</strong
+      >, qui administrent bénévolement l'application dans un cadre privé et non commercial. Pour
+      toute question relative à vos données, contactez un dirigeant via la messagerie de
+      l'application
+      @if (loggedIn) {
+        ou depuis la page <a routerLink="/clan">Le clan</a>
+      }
+      .
+    </p>
+  </section>
+
+  <section id="donnees">
+    <h2>2. Données collectées</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Catégorie</th>
+            <th scope="col">Données</th>
+            <th scope="col">Caractère</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Compte</td>
+            <td>
+              Identifiant de connexion, pseudo, adresse e-mail, mot de passe (enregistré uniquement
+              sous forme hachée, jamais en clair), rôle (membre ou dirigeant), statut et dates
+              d'inscription et de validation
+            </td>
+            <td>Obligatoire</td>
+          </tr>
+          <tr>
+            <td>Profil</td>
+            <td>
+              Avatar (image envoyée), présentation, identifiants de jeu (PSN, Xbox, Steam, Nintendo,
+              Epic, Battle.net), thème choisi (Confrérie, Ordre ou réglage de l'appareil)
+            </td>
+            <td>Facultatif</td>
+          </tr>
+          <tr>
+            <td>Gravatar</td>
+            <td>
+              Empreinte (SHA-256) de l'adresse e-mail de votre compte Gravatar ; l'adresse saisie
+              n'est pas conservée
+            </td>
+            <td>Facultatif</td>
+          </tr>
+          <tr>
+            <td>Messagerie</td>
+            <td>Messages échangés, conversations, état de lecture</td>
+            <td>Selon votre usage</td>
+          </tr>
+          <tr>
+            <td>Présence</td>
+            <td>Date de dernière activité dans l'application, onglet actif ou en arrière-plan</td>
+            <td>Automatique</td>
+          </tr>
+          <tr>
+            <td>Jeux</td>
+            <td>Jeux pratiqués et plateformes utilisées</td>
+            <td>Facultatif</td>
+          </tr>
+          <tr>
+            <td>Visioconférences</td>
+            <td>Titre, créateur, participants invités, membres connectés au salon, dates</td>
+            <td>Selon votre usage</td>
+          </tr>
+          <tr>
+            <td>Discord</td>
+            <td>
+              Si vous liez votre compte : identifiant, pseudo et avatar Discord, statut (en ligne,
+              inactif…), activité en cours (par exemple le jeu lancé), présence sur le serveur du
+              clan
+            </td>
+            <td>Facultatif</td>
+          </tr>
+          <tr>
+            <td>Données techniques</td>
+            <td>
+              Journaux du serveur (adresse IP, date, page demandée, erreurs), utilisés pour la
+              sécurité et le diagnostic
+            </td>
+            <td>Automatique</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p>
+      L'application ne collecte <strong>aucune donnée sensible</strong> (santé, opinions, etc.),
+      aucune donnée bancaire et aucune géolocalisation. Évitez de partager de telles informations
+      dans vos messages.
+    </p>
+  </section>
+
+  <section id="finalites">
+    <h2>3. Finalités et bases légales</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Finalité</th>
+            <th scope="col">Base légale</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Créer et gérer votre compte, valider votre inscription</td>
+            <td>Exécution des conditions d'utilisation</td>
+          </tr>
+          <tr>
+            <td>Messagerie, présence, ludothèque, profils, visioconférences</td>
+            <td>Exécution des conditions d'utilisation</td>
+          </tr>
+          <tr>
+            <td>
+              E-mails de service : validation ou refus d'inscription, mot de passe oublié, alertes
+              aux dirigeants
+            </td>
+            <td>Exécution des conditions d'utilisation</td>
+          </tr>
+          <tr>
+            <td>Liaison Discord, utilisation de Gravatar</td>
+            <td>Consentement, que vous pouvez retirer à tout moment depuis votre profil</td>
+          </tr>
+          <tr>
+            <td>Sécurité, prévention des abus, diagnostic des pannes</td>
+            <td>Intérêt légitime du clan à protéger l'application</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Aucune décision automatisée ni aucun profilage n'est réalisé à partir de vos données.</p>
+  </section>
+
+  <section id="destinataires">
+    <h2>4. Destinataires et services tiers</h2>
+    <h3>Au sein du clan</h3>
+    <ul>
+      <li>
+        Les <strong>membres</strong> voient votre profil (pseudo, avatar, présentation, identifiants
+        de jeu), votre présence et vos jeux ;
+      </li>
+      <li>
+        les <strong>participants d'une conversation</strong> sont seuls à en voir les messages ;
+      </li>
+      <li>
+        les <strong>dirigeants</strong> voient en plus votre adresse e-mail et les demandes
+        d'inscription.
+      </li>
+    </ul>
+    <h3>Services extérieurs</h3>
+    <ul>
+      <li>l'<strong>hébergeur</strong> du serveur de l'application ;</li>
+      <li>
+        le <strong>service d'envoi d'e-mails</strong> choisi par les dirigeants, qui reçoit votre
+        adresse et le contenu des e-mails de service ;
+      </li>
+      <li>
+        <strong>Discord</strong> (Discord Inc.), si vous liez votre compte : création des salons de
+        visio privés et lecture de votre statut ;
+      </li>
+      <li>
+        <strong>Gravatar</strong> (Automattic Inc.), si vous l'utilisez : votre avatar est chargé
+        depuis gravatar.com, qui voit alors l'adresse IP des visiteurs ;
+      </li>
+      <li>
+        <strong>Steam</strong> (Valve) et <strong>RAWG</strong> : seuls les termes de recherche de
+        jeux leur sont transmis par le serveur ; les jaquettes et captures d'écran sont chargées
+        depuis leurs serveurs.
+      </li>
+    </ul>
+    <p>
+      Ces services appliquent leurs propres politiques de confidentialité.
+      <strong>Aucune donnée n'est vendue, louée ou cédée</strong> à des fins commerciales ou
+      publicitaires.
+    </p>
+  </section>
+
+  <section id="transferts">
+    <h2>5. Transferts hors de l'Union européenne</h2>
+    <p>
+      Discord, Gravatar (Automattic) et Steam (Valve) sont établis aux États-Unis. Lorsque vous
+      utilisez les fonctions qui s'appuient sur eux, certaines données peuvent y être transférées.
+      Ces transferts sont encadrés par les garanties que ces sociétés mettent en place, par exemple
+      le cadre de protection des données UE–États-Unis (Data Privacy Framework) ou des clauses
+      contractuelles types de la Commission européenne. Vous pouvez éviter ces transferts en
+      n'activant pas Discord ni Gravatar.
+    </p>
+  </section>
+
+  <section id="conservation">
+    <h2>6. Durées de conservation</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Données</th>
+            <th scope="col">Durée</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Compte, profil, jeux</td>
+            <td>
+              Tant que le compte existe ; supprimés quand vous quittez le clan ou qu'un dirigeant
+              retire le compte
+            </td>
+          </tr>
+          <tr>
+            <td>Demande d'inscription refusée</td>
+            <td>Supprimée immédiatement, après l'envoi d'un e-mail vous en informant</td>
+          </tr>
+          <tr>
+            <td>Messages</td>
+            <td>Tant que les comptes de leurs auteurs existent</td>
+          </tr>
+          <tr>
+            <td>Avatar envoyé</td>
+            <td>Jusqu'à ce que vous le remplaciez ou le retiriez</td>
+          </tr>
+          <tr>
+            <td>Présence</td>
+            <td>Seule la dernière activité est gardée, remplacée en continu</td>
+          </tr>
+          <tr>
+            <td>Visioconférences</td>
+            <td>
+              Salon Discord supprimé à la fin de l'appel ; historique (titre, participants, dates)
+              conservé tant que les comptes existent
+            </td>
+          </tr>
+          <tr>
+            <td>Données Discord</td>
+            <td>Jusqu'à ce que vous déliiez votre compte Discord</td>
+          </tr>
+          <tr>
+            <td>Lien « mot de passe oublié »</td>
+            <td>Valable 1 heure et une seule fois ; il n'est pas enregistré</td>
+          </tr>
+          <tr>
+            <td>Journaux techniques</td>
+            <td>12 mois au plus</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="securite">
+    <h2>7. Sécurité</h2>
+    <ul>
+      <li>les échanges avec l'application sont chiffrés (HTTPS) ;</li>
+      <li>
+        les mots de passe sont hachés avec un algorithme dédié et ne sont jamais lisibles, même par
+        les dirigeants ;
+      </li>
+      <li>
+        les secrets de configuration (accès au service d'e-mail, à Discord…) sont chiffrés en base
+        de données ;
+      </li>
+      <li>
+        l'accès à l'application est réservé aux comptes validés, et les sessions expirent
+        automatiquement ;
+      </li>
+      <li>les salons de visio Discord ne sont visibles que des participants invités.</li>
+    </ul>
+    <p>
+      Aucun système n'étant infaillible, en cas de violation de données présentant un risque pour
+      vos droits, les dirigeants vous en informeront et prendront les mesures nécessaires.
+    </p>
+  </section>
+
+  <section id="cookies">
+    <h2>8. Cookies et stockage local</h2>
+    <p>
+      L'application n'utilise
+      <strong>aucun cookie publicitaire, de réseau social ou de mesure d'audience</strong>.
+    </p>
+    <h3>Éléments indispensables (sans consentement)</h3>
+    <p>
+      Ils sont strictement nécessaires au fonctionnement de l'application et exemptés de
+      consentement :
+    </p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th scope="col">Nom</th>
+            <th scope="col">Type</th>
+            <th scope="col">Utilité</th>
+            <th scope="col">Durée</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>clan-app.token</code></td>
+            <td>Stockage local</td>
+            <td>Vous garder connecté</td>
+            <td>Jusqu'à la déconnexion (7 jours au plus)</td>
+          </tr>
+          <tr>
+            <td><code>color-scheme</code></td>
+            <td>Stockage local</td>
+            <td>Mémoriser votre camp (Assassins ou Templiers), si vous en avez choisi un</td>
+            <td>Jusqu'à ce que vous changiez de camp</td>
+          </tr>
+          <tr>
+            <td><code>cookie-consent</code></td>
+            <td>Stockage local</td>
+            <td>Mémoriser vos choix sur les cookies et contenus externes</td>
+            <td>6 mois, puis votre choix vous est redemandé</td>
+          </tr>
+          <tr>
+            <td>
+              <code>__Secure-mercure_access_token</code><br />(<code>mercure_access_token</code> en
+              développement)
+            </td>
+            <td>Cookie</td>
+            <td>Recevoir les messages et notifications en temps réel</td>
+            <td>
+              Session du navigateur ; son contenu expire au bout d'1 heure et est renouvelé
+              automatiquement
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Contenus externes (avec votre consentement)</h3>
+    <p>
+      Les avatars Gravatar et Discord, ainsi que les jaquettes et captures d'écran de jeux (Steam,
+      RAWG), sont hébergés par ces services. Les afficher leur transmet votre adresse IP, et ils
+      peuvent déposer leurs propres cookies selon leurs politiques. Ces images ne sont donc chargées
+      <strong>qu'avec votre accord</strong>, donné ou refusé via la bannière affichée lors de votre
+      première visite. Sans accord, les avatars sont remplacés par des initiales et les images de
+      jeux ne sont pas affichées ; le reste de l'application fonctionne normalement. Votre choix est
+      conservé 6 mois.
+    </p>
+    <p>Vous pouvez modifier votre choix à tout moment : <app-manage-cookies />.</p>
+  </section>
+
+  <section id="droits">
+    <h2>9. Vos droits</h2>
+    <p>Vous disposez des droits suivants sur vos données :</p>
+    <ul>
+      <li>
+        <strong>accès</strong> et <strong>rectification</strong> : la plupart des informations sont
+        consultables et modifiables directement depuis votre profil ;
+      </li>
+      <li>
+        <strong>effacement</strong> : vous pouvez demander la suppression de votre compte et de vos
+        données ;
+      </li>
+      <li>
+        <strong>retrait du consentement</strong> : déliez votre compte Discord ou retirez votre
+        Gravatar depuis votre profil, à tout moment ;
+      </li>
+      <li>
+        <strong>limitation</strong>, <strong>opposition</strong> et <strong>portabilité</strong> de
+        vos données ;
+      </li>
+      <li>définir des <strong>directives</strong> sur le sort de vos données après votre décès.</li>
+    </ul>
+    <p>
+      Pour exercer ces droits, adressez-vous à un dirigeant du clan. Une réponse vous sera apportée
+      dans un délai d'un mois. Si vous estimez que vos droits ne sont pas respectés, vous pouvez
+      introduire une réclamation auprès de la CNIL (<a
+        href="https://www.cnil.fr/fr/plaintes"
+        target="_blank"
+        rel="noopener noreferrer"
+        >cnil.fr ↗</a
+      >).
+    </p>
+  </section>
+
+  <section id="mineurs">
+    <h2>10. Mineurs</h2>
+    <p>
+      Les mineurs de moins de 15 ans ne peuvent s'inscrire qu'avec l'accord d'un titulaire de
+      l'autorité parentale, qui peut exercer leurs droits en leur nom. L'utilisation de Discord est
+      soumise à l'âge minimum fixé par Discord.
+    </p>
+  </section>
+
+  <section id="modifications">
+    <h2>11. Modifications</h2>
+    <p>
+      Cette politique peut évoluer, notamment si de nouvelles fonctions sont ajoutées. La date de
+      dernière mise à jour figure en haut de cette page ; en cas de changement important, les
+      membres en sont informés dans l'application.
+    </p>
+  </section>
+
+  <p class="related">
+    Voir aussi les <a routerLink="/conditions-utilisation">conditions d'utilisation</a>.
+  </p>
+</main>

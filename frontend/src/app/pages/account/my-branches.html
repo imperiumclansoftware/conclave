@@ -1,0 +1,99 @@
+<section class="card" aria-labelledby="my-branches-title">
+  <h2 id="my-branches-title">Mes branches</h2>
+  <p class="meta intro">
+    Rejoignez les branches qui vous concernent, autant que vous voulez. Certaines demandent la
+    validation d'un dirigeant.
+    @if (branches.branches().length) {
+      Vous êtes membre de {{ joinedCount() }} branche(s) sur {{ branches.branches().length }}.
+    }
+  </p>
+
+  @if (branches.loaded() && branches.branches().length === 0) {
+    <p class="meta">
+      Aucune branche n'est ouverte pour l'instant.
+      @if (auth.isLeader()) {
+        <a [routerLink]="['/admin']" [queryParams]="{ onglet: 'branches' }">Activer des branches</a>
+      }
+    </p>
+  }
+
+  <ul class="branches">
+    @for (branch of branches.branches(); track branch.id) {
+      @let joined = isIn(branch.memberIds);
+      @let pending = isIn(branch.pendingIds);
+      <li [class.joined]="joined" [class.pending]="pending">
+        @if (branch.crest) {
+          <app-branch-crest [crest]="branch.crest" [size]="44" />
+        } @else {
+          <span class="banner"><app-icon name="branch" /></span>
+        }
+        <div class="branch-text">
+          <strong
+            >{{ branch.name }}
+            @if (branch.publishesNews) {
+              <span class="tag"><app-icon name="news" /> Publie les news</span>
+            }
+            @if (branch.approvalRequired) {
+              <span class="tag">Sur validation</span>
+            }
+          </strong>
+          @if (branch.description) {
+            <span class="description">{{ branch.description }}</span>
+          }
+          <a class="meta" [routerLink]="['/clan']" [queryParams]="{ branche: branch.id }"
+            >{{ branch.memberIds.length }} membre(s)</a
+          >
+          @if (pending) {
+            <span class="status" role="status"
+              >Demande envoyée : un dirigeant doit la valider.</span
+            >
+          }
+        </div>
+        @if (joined) {
+          <button
+            type="button"
+            class="btn btn-ghost"
+            [disabled]="busy() === branch.id"
+            [attr.aria-label]="'Quitter ' + branch.name"
+            (click)="toggle(branch, true)"
+          >
+            Quitter
+          </button>
+        } @else if (pending) {
+          <button
+            type="button"
+            class="btn btn-ghost"
+            [disabled]="busy() === branch.id"
+            [attr.aria-label]="'Annuler la demande pour ' + branch.name"
+            (click)="toggle(branch, true)"
+          >
+            Annuler la demande
+          </button>
+        } @else if (needsApproval(branch)) {
+          <button
+            type="button"
+            class="btn"
+            [disabled]="busy() === branch.id"
+            [attr.aria-label]="'Demander à rejoindre ' + branch.name"
+            (click)="toggle(branch, false)"
+          >
+            Demander à rejoindre
+          </button>
+        } @else {
+          <button
+            type="button"
+            class="btn"
+            [disabled]="busy() === branch.id"
+            [attr.aria-label]="'Rejoindre ' + branch.name"
+            (click)="toggle(branch, false)"
+          >
+            Rejoindre
+          </button>
+        }
+      </li>
+    }
+  </ul>
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+</section>

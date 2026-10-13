@@ -1,0 +1,126 @@
+<section class="card" aria-labelledby="branch-list-title">
+  <h2 id="branch-list-title">
+    Branches du clan ({{ activeCount() }} active(s) sur {{ all().length }})
+  </h2>
+  <p class="meta">
+    Les branches sont proposées par l'application, chacune avec son blason. Activez celles que vous
+    souhaitez ouvrir aux membres. Une branche désactivée est masquée et ne donne plus de droits ;
+    ses membres sont conservés et la retrouvent à sa réactivation.
+  </p>
+  @if (status(); as s) {
+    <p [class]="s.kind" [attr.role]="s.kind === 'error' ? 'alert' : 'status'">{{ s.message }}</p>
+  }
+  <ul class="branches">
+    @for (branch of all(); track branch.id) {
+      <li [class.inactive]="!branch.active">
+        @if (editing() === branch.id) {
+          <form
+            class="edit"
+            [formGroup]="editForm"
+            (ngSubmit)="save(branch)"
+            (keydown.escape)="cancelEdit(branch.id)"
+            novalidate
+          >
+            <div class="row">
+              <div class="field">
+                <label [for]="'branch-name-' + branch.id">Nom</label>
+                <input
+                  [id]="'branch-name-' + branch.id"
+                  formControlName="name"
+                  required
+                  [maxlength]="nameMax"
+                  autocomplete="off"
+                />
+              </div>
+              <div class="field">
+                <label [for]="'branch-description-' + branch.id">Description</label>
+                <input
+                  [id]="'branch-description-' + branch.id"
+                  formControlName="description"
+                  [maxlength]="descriptionMax"
+                  autocomplete="off"
+                />
+              </div>
+            </div>
+            <label class="right"
+              ><input type="checkbox" formControlName="publishesNews" /> Ses membres peuvent publier
+              des news</label
+            >
+            <label class="right"
+              ><input type="checkbox" formControlName="approvalRequired" /> Adhésion validée par un
+              dirigeant</label
+            >
+            @if (editForm.controls.name.touched && editForm.controls.name.invalid) {
+              <p class="error" role="alert">Donnez un nom à la branche.</p>
+            }
+            <div class="actions">
+              <button class="btn" type="submit" [disabled]="busy() === branch.id">
+                Enregistrer
+              </button>
+              <button class="btn btn-ghost" type="button" (click)="cancelEdit(branch.id)">
+                Annuler
+              </button>
+            </div>
+          </form>
+        } @else {
+          @if (branch.crest) {
+            <app-branch-crest [crest]="branch.crest" [size]="40" />
+          } @else {
+            <span class="banner"><app-icon name="branch" /></span>
+          }
+          <div class="branch-text">
+            <strong
+              >{{ branch.name }}
+              @if (!branch.active) {
+                <span class="tag off">Désactivée</span>
+              }
+              @if (branch.publishesNews) {
+                <span class="tag"><app-icon name="news" /> Publie les news</span>
+              }
+              @if (branch.approvalRequired) {
+                <span class="tag">Sur validation</span>
+              }
+            </strong>
+            @if (branch.description) {
+              <span>{{ branch.description }}</span>
+            }
+            <span class="meta"
+              >{{ branch.memberIds.length }} membre(s)
+              @if (branch.memberIds.length) {
+                : {{ memberNames(branch) }}
+              }
+              @if (branch.active && branch.pendingIds.length) {
+                · {{ branch.pendingIds.length }} demande(s) en attente
+              }
+            </span>
+          </div>
+          <div class="actions">
+            <label class="switch">
+              <input
+                type="checkbox"
+                role="switch"
+                [checked]="branch.active"
+                [disabled]="busy() === branch.id"
+                (change)="toggle(branch)"
+                [attr.aria-label]="'Branche ' + branch.name + ' active'"
+              />
+              <span class="track" aria-hidden="true"></span>
+              <span class="state" aria-hidden="true">{{
+                branch.active ? 'Active' : 'Inactive'
+              }}</span>
+            </label>
+            <button
+              class="btn btn-ghost"
+              type="button"
+              [id]="'branch-edit-' + branch.id"
+              (click)="edit(branch)"
+              [attr.aria-label]="'Modifier ' + branch.name"
+            >
+              Modifier
+            </button>
+          </div>
+        }
+      </li>
+    }
+  </ul>
+</section>

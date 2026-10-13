@@ -1,0 +1,94 @@
+<div class="page member">
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+
+  @if (profile(); as p) {
+    <header class="card hero">
+      <app-avatar [member]="p" [size]="120" />
+      <div class="hero-text">
+        <h1>{{ p.displayName }}</h1>
+        <p class="meta">
+          {{ p.role === 'leader' ? 'Dirigeant' : 'Membre' }} · {{ p.username }}
+          @if (p.discordUsername) {
+            · Discord : {{ p.discordUsername }}
+          }
+        </p>
+        <app-presence-badge [userId]="p.id" [withText]="true" />
+        @if (p.branches.length) {
+          <ul class="branches" aria-label="Branches">
+            @for (b of p.branches; track b.id) {
+              <li>
+                <a [routerLink]="['/clan']" [queryParams]="{ branche: b.id }">
+                  @if (b.crest) {
+                    <app-branch-crest [crest]="b.crest" [size]="18" />
+                  } @else {
+                    <app-icon name="branch" />
+                  }
+                  {{ b.name }}</a
+                >
+              </li>
+            }
+          </ul>
+        }
+        @if (p.bio) {
+          <p class="bio">{{ p.bio }}</p>
+        }
+        <div class="actions">
+          @if (isMe()) {
+            <a class="btn btn-ghost" routerLink="/account">Modifier mon profil</a>
+          } @else {
+            <button class="btn" type="button" (click)="panel.open(p.id)">
+              <app-icon name="write" /> Écrire
+            </button>
+          }
+        </div>
+      </div>
+    </header>
+
+    @if (tags().length) {
+      <section class="card" aria-labelledby="tags-title">
+        <h2 id="tags-title">Identifiants de jeu</h2>
+        <dl class="tags">
+          @for (t of tags(); track t.value) {
+            <div>
+              <dt>{{ t.label }}</dt>
+              <dd>
+                <code>{{ t.tag }}</code>
+                <button class="link" type="button" (click)="copy(t.value, t.tag)">
+                  {{ copied() === t.value ? 'Copié ✓' : 'Copier' }}
+                </button>
+              </dd>
+            </div>
+          }
+        </dl>
+      </section>
+    }
+
+    <section aria-labelledby="games-title">
+      <h2 id="games-title" class="section-title">Jeux ({{ p.games.length }})</h2>
+      @if (p.games.length === 0) {
+        <p class="meta">Aucun jeu déclaré pour l'instant.</p>
+      }
+      <ul class="games">
+        @for (g of p.games; track g.id) {
+          <li>
+            <a [routerLink]="['/games', g.game.id]">
+              @if (consent.src(g.game.coverUrl); as cover) {
+                <img
+                  [src]="cover"
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  referrerpolicy="no-referrer"
+                />
+              }
+              <span class="name">{{ g.game.name }}</span>
+            </a>
+            <app-platform-badges [platforms]="g.platforms" />
+          </li>
+        }
+      </ul>
+    </section>
+  }
+</div>

@@ -1,0 +1,6 @@
+{% extends 'emails/base.html.twig' %}
+{% block content %}
+  <p><strong>{{ applicant.displayName }}</strong> (identifiant « {{ applicant.username }} ») demande à rejoindre le clan.</p>
+  <p>Validez ou refusez cette demande dans l'administration.</p>
+  {% if link %}{% include 'emails/_button.html.twig' with { label: 'Voir les demandes' } %}{% endif %}
+{% endblock %}

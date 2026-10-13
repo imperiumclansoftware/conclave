@@ -1,0 +1,102 @@
+<header class="thread-header">
+  <button class="back" type="button" (click)="back.emit()" aria-label="Retour aux conversations">
+    ←
+  </button>
+  <div class="who">
+    <h2>
+      @if (member(); as m) {
+        <a class="profile-link" [routerLink]="['/members', m.id]" [appMemberCard]="m.id">{{
+          m.displayName
+        }}</a>
+      } @else {
+        Conversation
+      }
+    </h2>
+    @if (member(); as m) {
+      <app-presence-badge [userId]="m.id" [withText]="true" />
+    }
+  </div>
+  @if (canCall()) {
+    <button
+      class="btn btn-ghost call"
+      type="button"
+      (click)="call.emit(numericMemberId())"
+      [attr.aria-label]="'Lancer une visio avec ' + member()?.displayName"
+    >
+      <app-icon name="video" />
+    </button>
+  }
+</header>
+
+<div class="messages" #scroller (scroll)="onScroll()">
+  @if (loadError()) {
+    <p class="error notice" role="alert">{{ loadError() }}</p>
+  }
+
+  @if (hasOlder()) {
+    <button
+      class="btn btn-ghost older"
+      type="button"
+      (click)="loadOlder()"
+      [disabled]="loadingOlder()"
+    >
+      {{ loadingOlder() ? 'Chargement…' : 'Messages précédents' }}
+    </button>
+  }
+
+  <ol role="log" aria-live="polite" aria-label="Messages">
+    @for (item of items(); track item.message.id) {
+      @if (item.day) {
+        <li class="day" aria-hidden="true">{{ item.day }}</li>
+      }
+      @if (item.firstUnread) {
+        <li class="unread-divider">Nouveaux messages</li>
+      }
+      <li class="message" [class.mine]="item.mine">
+        <span class="visually-hidden">{{ item.mine ? 'Vous' : member()?.displayName }} :</span>
+        <p class="bubble">{{ item.message.content }}</p>
+        <time [attr.datetime]="item.message.createdAt">{{ time(item.message) }}</time>
+      </li>
+    } @empty {
+      @if (conversationId() !== null) {
+        <li class="notice">Aucun message pour l'instant. Dites bonjour !</li>
+      }
+    }
+  </ol>
+</div>
+
+<form class="composer" (submit)="$event.preventDefault(); send()">
+  @if (sendError()) {
+    <p class="error" role="alert">{{ sendError() }}</p>
+  }
+  <label class="visually-hidden" for="composer">Votre message</label>
+  <textarea
+    id="composer"
+    #composer
+    rows="1"
+    placeholder="Écrire un message…"
+    [value]="draft()"
+    (input)="draft.set(composer.value)"
+    (keydown)="onKeydown($event)"
+    [attr.maxlength]="maxLength"
+    [disabled]="conversationId() === null"
+    enterkeyhint="send"
+  ></textarea>
+  <button
+    class="btn send"
+    type="submit"
+    [disabled]="sending() || !draft().trim() || conversationId() === null"
+  >
+    Envoyer
+    <svg class="blade only-assassin" viewBox="0 0 28 12" aria-hidden="true">
+      <path d="M2 4.5 H5 V7.5 H2 Z M6 5 L22 5.2 L27 6 L22 6.8 L6 7 Z" fill="currentColor" />
+    </svg>
+    <svg class="blade only-templar" viewBox="0 0 28 12" aria-hidden="true">
+      <circle cx="1.8" cy="6" r="1.6" fill="currentColor" />
+      <path
+        d="M3 5.2 H6 V6.8 H3 Z M6 1.5 H7.6 V10.5 H6 Z M8 5 H24 L27 6 L24 7 H8 Z"
+        fill="currentColor"
+      />
+    </svg>
+  </button>
+</form>

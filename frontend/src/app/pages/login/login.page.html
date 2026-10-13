@@ -1,0 +1,64 @@
+<main class="card">
+  <header class="crest">
+    <app-emblem [size]="88" />
+    <p class="app-name">Conclave</p>
+    <p class="motto">
+      <span class="only-assassin">« Dans l'ombre, nous veillons sur la liberté. »</span>
+      <span class="only-templar">« Par l'ordre et la discipline, la paix. »</span>
+    </p>
+  </header>
+  <h1>Connexion</h1>
+  <p class="subtitle">Retrouvez les messages de votre clan.</p>
+
+  <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+    @if (error()) {
+      <p class="error" role="alert">{{ error() }}</p>
+    }
+
+    <div class="field">
+      <label for="username">Identifiant</label>
+      <input
+        id="username"
+        name="username"
+        formControlName="username"
+        required
+        autocomplete="username"
+        autocapitalize="none"
+        autocorrect="off"
+        spellcheck="false"
+      />
+    </div>
+
+    <div class="field">
+      <label for="current-password">Mot de passe</label>
+      <input
+        id="current-password"
+        name="password"
+        formControlName="password"
+        required
+        [type]="showPassword() ? 'text' : 'password'"
+        autocomplete="current-password"
+      />
+    </div>
+    <label class="show-password">
+      <input
+        type="checkbox"
+        [checked]="showPassword()"
+        (change)="showPassword.set(!showPassword())"
+      />
+      Afficher le mot de passe
+    </label>
+
+    <button class="btn" type="submit" [disabled]="pending()">
+      {{ pending() ? 'Connexion…' : 'Se connecter' }}
+    </button>
+  </form>
+
+  <p class="switch"><a routerLink="/forgot-password">Mot de passe oublié ?</a></p>
+  <p class="switch">Pas encore de compte ? <a routerLink="/register">S'inscrire</a></p>
+  <p class="legal">
+    <a routerLink="/conditions-utilisation">Conditions d'utilisation</a> ·
+    <a routerLink="/politique-confidentialite">Confidentialité</a> ·
+    <app-manage-cookies />
+  </p>
+</main>

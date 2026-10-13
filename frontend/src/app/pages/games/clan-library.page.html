@@ -1,0 +1,60 @@
+<div class="page">
+  <h1 class="visually-hidden">Ludothèque du clan</h1>
+  <app-games-tabs />
+
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+
+  <div class="toolbar">
+    <label for="platform-filter">Plateforme</label>
+    <select id="platform-filter" [value]="platform()" (change)="onFilter(filter.value)" #filter>
+      <option value="">Toutes</option>
+      @for (option of games.platforms(); track option.value) {
+        <option [value]="option.value">{{ option.label }}</option>
+      }
+    </select>
+    <span class="meta" role="status">{{ filtered().length }} jeu(x)</span>
+  </div>
+
+  @if (loaded() && library().length === 0) {
+    <p class="meta">
+      Aucun membre du clan n'a encore ajouté de jeu. <a routerLink="/games">Ajoutez les vôtres</a> !
+    </p>
+  }
+
+  <ul class="game-grid">
+    @for (entry of filtered(); track entry.game.id) {
+      <li class="game-card">
+        <a class="cover" [routerLink]="['/games', entry.game.id]">
+          @if (consent.src(entry.game.coverUrl); as cover) {
+            <img
+              [src]="cover"
+              alt=""
+              loading="lazy"
+              decoding="async"
+              referrerpolicy="no-referrer"
+            />
+          }
+          <span class="name">{{ entry.game.name }}</span>
+        </a>
+        <div class="body">
+          <p class="meta">
+            {{ entry.players.length }} joueur{{ entry.players.length > 1 ? 's' : '' }}
+          </p>
+          <ul class="players">
+            @for (player of entry.players; track player.user.id) {
+              <li>
+                <span class="player-name"
+                  >{{ player.user.displayName
+                  }}{{ player.user.id === me()?.id ? ' (vous)' : '' }}</span
+                >
+                <app-platform-badges [platforms]="player.platforms" />
+              </li>
+            }
+          </ul>
+        </div>
+      </li>
+    }
+  </ul>
+</div>

@@ -1,0 +1,173 @@
+:host {
+  display: block;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.admin {
+  display: grid;
+  gap: 1.25rem;
+}
+
+[role='tabpanel'] {
+  display: grid;
+  gap: 1.25rem;
+}
+
+h2 {
+  margin-bottom: 0.9rem;
+  font-size: 1.05rem;
+}
+
+.meta {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.gateway {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+
+  p {
+    margin: 0.25rem 0 0;
+  }
+
+  .state-dot {
+    flex: none;
+    width: 0.8rem;
+    height: 0.8rem;
+    margin-top: 0.35rem;
+    border-radius: 50%;
+    background: var(--text-muted);
+  }
+
+  &[data-state='connected'] .state-dot {
+    background: var(--success);
+    box-shadow: 0 0 6px var(--success);
+  }
+
+  &[data-state='connecting'] .state-dot,
+  &[data-state='waiting-config'] .state-dot {
+    background: #d29922;
+  }
+
+  &[data-state='error'] .state-dot {
+    background: var(--danger);
+  }
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 20rem;
+  gap: 1.25rem;
+  align-items: start;
+
+  @media (max-width: 56rem) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.narrow {
+  max-width: 40rem;
+}
+
+.source {
+  margin-left: 0.4rem;
+  padding: 0 0.35rem;
+  border-radius: 4px;
+  background: var(--surface-muted);
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.link {
+  justify-self: start;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--accent-text);
+  font-size: 0.85rem;
+  text-align: left;
+  text-decoration: underline;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.success {
+  color: var(--success);
+}
+
+code {
+  padding: 0.05rem 0.35rem;
+  border-radius: 4px;
+  background: var(--surface-muted);
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+
+.checks {
+  display: grid;
+  gap: 0.35rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    color: var(--danger);
+  }
+
+  li.ok {
+    color: var(--success);
+  }
+}
+
+.steps ol {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+.users {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  .who {
+    display: grid;
+    flex: 1;
+    min-width: 10rem;
+  }
+}
+
+.hint {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.examples {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+  padding-left: 1.1rem;
+}

@@ -1,0 +1,75 @@
+:host {
+  display: grid;
+  place-items: center;
+  min-height: 100%;
+  padding: 1.5rem 1rem;
+}
+
+.card {
+  width: min(100%, 27rem);
+}
+
+.crest {
+  display: grid;
+  justify-items: center;
+  gap: 0.6rem;
+  margin: -0.25rem 0 1.25rem;
+  text-align: center;
+
+  // Name of the application, under the emblem
+  .app-name {
+    margin: -0.2rem 0 0;
+    color: var(--accent-text);
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+  }
+
+  .motto {
+    font-size: 0.95rem;
+  }
+}
+
+h1 {
+  margin-bottom: 0.25rem;
+  font-size: 1.5rem;
+  text-align: center;
+}
+
+.subtitle {
+  margin: 0 0 1.5rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+.show-password {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: -0.25rem 0 1rem;
+  font-size: 0.95rem;
+}
+
+.btn {
+  width: 100%;
+}
+
+.consent {
+  margin: 0 0 1rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+.legal {
+  margin: 0.75rem 0 0;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.switch {
+  margin: 1.25rem 0 0;
+  color: var(--text-muted);
+  text-align: center;
+}

@@ -1,0 +1,86 @@
+@use 'faction';
+
+// Grain textures generated with SVG noise (no image files)
+$parchment-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .36 0 0 0 0 .25 0 0 0 0 .1 0 0 0 .2 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+$parchment-stains: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='900'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.006' numOctaves='4' seed='4'/%3E%3CfeColorMatrix values='0 0 0 0 .55 0 0 0 0 .38 0 0 0 0 .16 0 0 0 .38 -.08'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23s)'/%3E%3C/svg%3E");
+$stone-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .45 0 0 0 0 .42 0 0 0 .12 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+$stone-blocks: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='900'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.012' numOctaves='5' seed='9'/%3E%3CfeColorMatrix values='0 0 0 0 .28 0 0 0 0 .05 0 0 0 0 .05 0 0 0 .5 -.12'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23s)'/%3E%3C/svg%3E");
+
+:root {
+  color-scheme: light dark;
+
+  &:has(> head > #{faction.$dark-meta}) {
+    color-scheme: dark;
+  }
+  &:has(> head > #{faction.$light-meta}) {
+    color-scheme: light;
+  }
+
+  // ---- Assassins: parchment, white robes, crimson and ink ----
+  --bg: #ece2cb;
+  --bg-layers: #{$parchment-grain}, #{$parchment-stains};
+  --vignette: radial-gradient(ellipse at 50% 40%, transparent 55%, rgb(110 72 28 / 0.28));
+  --surface: rgb(251 247 238 / 0.9);
+  --surface-solid: #fbf7ee;
+  --surface-muted: #e9dfc8;
+  --border: #c9b48e;
+  --border-strong: #231c15;
+  --text: #231c15;
+  --text-muted: #6b5a45;
+  --accent: #a3171d;
+  --accent-strong: #7d1015;
+  --accent-contrast: #fbf7ee;
+  --accent-text: #a3171d;
+  --gold: #b8860b;
+  --ornament: var(--accent);
+  --danger: #8f1d14;
+  --success: #3d6b35;
+  --radius: 6px;
+  --shadow: 0 1px 0 rgb(35 28 21 / 0.06), 0 8px 24px rgb(90 61 30 / 0.14);
+  --focus: 0 0 0 3px color-mix(in srgb, var(--accent) 35%, transparent);
+  --topbar-bg: rgb(251 247 238 / 0.82);
+  --topbar-border: var(--accent);
+  --bubble-mine: var(--accent);
+  --bubble-mine-text: #fbf7ee;
+  --bubble-mine-border: var(--accent-strong);
+  --bubble-other: #fbf7ee;
+  --bubble-other-text: var(--text);
+  --bubble-other-border: var(--border);
+  --sheen: rgb(255 255 255 / 0.55);
+  --font-display: 'Cinzel', 'Trajan Pro', Georgia, serif;
+  --font-body: 'EB Garamond', Garamond, Georgia, 'Times New Roman', serif;
+
+  // ---- Templars: dark stone, blood red and gold ----
+  @include faction.templar-root {
+    --bg: #0e0b0b;
+    --bg-layers: #{$stone-grain}, #{$stone-blocks};
+    --vignette: radial-gradient(ellipse at 50% 35%, transparent 40%, rgb(0 0 0 / 0.75));
+    --surface: rgb(24 20 19 / 0.88);
+    --surface-solid: #181413;
+    --surface-muted: #261e1b;
+    --border: #4b3b2a;
+    --border-strong: #d4af37;
+    --text: #ece3d0;
+    --text-muted: #a99a88;
+    --accent: #b3121b;
+    --accent-strong: #6e0a10;
+    --accent-contrast: #f6e7c1;
+    --accent-text: #d4af37;
+    --gold: #d4af37;
+    --ornament: var(--gold);
+    --danger: #ff8a7a;
+    --success: #8cc96f;
+    --radius: 3px;
+    --shadow: 0 0 0 1px rgb(0 0 0 / 0.4), 0 12px 32px rgb(0 0 0 / 0.55);
+    --focus: 0 0 0 3px color-mix(in srgb, var(--gold) 45%, transparent);
+    --topbar-bg: rgb(14 11 11 / 0.82);
+    --topbar-border: var(--gold);
+    --bubble-mine: linear-gradient(160deg, #b3121b, #6e0a10);
+    --bubble-mine-text: #f6e7c1;
+    --bubble-mine-border: color-mix(in srgb, var(--gold) 55%, transparent);
+    --bubble-other: #221b19;
+    --bubble-other-text: var(--text);
+    --bubble-other-border: var(--border);
+    --sheen: rgb(244 214 128 / 0.45);
+  }
+}

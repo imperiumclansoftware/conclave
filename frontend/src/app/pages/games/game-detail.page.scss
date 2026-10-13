@@ -1,0 +1,193 @@
+@use 'games-shared';
+
+:host {
+  display: block;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.back {
+  display: inline-block;
+  margin-bottom: 1rem;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+
+.hero {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+
+  .cover {
+    width: min(100%, 26rem);
+    aspect-ratio: 460 / 215;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    object-fit: cover;
+  }
+
+  h1 {
+    font-size: clamp(1.5rem, 4vw, 2.2rem);
+  }
+}
+
+.hero-text {
+  display: grid;
+  flex: 1 1 16rem;
+  align-content: start;
+  gap: 0.5rem;
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    margin: 0;
+  }
+}
+
+.genres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    padding: 0.1rem 0.55rem;
+    border-left: 3px solid var(--accent);
+    background: var(--surface);
+    font-size: 0.9rem;
+  }
+}
+
+.columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 20rem;
+  gap: 1.25rem;
+  align-items: start;
+
+  @media (max-width: 52rem) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.main,
+.side {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.card h2 {
+  margin-bottom: 0.75rem;
+  font-size: 1.05rem;
+}
+
+.description {
+  margin: 0;
+  white-space: pre-line;
+}
+
+.shots {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  button {
+    display: block;
+    width: 100%;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface-muted);
+    cursor: zoom-in;
+  }
+
+  img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    transition: scale 0.3s;
+  }
+
+  button:hover img {
+    scale: 1.05;
+  }
+}
+
+.side .actions {
+  align-items: center;
+  margin-top: 0.9rem;
+}
+
+.saved {
+  margin: 0.5rem 0 0;
+  color: var(--success);
+}
+
+.players {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+}
+
+.player {
+  display: grid;
+  flex: 1;
+  gap: 0.25rem;
+}
+
+.player-name {
+  color: var(--text);
+  font-weight: 700;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.lightbox {
+  width: min(96vw, 1280px);
+  max-height: 94vh;
+  padding: 0.5rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--surface-solid);
+  color: var(--text);
+
+  &::backdrop {
+    background: rgb(0 0 0 / 0.8);
+  }
+
+  img {
+    display: block;
+    width: 100%;
+    max-height: calc(94vh - 4.5rem);
+    object-fit: contain;
+  }
+}
+
+.lightbox-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding-top: 0.5rem;
+}

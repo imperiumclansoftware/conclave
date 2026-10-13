@@ -1,0 +1,97 @@
+@use 'faction';
+
+// Page transitions (router view transitions), themed per faction.
+// Assassins: the new page is revealed in slices, like a fresco being uncovered.
+// Templars: the old page sinks into shadow and blood.
+
+::view-transition-group(root) {
+  animation-duration: 0.45s;
+}
+
+::view-transition-old(root) {
+  animation: fresco-hide 0.3s ease-in both;
+}
+
+::view-transition-new(root) {
+  animation: fresco-reveal 0.45s steps(6, end) both;
+}
+
+@keyframes fresco-hide {
+  to {
+    opacity: 0;
+    filter: grayscale(1) blur(2px);
+    translate: -12px 0;
+  }
+}
+
+@keyframes fresco-reveal {
+  from {
+    clip-path: polygon(0 0, 8% 0, 0 30%, 6% 60%, 0 100%, 0 100%, 0 0);
+  }
+  to {
+    clip-path: polygon(0 0, 100% 0, 100% 30%, 100% 60%, 100% 100%, 0 100%, 0 0);
+  }
+}
+
+:root {
+  @include faction.templar-root {
+    &::view-transition-old(root) {
+      animation: templar-sink 0.35s ease-in both;
+    }
+
+    &::view-transition-new(root) {
+      animation: templar-rise 0.4s ease-out 0.05s both;
+    }
+  }
+}
+
+@keyframes templar-sink {
+  to {
+    opacity: 0;
+    filter: brightness(0.35) sepia(1) hue-rotate(-35deg) saturate(4);
+  }
+}
+
+@keyframes templar-rise {
+  from {
+    opacity: 0;
+    scale: 1.015;
+  }
+}
+
+// Changing sides: the new faction spreads from the toggle button
+:root.faction-switch {
+  &::view-transition-old(root) {
+    animation: none;
+  }
+
+  &::view-transition-new(root) {
+    animation: faction-reveal 0.7s cubic-bezier(0.6, 0, 0.3, 1) both;
+  }
+}
+
+@keyframes faction-reveal {
+  from {
+    clip-path: circle(0 at var(--reveal-x, 50%) var(--reveal-y, 0));
+  }
+  to {
+    clip-path: circle(150vmax at var(--reveal-x, 50%) var(--reveal-y, 0));
+  }
+}
+
+// Navigation within a section (e.g. between conversations)
+:root.vt-instant {
+  &::view-transition-group(root),
+  &::view-transition-old(root),
+  &::view-transition-new(root) {
+    animation: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}

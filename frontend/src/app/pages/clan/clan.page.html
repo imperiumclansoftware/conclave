@@ -1,0 +1,133 @@
+<div class="page">
+  <section class="card" aria-labelledby="clan-title">
+    <h1 id="clan-title">{{ chat.me()?.clan?.name }}</h1>
+    <p class="meta intro">
+      {{ everyoneCount() }} membre(s) ·
+      <a [routerLink]="['/account']" [queryParams]="{ onglet: 'branches' }">Choisir mes branches</a>
+      @if (auth.isLeader()) {
+        · <a routerLink="/admin">Gérer les membres</a> ·
+        <a [routerLink]="['/admin']" [queryParams]="{ onglet: 'branches' }">Gérer les branches</a>
+      }
+    </p>
+
+    @if (branches.branches().length) {
+      <div class="tabs" role="tablist" aria-label="Branches du clan" (keydown)="onTabKey($event)">
+        <button
+          id="clan-tab-all"
+          role="tab"
+          type="button"
+          aria-controls="clan-panel"
+          [attr.aria-selected]="!branch()"
+          [tabindex]="!branch() ? 0 : -1"
+          [class.active]="!branch()"
+          (click)="selectTab(null)"
+        >
+          <app-icon name="members" /> Tous <span class="tab-count">{{ tabCount(null) }}</span>
+        </button>
+        @for (b of branches.branches(); track b.id) {
+          <button
+            [id]="'clan-tab-' + b.id"
+            role="tab"
+            type="button"
+            aria-controls="clan-panel"
+            [attr.aria-selected]="branch()?.id === b.id"
+            [tabindex]="branch()?.id === b.id ? 0 : -1"
+            [class.active]="branch()?.id === b.id"
+            (click)="selectTab(b.id)"
+          >
+            @if (b.crest) {
+              <app-branch-crest [crest]="b.crest" [size]="18" />
+            } @else {
+              <app-icon name="branch" />
+            }
+            {{ b.name }} <span class="tab-count">{{ b.memberIds.length }}</span>
+          </button>
+        }
+      </div>
+    }
+    @if (error()) {
+      <p class="error" role="alert">{{ error() }}</p>
+    }
+
+    <div
+      id="clan-panel"
+      role="tabpanel"
+      [attr.aria-labelledby]="
+        branches.branches().length ? 'clan-tab-' + (branch()?.id ?? 'all') : 'clan-title'
+      "
+    >
+      @if (branch(); as b) {
+        <header class="branch-head">
+          @if (b.crest) {
+            <app-branch-crest [crest]="b.crest" [size]="48" />
+          }
+          <div>
+            <h2>
+              {{ b.name }}
+              @if (b.publishesNews) {
+                <span class="tag"><app-icon name="news" /> Publie les news</span>
+              }
+              @if (b.approvalRequired) {
+                <span class="tag">Sur validation</span>
+              }
+            </h2>
+            @if (b.description) {
+              <p class="description">{{ b.description }}</p>
+            }
+          </div>
+        </header>
+      }
+
+      <ul class="members">
+        @for (member of members(); track member.id) {
+          @let isMe = member.id === myId();
+          <li>
+            <app-avatar [member]="member" [size]="40" />
+            <span>
+              <a
+                class="member-name"
+                [routerLink]="['/members', member.id]"
+                [appMemberCard]="member.id"
+                >{{ member.displayName }}
+                @if (isMe) {
+                  (vous)
+                }
+              </a>
+              <span class="meta"
+                >{{ member.role === 'leader' ? 'Dirigeant' : 'Membre' }} ·
+                {{ member.username }}</span
+              >
+              @if (!isMe) {
+                <app-presence-badge [userId]="member.id" [withText]="true" />
+              }
+              @if (!branch()) {
+                @if (branches.byMember().get(member.id); as memberBranches) {
+                  <span class="chips" aria-label="Branches">
+                    @for (mb of memberBranches; track mb.id) {
+                      <span class="chip">
+                        @if (mb.crest) {
+                          <app-branch-crest [crest]="mb.crest" [size]="14" />
+                        }
+                        {{ mb.name }}</span
+                      >
+                    }
+                  </span>
+                }
+              }
+            </span>
+            @if (!isMe) {
+              <button class="btn btn-ghost" type="button" (click)="panel.open(member.id)">
+                <app-icon name="write" /> Écrire
+              </button>
+            }
+          </li>
+        } @empty {
+          <li class="meta empty">
+            Personne dans cette branche pour l'instant.
+            <a [routerLink]="['/account']" [queryParams]="{ onglet: 'branches' }">La rejoindre</a>
+          </li>
+        }
+      </ul>
+    </div>
+  </section>
+</div>

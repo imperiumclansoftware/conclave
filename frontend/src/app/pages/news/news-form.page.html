@@ -1,0 +1,88 @@
+<div class="page">
+  <a class="back" [routerLink]="editing() ? ['/news', id()] : ['/news']"
+    >← {{ editing() ? 'Retour à la news' : 'Toutes les news' }}</a
+  >
+  <h1><app-icon name="publish" /> {{ editing() ? 'Modifier la news' : 'Publier une news' }}</h1>
+
+  @if (loaded()) {
+    <form class="card" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+      <section class="image" aria-labelledby="image-title">
+        <h2 id="image-title" class="label">Image</h2>
+        <div class="preview">
+          @if (preview(); as url) {
+            <img [src]="url" alt="Aperçu de l'image" />
+          } @else {
+            <app-news-cover [seed]="title()" [title]="title()" [clanName]="clanName()" />
+            <span class="badge-default">Visuel par défaut</span>
+          }
+        </div>
+        <div class="image-actions">
+          <label class="btn btn-ghost file">
+            <app-icon name="image" /> {{ preview() ? 'Changer l’image' : 'Ajouter une image' }}
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              (change)="chooseImage(fileInput)"
+              #fileInput
+            />
+          </label>
+          @if (preview()) {
+            <button class="link" type="button" (click)="clearImage()">
+              Utiliser le visuel par défaut
+            </button>
+          }
+        </div>
+        @if (imageError()) {
+          <p class="error" role="alert">{{ imageError() }}</p>
+        } @else {
+          <p class="hint">
+            JPEG, PNG, WebP ou GIF, 8 Mo maximum. Sans image, un visuel aux couleurs du clan est
+            généré à partir du titre.
+          </p>
+        }
+      </section>
+
+      <div class="field">
+        <label for="news-title">Titre</label>
+        <input
+          id="news-title"
+          formControlName="title"
+          required
+          [maxlength]="titleMax"
+          autocomplete="off"
+          aria-describedby="news-title-count"
+        />
+        <span class="hint" id="news-title-count">{{ titleLength() }} / {{ titleMax }}</span>
+      </div>
+      <div class="field">
+        <label for="news-body">Texte</label>
+        <textarea
+          id="news-body"
+          formControlName="body"
+          required
+          rows="12"
+          [maxlength]="bodyMax"
+          aria-describedby="news-body-hint"
+        ></textarea>
+        <span class="hint" id="news-body-hint"
+          >Laissez une ligne vide entre les paragraphes. {{ bodyLength() }} / {{ bodyMax }}</span
+        >
+      </div>
+
+      @if (form.touched && form.invalid) {
+        <p class="error" role="alert">Le titre et le texte sont obligatoires.</p>
+      }
+      @if (error()) {
+        <p class="error" role="alert">{{ error() }}</p>
+      }
+      <div class="actions">
+        <button class="btn" type="submit" [disabled]="busy()">
+          {{ busy() ? 'Enregistrement…' : editing() ? 'Enregistrer' : 'Publier' }}
+        </button>
+        <a class="btn btn-ghost" [routerLink]="editing() ? ['/news', id()] : ['/news']">Annuler</a>
+      </div>
+    </form>
+  } @else if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+</div>

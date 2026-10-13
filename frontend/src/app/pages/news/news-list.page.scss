@@ -1,0 +1,151 @@
+:host {
+  display: block;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.page {
+  display: grid;
+  gap: 1.25rem;
+  width: min(100%, 64rem);
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+
+  h1 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    font-size: 1.5rem;
+  }
+}
+
+.meta {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+
+  .author {
+    color: inherit;
+  }
+}
+
+.card {
+  overflow: hidden;
+  padding: 0;
+}
+
+.cover {
+  display: block;
+  aspect-ratio: 1200 / 630;
+  background: var(--surface-muted);
+
+  img,
+  app-news-cover {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.text {
+  display: grid;
+  align-content: start;
+  gap: 0.5rem;
+  padding: 1rem 1.25rem 1.25rem;
+
+  p {
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+}
+
+h2,
+h3 {
+  margin: 0;
+
+  a {
+    color: var(--text);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--accent-text);
+      text-decoration: underline;
+    }
+  }
+}
+
+h2 {
+  font-size: 1.5rem;
+}
+
+h3 {
+  font-size: 1.1rem;
+}
+
+// The latest news, image beside the text on wide screens
+.featured {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+
+  .text {
+    align-content: center;
+  }
+
+  @media (max-width: 48rem) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.more {
+  justify-self: start;
+  color: var(--accent-text);
+  font-weight: 600;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+  gap: 1.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li,
+  .item {
+    height: 100%;
+  }
+}
+
+.empty {
+  display: grid;
+  justify-items: start;
+  gap: 0.75rem;
+  padding: 1.25rem;
+
+  p {
+    margin: 0;
+  }
+}
+
+.more-news {
+  justify-self: center;
+}
+
+.link {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--accent-text);
+  text-decoration: underline;
+  cursor: pointer;
+}

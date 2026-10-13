@@ -1,0 +1,107 @@
+<div class="page">
+  <header class="head">
+    <h1><app-icon name="news" /> News du clan</h1>
+    @if (auth.user()?.canPublishNews) {
+      <a class="btn" routerLink="/news/nouvelle"><app-icon name="publish" /> Publier une news</a>
+    }
+  </header>
+
+  @if (error()) {
+    <p class="error" role="alert">
+      {{ error() }} <button class="link" type="button" (click)="load()">Réessayer</button>
+    </p>
+  }
+
+  @if (featured(); as n) {
+    <article class="card featured">
+      <a class="cover" [routerLink]="['/news', n.id]" tabindex="-1" aria-hidden="true">
+        @if (n.imageUrl) {
+          <img [src]="n.imageUrl" alt="" />
+        } @else {
+          <app-news-cover [seed]="n.title" [title]="n.title" [clanName]="clanName()" />
+        }
+      </a>
+      <div class="text">
+        <p class="meta">
+          {{ date(n.createdAt) }}
+          @if (n.author) {
+            · par
+            <a
+              class="author"
+              [routerLink]="['/members', n.author.id]"
+              [appMemberCard]="n.author.id"
+              >{{ n.author.displayName }}</a
+            >
+          }
+        </p>
+        <h2>
+          <a [routerLink]="['/news', n.id]">{{ n.title }}</a>
+        </h2>
+        <p>{{ excerpt(n.body, 320) }}</p>
+        <a class="more" [routerLink]="['/news', n.id]"
+          >Lire la suite<span class="visually-hidden"> : {{ n.title }}</span> →</a
+        >
+      </div>
+    </article>
+  }
+
+  @if (others().length) {
+    <ul class="grid">
+      @for (n of others(); track n.id) {
+        <li>
+          <article class="card item">
+            <a class="cover" [routerLink]="['/news', n.id]" tabindex="-1" aria-hidden="true">
+              @if (n.imageUrl) {
+                <img [src]="n.imageUrl" alt="" loading="lazy" />
+              } @else {
+                <app-news-cover [seed]="n.title" [title]="n.title" [clanName]="clanName()" />
+              }
+            </a>
+            <div class="text">
+              <p class="meta">
+                {{ date(n.createdAt) }}
+                @if (n.author) {
+                  ·
+                  <a
+                    class="author"
+                    [routerLink]="['/members', n.author.id]"
+                    [appMemberCard]="n.author.id"
+                    >{{ n.author.displayName }}</a
+                  >
+                }
+              </p>
+              <h3>
+                <a [routerLink]="['/news', n.id]">{{ n.title }}</a>
+              </h3>
+              <p>{{ excerpt(n.body) }}</p>
+            </div>
+          </article>
+        </li>
+      }
+    </ul>
+  }
+
+  @if (!loading() && !error() && news().length === 0) {
+    <section class="card empty">
+      <p>Aucune news pour l'instant.</p>
+      @if (auth.user()?.canPublishNews) {
+        <a class="btn" routerLink="/news/nouvelle"
+          ><app-icon name="publish" /> Publier la première</a
+        >
+      } @else {
+        <p class="meta">
+          Les membres de la branche Communicants publient ici les nouvelles du clan. Pour en faire
+          partie, demandez à la rejoindre dans
+          <a [routerLink]="['/account']" [queryParams]="{ onglet: 'branches' }">votre profil</a> :
+          un dirigeant validera votre demande.
+        </p>
+      }
+    </section>
+  }
+
+  @if (hasMore()) {
+    <button class="btn btn-ghost more-news" type="button" (click)="load()" [disabled]="loading()">
+      {{ loading() ? 'Chargement…' : 'News plus anciennes' }}
+    </button>
+  }
+</div>

@@ -1,0 +1,107 @@
+:host {
+  display: block;
+  padding: 1.5rem 1rem 3rem;
+}
+
+.terms {
+  width: min(100%, 52rem);
+  margin: 0 auto;
+  line-height: 1.65;
+}
+
+.back {
+  margin: 0 0 1rem;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+
+  a {
+    text-decoration: none;
+  }
+}
+
+h1 {
+  font-size: clamp(1.6rem, 4vw, 2.2rem);
+}
+
+.meta {
+  margin: 0.4rem 0 1.5rem;
+  color: var(--text-muted);
+}
+
+nav {
+  margin-bottom: 2rem;
+  padding: 1rem 1.25rem;
+  border-left: 3px solid var(--accent-text);
+  background: var(--surface-muted);
+
+  ol {
+    columns: 2 16rem;
+    margin: 0;
+    padding-left: 1.2rem;
+  }
+}
+
+section {
+  scroll-margin-top: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+h2 {
+  margin-bottom: 0.6rem;
+  color: var(--accent-text);
+  font-size: 1.15rem;
+}
+
+h3 {
+  margin: 1rem 0 0.4rem;
+  font-size: 0.95rem;
+}
+
+p,
+ul {
+  margin: 0 0 0.75rem;
+}
+
+li + li {
+  margin-top: 0.3rem;
+}
+
+// Data tables of the privacy policy
+.table-wrap {
+  overflow-x: auto;
+  margin: 0 0 1rem;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  line-height: 1.45;
+
+  th,
+  td {
+    padding: 0.5rem 0.6rem;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  th {
+    background: var(--surface-muted);
+    font-family: var(--font-display);
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  code {
+    font-size: 0.85rem;
+  }
+}
+
+.related {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.95rem;
+}

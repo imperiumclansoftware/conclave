@@ -1,0 +1,5 @@
+{% extends 'emails/base.html.twig' %}
+{% block content %}
+  <p>Bonne nouvelle : votre inscription a été validée par un dirigeant. Vous pouvez maintenant vous connecter avec votre identifiant « {{ user.username }} ».</p>
+  {% if link %}{% include 'emails/_button.html.twig' with { label: 'Se connecter' } %}{% endif %}
+{% endblock %}

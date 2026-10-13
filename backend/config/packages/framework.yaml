@@ -1,0 +1,46 @@
+# see https://symfony.com/doc/current/reference/configuration/framework.html
+framework:
+    secret: '%env(APP_SECRET)%'
+
+    # Note that the session will be started ONLY if you read or write from it.
+    session: true
+
+    #esi: true
+    #fragments: true
+
+    http_client:
+        scoped_clients:
+            # Game catalogs (see src/Catalog)
+            steam.client:
+                base_uri: 'https://store.steampowered.com'
+                timeout: 8
+                max_duration: 15
+                headers:
+                    User-Agent: 'ClanApp/1.0'
+            discord.client:
+                base_uri: 'https://discord.com/api/v10/'
+                timeout: 8
+                max_duration: 15
+                headers:
+                    User-Agent: 'DiscordBot (https://github.com/clan-app, 1.0)'
+            gravatar.client:
+                base_uri: 'https://gravatar.com/'
+                timeout: 5
+                max_duration: 8
+            rawg.client:
+                base_uri: 'https://api.rawg.io/api/'
+                timeout: 8
+                max_duration: 15
+                headers:
+                    User-Agent: 'ClanApp/1.0'
+
+when@test:
+    framework:
+        test: true
+        session:
+            storage_factory_id: session.storage.factory.mock_file
+        http_client:
+            mock_response_factory: App\Tests\Support\HttpClientMock
+        cache:
+            # Survives between requests of a test (OAuth states); cleared before each test
+            app: cache.adapter.filesystem

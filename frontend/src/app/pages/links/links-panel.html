@@ -1,0 +1,128 @@
+<header class="bar">
+  <h2 id="links-panel-title"><app-icon name="links" /> Liens</h2>
+  <button
+    class="close"
+    type="button"
+    (click)="panels.close('links')"
+    aria-label="Fermer les liens"
+    title="Fermer (Échap)"
+  >
+    ✕
+  </button>
+</header>
+
+<div class="body">
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+
+  @if (links.loaded() && links.groups().length === 0) {
+    <div class="empty">
+      <p>Les liens favoris sont partagés par branche.</p>
+      <p class="meta">Rejoignez des branches pour retrouver ici leurs liens.</p>
+      <a class="btn btn-ghost" [routerLink]="['/account']" [queryParams]="{ onglet: 'branches' }"
+        >Choisir mes branches</a
+      >
+    </div>
+  }
+
+  @for (group of links.groups(); track group.branch.id) {
+    <section class="group" [attr.aria-labelledby]="'links-branch-' + group.branch.id">
+      <h3 [id]="'links-branch-' + group.branch.id">
+        @if (group.branch.crest) {
+          <app-branch-crest [crest]="group.branch.crest" [size]="22" />
+        } @else {
+          <app-icon name="branch" />
+        }
+        {{ group.branch.name }}
+      </h3>
+
+      @if (group.links.length) {
+        <ul>
+          @for (link of group.links; track link.id) {
+            <li>
+              <a [href]="link.url" target="_blank" rel="noopener noreferrer">
+                <span class="initial" aria-hidden="true">{{
+                  link.host.charAt(0).toUpperCase()
+                }}</span>
+                <span class="text">
+                  <span class="title">{{ link.title }}</span>
+                  <span class="host"
+                    >{{ link.host }}
+                    @if (link.addedBy) {
+                      · {{ link.addedBy.displayName }}
+                    }
+                  </span>
+                </span>
+                <span class="visually-hidden">(nouvel onglet)</span>
+              </a>
+              @if (link.canRemove) {
+                <button
+                  class="remove"
+                  type="button"
+                  (click)="remove(link)"
+                  [attr.aria-label]="'Retirer le lien ' + link.title"
+                  title="Retirer"
+                >
+                  <app-icon name="remove" />
+                </button>
+              }
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="meta none">Aucun lien pour l'instant.</p>
+      }
+
+      @if (adding() === group.branch.id) {
+        <form
+          class="add"
+          novalidate
+          (submit)="$event.preventDefault(); add(group.branch.id, url, title)"
+          (keydown.escape)="$event.stopPropagation(); closeForm(group.branch.id)"
+        >
+          <label class="visually-hidden" [for]="'link-url-' + group.branch.id">Adresse</label>
+          <input
+            [id]="'link-url-' + group.branch.id"
+            #url
+            type="url"
+            inputmode="url"
+            required
+            [attr.maxlength]="urlMax"
+            placeholder="https://…"
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <label class="visually-hidden" [for]="'link-title-' + group.branch.id"
+            >Titre (facultatif)</label
+          >
+          <input
+            [id]="'link-title-' + group.branch.id"
+            #title
+            [attr.maxlength]="titleMax"
+            placeholder="Titre (facultatif)"
+            autocomplete="off"
+          />
+          @if (formError()) {
+            <p class="error" role="alert">{{ formError() }}</p>
+          }
+          <div class="actions">
+            <button class="btn" type="submit" [disabled]="busy()">Ajouter</button>
+            <button class="btn btn-ghost" type="button" (click)="closeForm(group.branch.id)">
+              Annuler
+            </button>
+          </div>
+        </form>
+      } @else {
+        <button
+          class="link"
+          type="button"
+          [id]="'link-add-' + group.branch.id"
+          (click)="openForm(group.branch.id)"
+        >
+          + Ajouter un lien<span class="visually-hidden"> à {{ group.branch.name }}</span>
+        </button>
+      }
+    </section>
+  }
+</div>

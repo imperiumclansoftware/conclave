@@ -1,0 +1,278 @@
+<main class="card">
+  <header class="crest">
+    <app-emblem [size]="72" />
+    <p class="app-name">Conclave</p>
+    <p class="kicker">Installation</p>
+  </header>
+
+  @if (step() !== 'done') {
+    <ol class="stepper" aria-label="Étapes de l'installation">
+      @for (s of steps; track s.id; let i = $index) {
+        <li
+          [class.current]="s.id === step()"
+          [class.done]="i < stepIndex()"
+          [attr.aria-current]="s.id === step() ? 'step' : null"
+        >
+          <span class="dot" aria-hidden="true">{{ i < stepIndex() ? '✓' : i + 1 }}</span>
+          <span class="name">{{ s.label }}</span>
+        </li>
+      }
+    </ol>
+  }
+
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+
+  @switch (step()) {
+    @case ('code') {
+      <h1 #heading tabindex="-1">Bienvenue</h1>
+      <p class="subtitle">
+        Conclave est le quartier général privé de votre clan. Cet assistant crée le clan et son
+        premier dirigeant. Pour vérifier que vous administrez le serveur, saisissez le code
+        d'installation qu'il affiche.
+      </p>
+      <div class="command">
+        <code>{{ command }}</code>
+        <button class="link" type="button" (click)="copyCommand()">
+          {{ copied() ? 'Copié ✓' : 'Copier' }}
+        </button>
+      </div>
+      <p class="hint">
+        À lancer dans le dossier <code>backend</code>. Le code figure aussi dans les journaux du
+        serveur.
+      </p>
+      <form [formGroup]="codeForm" (ngSubmit)="checkCode()" novalidate>
+        <div class="field">
+          <label for="setup-code">Code d'installation</label>
+          <input
+            id="setup-code"
+            formControlName="code"
+            class="code-input"
+            required
+            autocomplete="one-time-code"
+            autocapitalize="characters"
+            spellcheck="false"
+            placeholder="ABCD-EFGH"
+            maxlength="11"
+          />
+        </div>
+        @if (codeForm.touched && codeForm.invalid) {
+          <p class="error" role="alert">Le code compte 8 caractères, par exemple ABCD-EFGH.</p>
+        }
+        <button class="btn" type="submit" [disabled]="busy()">
+          {{ busy() ? 'Vérification…' : 'Continuer' }}
+        </button>
+      </form>
+    }
+
+    @case ('clan') {
+      <h1 #heading tabindex="-1">Votre clan</h1>
+      <p class="subtitle">Ces réglages se modifient ensuite dans l'administration.</p>
+      <form [formGroup]="clanForm" (ngSubmit)="next('clan')" novalidate>
+        <div class="field">
+          <label for="clan-name">Nom du clan</label>
+          <input
+            id="clan-name"
+            formControlName="clanName"
+            required
+            maxlength="100"
+            autocomplete="off"
+            placeholder="Imperium"
+          />
+        </div>
+        <div class="field">
+          <label for="app-url"
+            >Adresse de l'application <span class="optional">(facultatif)</span></label
+          >
+          <input
+            id="app-url"
+            type="url"
+            formControlName="appUrl"
+            maxlength="255"
+            autocomplete="url"
+            spellcheck="false"
+            aria-describedby="app-url-hint"
+          />
+          <span class="hint" id="app-url-hint"
+            >Pour les liens des e-mails (validation des inscriptions, mot de passe oublié).</span
+          >
+        </div>
+        @if (clanForm.touched && clanForm.invalid) {
+          <p class="error" role="alert">Donnez un nom à votre clan.</p>
+        }
+        <div class="actions">
+          <button class="btn btn-ghost" type="button" (click)="go('code')">Retour</button>
+          <button class="btn" type="submit">Continuer</button>
+        </div>
+      </form>
+    }
+
+    @case ('leader') {
+      <h1 #heading tabindex="-1">Premier dirigeant</h1>
+      <p class="subtitle">
+        Votre compte : vous dirigerez {{ clanName() || 'le clan' }} et validerez les inscriptions
+        des membres.
+      </p>
+      <form [formGroup]="leaderForm" (ngSubmit)="next('leader')" novalidate>
+        <div class="field">
+          <label for="display-name">Votre pseudo</label>
+          <input
+            id="display-name"
+            formControlName="displayName"
+            required
+            maxlength="50"
+            autocomplete="nickname"
+          />
+        </div>
+        <div class="field">
+          <label for="email">Adresse e-mail</label>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            required
+            maxlength="180"
+            autocomplete="email"
+            aria-describedby="email-hint"
+          />
+          <span class="hint" id="email-hint"
+            >Pour être alerté des inscriptions et retrouver votre mot de passe.</span
+          >
+        </div>
+        <div class="field">
+          <label for="username">Identifiant de connexion</label>
+          <input
+            id="username"
+            formControlName="username"
+            required
+            autocomplete="username"
+            autocapitalize="none"
+            spellcheck="false"
+            aria-describedby="username-hint"
+          />
+          <span class="hint" id="username-hint">{{ usernameHint }}</span>
+        </div>
+        <div class="field">
+          <label for="new-password">Mot de passe</label>
+          <input
+            id="new-password"
+            formControlName="password"
+            required
+            [type]="showPassword() ? 'text' : 'password'"
+            autocomplete="new-password"
+            [attr.minlength]="passwordMinLength"
+            aria-describedby="password-hint"
+          />
+          <span class="hint" id="password-hint">Au moins {{ passwordMinLength }} caractères.</span>
+        </div>
+        <div class="field">
+          <label for="confirm-password">Confirmez le mot de passe</label>
+          <input
+            id="confirm-password"
+            formControlName="confirm"
+            required
+            [type]="showPassword() ? 'text' : 'password'"
+            autocomplete="new-password"
+          />
+        </div>
+        <label class="show-password"
+          ><input
+            type="checkbox"
+            [checked]="showPassword()"
+            (change)="showPassword.set(!showPassword())"
+          />
+          Afficher les mots de passe</label
+        >
+        @if (leaderForm.touched && leaderForm.invalid) {
+          <p class="error" role="alert">
+            @if (leaderForm.hasError('mismatch')) {
+              Les deux mots de passe diffèrent.
+            } @else {
+              Vérifiez les champs : tous sont obligatoires.
+            }
+          </p>
+        }
+        <div class="actions">
+          <button class="btn btn-ghost" type="button" (click)="go('clan')">Retour</button>
+          <button class="btn" type="submit">Continuer</button>
+        </div>
+      </form>
+    }
+
+    @case ('summary') {
+      <h1 #heading tabindex="-1">Tout est prêt</h1>
+      <p class="subtitle">Vérifiez avant d'installer.</p>
+      @let v = summary();
+      <dl class="recap">
+        <div>
+          <dt>Clan</dt>
+          <dd>
+            {{ v.clanName }}
+            <button class="link" type="button" (click)="go('clan')">Modifier</button>
+          </dd>
+        </div>
+        <div>
+          <dt>Adresse</dt>
+          <dd>{{ v.appUrl || 'Non renseignée' }}</dd>
+        </div>
+        <div>
+          <dt>Dirigeant</dt>
+          <dd>
+            {{ v.displayName }} ({{ v.username?.trim()?.toLowerCase() }})
+            <button class="link" type="button" (click)="go('leader')">Modifier</button>
+          </dd>
+        </div>
+        <div>
+          <dt>E-mail</dt>
+          <dd>{{ v.email }}</dd>
+        </div>
+      </dl>
+      <div class="actions">
+        <button class="btn btn-ghost" type="button" (click)="go('leader')">Retour</button>
+        <button class="btn" type="button" (click)="install()" [disabled]="busy()">
+          {{ busy() ? 'Installation…' : 'Installer' }}
+        </button>
+      </div>
+    }
+
+    @case ('done') {
+      <h1 #heading tabindex="-1">Bienvenue, {{ leaderName() }} !</h1>
+      <p class="subtitle" role="status">
+        {{ clanName() }} est installé et vous en êtes le dirigeant.
+      </p>
+      <p class="next-title">Pour finir de préparer le clan :</p>
+      <ul class="next">
+        <li>
+          <button type="button" (click)="open('/admin', 'mail')">
+            <app-icon name="mail" /><span
+              ><strong>Service d'e-mail</strong>Prévenir les dirigeants et les inscrits</span
+            >
+          </button>
+        </li>
+        <li>
+          <button type="button" (click)="open('/admin', 'branches')">
+            <app-icon name="branch" /><span><strong>Branches</strong>Activer celles du clan</span>
+          </button>
+        </li>
+        <li>
+          <button type="button" (click)="open('/admin', 'discord')">
+            <app-icon name="discord" /><span><strong>Discord</strong>Présences et visios</span>
+          </button>
+        </li>
+      </ul>
+      <p class="hint invite">
+        Pour inviter les membres, partagez l'adresse de l'application : ils demandent à rejoindre le
+        clan avec le lien « S'inscrire » de la page de connexion et vous validez leur demande.
+      </p>
+      <button class="btn" type="button" (click)="open('/clan')">Entrer dans le clan</button>
+    }
+  }
+
+  @if (step() === 'code') {
+    <p class="legal">
+      <a routerLink="/conditions-utilisation">Conditions d'utilisation</a> ·
+      <a routerLink="/politique-confidentialite">Confidentialité</a>
+    </p>
+  }
+</main>

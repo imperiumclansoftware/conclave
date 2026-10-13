@@ -1,0 +1,213 @@
+:host {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  height: 100dvh;
+}
+
+.topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 1.25rem;
+  padding: 0.5rem 1rem;
+  border-bottom: 2px solid var(--topbar-border);
+  background: var(--topbar-bg);
+  backdrop-filter: blur(6px);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+}
+
+nav {
+  display: flex;
+  gap: 0.25rem;
+  flex: 1;
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.75rem;
+    border-bottom: 2px solid transparent;
+    color: var(--text);
+    font-family: var(--font-display);
+    font-size: 0.85rem;
+    letter-spacing: 0.06em;
+    text-decoration: none;
+    text-transform: uppercase;
+
+    &.active {
+      border-bottom-color: var(--accent-text);
+      color: var(--accent-text);
+      font-weight: 700;
+    }
+  }
+}
+
+.account {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.status {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: var(--text-muted);
+
+  &.connected {
+    background: var(--success);
+    box-shadow: 0 0 6px var(--success);
+  }
+}
+
+.workspace {
+  --edge-width: 2.4rem;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto var(--edge-width);
+  min-height: 0;
+
+  // Phones: the tabs float over the page, which keeps its whole width
+  @media (max-width: 40rem) {
+    grid-template-columns: minmax(0, 1fr) auto 0;
+  }
+}
+
+.content {
+  grid-column: 1;
+  min-width: 0;
+  min-height: 0;
+}
+
+// Sidebars (messaging, links): beside the page on wide screens, over it otherwise
+.side-panel {
+  grid-column: 2;
+  width: 24rem;
+  animation: slide-in 0.25s ease-out;
+  --animation-reduced: none;
+
+  @media (max-width: 64rem) {
+    // Positioned against the whole workspace, not against its grid column
+    grid-column: 1 / -1;
+    position: absolute;
+    inset: 0 var(--edge-width) 0 auto;
+    z-index: 5;
+    width: min(calc(100% - var(--edge-width)), 26rem);
+    // Over the page: the translucent surface would let it show through
+    background: var(--surface-solid);
+    box-shadow: -8px 0 24px rgb(0 0 0 / 0.25);
+  }
+
+  // Phones: the whole width, over the tabs too (the sidebar has its own close button)
+  @media (max-width: 40rem) {
+    right: 0;
+    z-index: 6;
+    width: 100%;
+  }
+}
+
+// Tabs of the sidebars on the right edge. In their own column, so that the scrollbar of the
+// page stays beside them rather than under them.
+.edge-tabs {
+  grid-column: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.6rem;
+  padding-top: 6rem;
+
+  // Touch screens: scrollbars overlay the page, keep its full width
+  @media (max-width: 40rem) {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 4;
+  }
+}
+
+.edge-tab {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 0.4rem;
+  border: 1px solid var(--accent);
+  border-right: none;
+  border-radius: var(--radius) 0 0 var(--radius);
+  color: var(--accent-contrast);
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--accent);
+  box-shadow: -3px 2px 10px rgb(0 0 0 / 0.25);
+  cursor: pointer;
+  transition: background-color 0.15s ease-out;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--accent-strong);
+  }
+
+  // The tab of the open sidebar, joined to it
+  &.active {
+    border-color: var(--border);
+    color: var(--accent-text);
+    background: var(--surface-solid);
+    box-shadow: none;
+  }
+
+  app-icon {
+    font-size: 1.15rem;
+  }
+
+  .label {
+    writing-mode: vertical-rl;
+  }
+
+  // Centred above the tab, clear of the scrollbar
+  .badge {
+    position: absolute;
+    top: -0.75rem;
+    left: 50%;
+    translate: -50% 0;
+  }
+}
+
+@keyframes slide-in {
+  from {
+    translate: 100% 0;
+  }
+}
+
+@media (max-width: 40rem) {
+  .brand span {
+    display: none;
+  }
+
+  // Icons only: the labels stay available to screen readers
+  nav .label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  nav a app-icon {
+    font-size: 1.3rem;
+  }
+}

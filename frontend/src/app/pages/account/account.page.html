@@ -1,0 +1,358 @@
+<div class="page profile">
+  @if (auth.user(); as me) {
+    <header class="card identity">
+      <app-avatar [member]="me" [size]="72" />
+      <div class="identity-text">
+        <h1>{{ me.displayName }}</h1>
+        <p class="meta">
+          {{ me.username }} · {{ me.role === 'leader' ? 'Dirigeant' : 'Membre' }} de
+          {{ me.clan.name }}
+        </p>
+        <app-presence-badge [userId]="me.id" [withText]="true" />
+      </div>
+      <a class="btn btn-ghost public" [routerLink]="['/members', me.id]">Voir ma fiche</a>
+    </header>
+  }
+
+  <div class="tabs" role="tablist" aria-label="Sections du profil" (keydown)="onTabKey($event)">
+    @for (t of tabs; track t.id) {
+      <button
+        [id]="'tab-' + t.id"
+        role="tab"
+        type="button"
+        [attr.aria-selected]="tab() === t.id"
+        [attr.aria-controls]="'panel-' + t.id"
+        [tabindex]="tab() === t.id ? 0 : -1"
+        [class.active]="tab() === t.id"
+        (click)="selectTab(t.id)"
+      >
+        <app-icon [name]="t.icon" /> {{ t.label }}
+      </button>
+    }
+  </div>
+
+  <div id="panel-profil" role="tabpanel" aria-labelledby="tab-profil" [hidden]="tab() !== 'profil'">
+    <form
+      class="card"
+      [formGroup]="form"
+      (ngSubmit)="saveProfile()"
+      novalidate
+      aria-labelledby="info-title"
+    >
+      <h2 id="info-title">Informations</h2>
+
+      <div class="field">
+        <label for="display-name">Nom affiché</label>
+        <input
+          id="display-name"
+          formControlName="displayName"
+          required
+          maxlength="50"
+          autocomplete="nickname"
+        />
+      </div>
+      <div class="field">
+        <label for="email">Adresse e-mail</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          autocomplete="email"
+          maxlength="180"
+          aria-describedby="email-hint"
+        />
+        <span class="hint" id="email-hint"
+          >Visible des seuls dirigeants. Sert au mot de passe oublié{{
+            auth.isLeader() ? ' et aux alertes d’inscription' : ''
+          }}.</span
+        >
+      </div>
+      <div class="field">
+        <label for="bio">Présentation</label>
+        <textarea
+          id="bio"
+          formControlName="bio"
+          rows="3"
+          [attr.maxlength]="bioMax"
+          aria-describedby="bio-count"
+          placeholder="Jeux préférés, disponibilités, rôle dans le clan…"
+        ></textarea>
+        <span class="hint" id="bio-count">{{ form.controls.bio.value.length }} / {{ bioMax }}</span>
+      </div>
+
+      <fieldset formGroupName="gamerTags">
+        <legend>Identifiants de jeu</legend>
+        <p class="hint">
+          Pour que le clan vous ajoute en ami. Laissez vide ce que vous n'utilisez pas.
+        </p>
+        <div class="tags">
+          @for (network of profile()?.networks ?? []; track network.value) {
+            <div class="field">
+              <label [for]="'tag-' + network.value">{{ network.label }}</label>
+              <input
+                [id]="'tag-' + network.value"
+                [formControlName]="network.value"
+                maxlength="50"
+                autocomplete="off"
+                autocapitalize="none"
+                spellcheck="false"
+              />
+            </div>
+          }
+        </div>
+      </fieldset>
+
+      @if (profileStatus(); as s) {
+        <p [class]="s.kind" [attr.role]="s.kind === 'error' ? 'alert' : 'status'">
+          {{ s.message }}
+        </p>
+      }
+      <button class="btn" type="submit" [disabled]="busy() === 'profile'">Enregistrer</button>
+    </form>
+  </div>
+
+  <div id="panel-avatar" role="tabpanel" aria-labelledby="tab-avatar" [hidden]="tab() !== 'avatar'">
+    @if (avatar(); as av) {
+      <section class="card" aria-labelledby="avatar-source-title">
+        <h2 id="avatar-source-title">Avatar</h2>
+        <div class="actions">
+          <label class="btn btn-ghost file">
+            {{ avatar()?.available?.upload ? 'Changer l’image' : 'Envoyer une image' }}
+            <input
+              type="file"
+              accept="image/jpeg,image/png,image/webp,image/gif"
+              (change)="onAvatarSelected(fileInput)"
+              #fileInput
+              [disabled]="busy() === 'avatar'"
+            />
+          </label>
+          @if (avatar()?.available?.upload) {
+            <button
+              class="link"
+              type="button"
+              (click)="removeAvatar()"
+              [disabled]="busy() === 'avatar'"
+            >
+              Retirer l'image
+            </button>
+          }
+        </div>
+        <p class="hint">JPEG, PNG, WebP ou GIF, 5 Mo maximum, recadré en carré.</p>
+        @if (avatarStatus(); as s) {
+          <p [class]="s.kind" [attr.role]="s.kind === 'error' ? 'alert' : 'status'">
+            {{ s.message }}
+          </p>
+        }
+
+        <h3>Avatar affiché</h3>
+        <fieldset class="sources" [disabled]="busy() === 'avatar'">
+          <legend class="visually-hidden">Source de l'avatar</legend>
+          @for (choice of avatarChoices(); track choice.source) {
+            <label class="source" [class.selected]="av.source === choice.source">
+              <input
+                type="radio"
+                name="avatar-source"
+                [value]="choice.source"
+                [checked]="av.source === choice.source"
+                (change)="chooseAvatar(choice.source)"
+              />
+              <app-avatar
+                [member]="{ displayName: auth.user()?.displayName ?? '?', avatarUrl: choice.url }"
+                [size]="56"
+              />
+              <span>{{ choice.label }}</span>
+            </label>
+          }
+        </fieldset>
+
+        <div class="gravatar">
+          <h3>Gravatar</h3>
+          @if (av.available.gravatar) {
+            <p class="hint">
+              Un Gravatar est associé à votre profil.
+              <button
+                class="link"
+                type="button"
+                (click)="removeGravatar()"
+                [disabled]="busy() === 'avatar'"
+              >
+                Retirer le Gravatar
+              </button>
+            </p>
+          } @else {
+            <form class="gravatar-form" (submit)="$event.preventDefault(); useGravatar()">
+              <div class="field">
+                <label for="gravatar-email">Adresse e-mail de votre compte Gravatar</label>
+                <input
+                  id="gravatar-email"
+                  type="email"
+                  autocomplete="email"
+                  inputmode="email"
+                  placeholder="vous@exemple.fr"
+                  [value]="gravatarEmail()"
+                  (input)="gravatarEmail.set(gravatarInput.value)"
+                  #gravatarInput
+                />
+              </div>
+              <button
+                class="btn btn-ghost"
+                type="submit"
+                [disabled]="busy() === 'avatar' || !gravatarEmail().trim()"
+              >
+                Utiliser mon Gravatar
+              </button>
+            </form>
+            <p class="hint">
+              Seule une empreinte de l'adresse est conservée, jamais l'adresse elle-même. L'image
+              est chargée depuis gravatar.com. Pas encore de Gravatar ?
+              <a href="https://gravatar.com" target="_blank" rel="noopener noreferrer"
+                >En créer un ↗</a
+              >
+            </p>
+          }
+        </div>
+      </section>
+    }
+  </div>
+
+  <div
+    id="panel-branches"
+    role="tabpanel"
+    aria-labelledby="tab-branches"
+    [hidden]="tab() !== 'branches'"
+  >
+    @if (tab() === 'branches') {
+      <app-my-branches />
+    }
+  </div>
+
+  <div
+    id="panel-apparence"
+    role="tabpanel"
+    aria-labelledby="tab-apparence"
+    [hidden]="tab() !== 'apparence'"
+  >
+    <section class="card" aria-labelledby="faction-title">
+      <h2 id="faction-title">Apparence</h2>
+      <fieldset class="factions">
+        <legend class="visually-hidden">Thème de l'interface</legend>
+        @let chosen = auth.user()?.faction ?? null;
+        <label class="faction" [class.selected]="chosen === 'assassin'">
+          <input
+            type="radio"
+            name="faction"
+            [checked]="chosen === 'assassin'"
+            (change)="chooseFaction('assassin', $event)"
+          />
+          <app-emblem faction="assassin" [size]="56" />
+          <strong>Confrérie des Assassins</strong>
+          <span class="hint">Parchemin et Renaissance</span>
+        </label>
+        <label class="faction" [class.selected]="chosen === 'templar'">
+          <input
+            type="radio"
+            name="faction"
+            [checked]="chosen === 'templar'"
+            (change)="chooseFaction('templar', $event)"
+          />
+          <app-emblem faction="templar" [size]="56" />
+          <strong>Ordre des Templiers</strong>
+          <span class="hint">Pierre noire et or</span>
+        </label>
+        <label class="faction" [class.selected]="chosen === null">
+          <input
+            type="radio"
+            name="faction"
+            [checked]="chosen === null"
+            (change)="chooseFaction(null, $event)"
+          />
+          <app-emblem faction="split" [size]="56" />
+          <strong>Suivre mon appareil</strong>
+          <span class="hint"
+            >Clair : Confrérie, sombre : Ordre
+            @if (chosen === null) {
+              (actuellement {{ shownFaction() === 'templar' ? 'l’Ordre' : 'la Confrérie' }})
+            }
+          </span>
+        </label>
+      </fieldset>
+      @if (factionStatus(); as s) {
+        <p [class]="s.kind" [attr.role]="s.kind === 'error' ? 'alert' : 'status'">
+          {{ s.message }}
+        </p>
+      }
+    </section>
+  </div>
+
+  <div
+    id="panel-securite"
+    role="tabpanel"
+    aria-labelledby="tab-securite"
+    [hidden]="tab() !== 'securite'"
+  >
+    <form
+      class="card"
+      [formGroup]="passwordForm"
+      (ngSubmit)="changePassword()"
+      novalidate
+      aria-labelledby="password-title"
+    >
+      <h2 id="password-title">Mot de passe</h2>
+      <input
+        type="text"
+        name="username"
+        autocomplete="username"
+        [value]="auth.user()?.username"
+        hidden
+      />
+      <div class="field">
+        <label for="current-password">Mot de passe actuel</label>
+        <input
+          id="current-password"
+          type="password"
+          formControlName="currentPassword"
+          autocomplete="current-password"
+          required
+        />
+      </div>
+      <div class="field">
+        <label for="new-password">Nouveau mot de passe</label>
+        <input
+          id="new-password"
+          type="password"
+          formControlName="newPassword"
+          autocomplete="new-password"
+          required
+          [attr.minlength]="passwordMinLength"
+          aria-describedby="new-password-hint"
+        />
+        <span class="hint" id="new-password-hint"
+          >Au moins {{ passwordMinLength }} caractères.</span
+        >
+      </div>
+      @if (passwordStatus(); as s) {
+        <p [class]="s.kind" [attr.role]="s.kind === 'error' ? 'alert' : 'status'">
+          {{ s.message }}
+        </p>
+      }
+      <button class="btn" type="submit" [disabled]="busy() === 'password'">
+        Changer le mot de passe
+      </button>
+    </form>
+  </div>
+
+  <div
+    id="panel-discord"
+    role="tabpanel"
+    aria-labelledby="tab-discord"
+    [hidden]="tab() !== 'discord'"
+  >
+    <app-discord-card scope="account" [flash]="flash()" />
+  </div>
+
+  <p class="legal">
+    <a routerLink="/conditions-utilisation">Conditions d'utilisation</a> ·
+    <a routerLink="/politique-confidentialite">Politique de confidentialité</a> ·
+    <app-manage-cookies />
+  </p>
+</div>

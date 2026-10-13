@@ -1,0 +1,182 @@
+<div class="page">
+  <h1 class="visually-hidden">Mes jeux</h1>
+  <app-games-tabs />
+
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+
+  <section class="card add" aria-labelledby="add-title">
+    <h2 id="add-title">Ajouter un jeu</h2>
+    <search>
+      <form (submit)="$event.preventDefault()">
+        <label class="visually-hidden" for="game-search">Rechercher un jeu</label>
+        <input
+          id="game-search"
+          type="search"
+          placeholder="Rechercher un jeu : Elden Ring, Fortnite…"
+          autocomplete="off"
+          spellcheck="false"
+          enterkeyhint="search"
+          #searchInput
+          [value]="query()"
+          (input)="query.set(searchInput.value)"
+        />
+      </form>
+    </search>
+
+    <p class="status" role="status">
+      @if (searchError(); as message) {
+        <span class="error">{{ message }}</span>
+      } @else {
+        {{ searchStatus() }}
+      }
+    </p>
+
+    @if (results().length) {
+      <ul class="results">
+        @for (result of results(); track result.source + result.externalId) {
+          <li class="result" [class.selected]="adding() === result">
+            <div class="result-row">
+              @if (consent.src(result.coverUrl); as cover) {
+                <img
+                  [src]="cover"
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                  referrerpolicy="no-referrer"
+                />
+              } @else {
+                <span class="no-cover" aria-hidden="true"></span>
+              }
+              <span class="result-info">
+                <strong>{{ result.name }}</strong>
+                @if (result.releaseDate) {
+                  <span class="meta">{{ result.releaseDate.slice(0, 4) }}</span>
+                }
+              </span>
+              @if (inLibrary(result)) {
+                <span class="meta owned">Dans vos jeux</span>
+              } @else if (adding() !== result) {
+                <button class="btn btn-ghost" type="button" (click)="startAdding(result)">
+                  Ajouter
+                </button>
+              }
+            </div>
+
+            @if (adding() === result) {
+              <div class="add-form">
+                <app-platform-picker
+                  legend="Sur quelles plateformes y jouez-vous ?"
+                  [(selected)]="addPlatforms"
+                />
+                <div class="actions">
+                  <button
+                    class="btn"
+                    type="button"
+                    (click)="confirmAdd()"
+                    [disabled]="saving() || addPlatforms().length === 0"
+                  >
+                    {{ saving() ? 'Ajout…' : 'Ajouter à mes jeux' }}
+                  </button>
+                  <button class="btn btn-ghost" type="button" (click)="adding.set(null)">
+                    Annuler
+                  </button>
+                </div>
+              </div>
+            }
+          </li>
+        }
+      </ul>
+    }
+  </section>
+
+  <section aria-labelledby="mine-title">
+    <h2 id="mine-title" class="section-title">
+      Mes jeux
+      @if (myGames().length) {
+        <span class="count">({{ myGames().length }})</span>
+      }
+    </h2>
+
+    @if (loaded() && myGames().length === 0) {
+      <p class="meta">Vous n'avez pas encore ajouté de jeu. Utilisez la recherche ci-dessus.</p>
+    }
+
+    @if (myGames().length) {
+      <div class="tabs" role="tablist" aria-label="Plateformes" (keydown)="onTabKey($event)">
+        @for (t of tabs(); track t.platform) {
+          <button
+            [id]="'platform-tab-' + t.platform"
+            role="tab"
+            type="button"
+            aria-controls="platform-panel"
+            [attr.aria-selected]="shown().platform === t.platform"
+            [tabindex]="shown().platform === t.platform ? 0 : -1"
+            [class.active]="shown().platform === t.platform"
+            (click)="selectTab(t.platform)"
+          >
+            {{ t.label }} <span class="tab-count">{{ t.games.length }}</span>
+          </button>
+        }
+      </div>
+
+      <div
+        id="platform-panel"
+        role="tabpanel"
+        [attr.aria-labelledby]="'platform-tab-' + shown().platform"
+      >
+        <ul class="game-grid">
+          @for (myGame of shown().games; track myGame.id) {
+            <li class="game-card">
+              <a class="cover" [routerLink]="['/games', myGame.game.id]">
+                @if (consent.src(myGame.game.coverUrl); as cover) {
+                  <img
+                    [src]="cover"
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    referrerpolicy="no-referrer"
+                  />
+                }
+                <span class="name">{{ myGame.game.name }}</span>
+              </a>
+              <div class="body">
+                @if (editing() === myGame.id + ':' + shown().platform) {
+                  <app-platform-picker [(selected)]="editPlatforms" />
+                  <div class="actions">
+                    <button
+                      class="btn"
+                      type="button"
+                      (click)="saveEdit(myGame)"
+                      [disabled]="saving() || editPlatforms().length === 0"
+                    >
+                      Enregistrer
+                    </button>
+                    <button class="btn btn-ghost" type="button" (click)="editing.set(null)">
+                      Annuler
+                    </button>
+                  </div>
+                } @else {
+                  <app-platform-badges [platforms]="myGame.platforms" />
+                  <div class="actions">
+                    <button
+                      class="link"
+                      type="button"
+                      (click)="startEditing(myGame, shown().platform)"
+                    >
+                      Plateformes
+                    </button>
+                    <button class="link danger" type="button" (click)="remove(myGame)">
+                      Retirer
+                    </button>
+                  </div>
+                }
+              </div>
+            </li>
+          }
+        </ul>
+      </div>
+    }
+  </section>
+</div>

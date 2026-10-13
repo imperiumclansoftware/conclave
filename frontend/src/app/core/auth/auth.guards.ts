@@ -1,0 +1,44 @@
+import { inject } from '@angular/core';
+import { CanActivateFn, Router } from '@angular/router';
+import { ChatPanelService } from '../chat/chat-panel.service';
+import { AuthService } from './auth.service';
+
+export const authGuard: CanActivateFn = async () => {
+  const router = inject(Router);
+  return (await inject(AuthService).restoreSession()) || router.createUrlTree(['/login']);
+};
+
+/** Before the installation, every public page leads to the installation wizard. */
+export const installedGuard: CanActivateFn = async () => {
+  const router = inject(Router);
+  return (await inject(AuthService).installed()) || router.createUrlTree(['/installation']);
+};
+
+/** The installation wizard, only before the installation. */
+export const setupGuard: CanActivateFn = async () => {
+  const router = inject(Router);
+  return !(await inject(AuthService).installed()) || router.createUrlTree(['/login']);
+};
+
+export const guestGuard: CanActivateFn = async () => {
+  const router = inject(Router);
+  return !(await inject(AuthService).restoreSession()) || router.createUrlTree(['/']);
+};
+
+/** /messages[/:memberId]: opens the messaging sidebar (on that conversation), over the clan page. */
+export const openChatPanel: CanActivateFn = (route) => {
+  const memberId = Number(route.paramMap.get('memberId'));
+  inject(ChatPanelService).open(memberId > 0 ? memberId : null);
+  return inject(Router).createUrlTree(['/clan']);
+};
+
+/** Writing news: leaders and members of a publishing branch */
+export const newsPublisherGuard: CanActivateFn = () => {
+  const router = inject(Router);
+  return inject(AuthService).user()?.canPublishNews === true || router.createUrlTree(['/news']);
+};
+
+export const leaderGuard: CanActivateFn = () => {
+  const router = inject(Router);
+  return inject(AuthService).isLeader() || router.createUrlTree(['/']);
+};

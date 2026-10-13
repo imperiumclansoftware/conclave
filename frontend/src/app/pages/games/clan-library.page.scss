@@ -1,0 +1,54 @@
+@use 'games-shared';
+
+:host {
+  display: block;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1.25rem;
+
+  label {
+    font-family: var(--font-display);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  select {
+    padding: 0.4rem 0.6rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface-solid);
+  }
+}
+
+.body .meta {
+  margin: 0;
+}
+
+.players {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.3rem 0.6rem;
+  }
+}
+
+.player-name {
+  font-weight: 600;
+}

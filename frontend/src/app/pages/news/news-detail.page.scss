@@ -1,0 +1,90 @@
+:host {
+  display: block;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.page {
+  display: grid;
+  gap: 1rem;
+  width: min(100%, 50rem);
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+}
+
+.back {
+  justify-self: start;
+  color: var(--accent-text);
+}
+
+.card {
+  overflow: hidden;
+  padding: 0;
+}
+
+.cover {
+  aspect-ratio: 1200 / 630;
+  background: var(--surface-muted);
+
+  img,
+  app-news-cover {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.content {
+  display: grid;
+  gap: 1rem;
+  padding: 1.5rem;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.75rem;
+  overflow-wrap: anywhere;
+}
+
+.byline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+
+  a {
+    color: var(--text);
+    font-weight: 600;
+  }
+}
+
+.meta {
+  font-style: italic;
+}
+
+.body {
+  font-size: 1.05rem;
+  line-height: 1.65;
+
+  p {
+    margin: 0 0 1rem;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+  }
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.danger {
+  color: var(--danger);
+}

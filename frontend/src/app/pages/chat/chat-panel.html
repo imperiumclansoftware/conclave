@@ -1,0 +1,91 @@
+<header class="bar">
+  <h2 id="chat-panel-title"><app-icon name="messages" /> Messages</h2>
+  @if (discord.status()?.guild) {
+    <button class="btn btn-ghost call-btn" type="button" (click)="startCall()">
+      <app-icon name="video" /> Visio
+    </button>
+  }
+  <button
+    class="close"
+    type="button"
+    (click)="panel.close()"
+    aria-label="Fermer la messagerie"
+    title="Fermer (Échap)"
+  >
+    ✕
+  </button>
+</header>
+
+@if (panel.contactId(); as contactId) {
+  <app-thread
+    class="body"
+    [memberId]="contactId"
+    (back)="panel.showList()"
+    (call)="startCall([$event])"
+  />
+} @else {
+  <div class="body contacts">
+    @if (calls.calls().length) {
+      <section class="calls" aria-label="Visios en cours">
+        @for (call of calls.calls(); track call.id) {
+          <div class="call">
+            <span class="call-title"><app-icon name="video" /> {{ call.title }}</span>
+            <span class="call-meta">
+              {{ call.connectedUserIds.length }}/{{ call.participants.length }} connecté(s)
+            </span>
+            <span class="call-actions">
+              <a class="btn" [href]="call.joinUrl" target="_blank" rel="noopener noreferrer"
+                >Rejoindre ↗</a
+              >
+              @if (call.createdBy?.id === chat.me()?.id || chat.me()?.role === 'leader') {
+                <button class="link" type="button" (click)="endCall(call.id)">Terminer</button>
+              }
+            </span>
+          </div>
+        }
+      </section>
+    }
+
+    @let conversations = chat.conversationByContact();
+    <ul>
+      @for (member of chat.contacts(); track member.id) {
+        @let conversation = conversations.get(member.id);
+        <li>
+          <button type="button" class="contact" (click)="panel.open(member.id)">
+            <span class="avatar-wrap">
+              <app-avatar [member]="member" [size]="40" />
+              <app-presence-badge class="presence" [userId]="member.id" />
+            </span>
+            <span class="summary">
+              <span class="name">
+                {{ member.displayName }}
+                <span class="role">{{ member.role === 'leader' ? 'Dirigeant' : 'Membre' }}</span>
+              </span>
+              <span class="preview">
+                @if (conversation?.lastMessage; as last) {
+                  {{ last.senderId === chat.me()?.id ? 'Vous : ' : '' }}{{ last.content }}
+                } @else {
+                  Démarrer une conversation
+                }
+              </span>
+            </span>
+            @if (conversation && conversation.unreadCount > 0) {
+              <span class="badge">
+                {{ conversation.unreadCount }}<span class="visually-hidden"> messages non lus</span>
+              </span>
+            }
+          </button>
+        </li>
+      } @empty {
+        <li class="empty">
+          Personne d'autre dans le clan pour l'instant.
+          @if (chat.me()?.role === 'leader') {
+            <a routerLink="/admin" (click)="panel.close()">Gérer les membres</a>
+          }
+        </li>
+      }
+    </ul>
+  </div>
+}
+
+<app-call-dialog />

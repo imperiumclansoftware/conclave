@@ -1,0 +1,170 @@
+:host {
+  display: block;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.page {
+  display: grid;
+  gap: 1.25rem;
+  width: min(100%, 40rem);
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+}
+
+h1,
+h2 {
+  margin-bottom: 0.75rem;
+  font-size: 1.25rem;
+}
+
+.meta {
+  display: block;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.members {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+
+    > span:nth-child(2) {
+      display: grid;
+      flex: 1;
+      min-width: 0;
+    }
+  }
+
+  .btn {
+    padding: 0.3rem 0.8rem;
+    font-size: 0.875rem;
+  }
+}
+
+.intro {
+  margin: -0.4rem 0 1rem;
+}
+
+// The page is a grid: without this, the row of tabs widens the card instead of scrolling
+.card {
+  min-width: 0;
+}
+
+.tabs {
+  margin-bottom: 1rem;
+
+  > button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+  }
+}
+
+.tab-count {
+  margin-left: 0.25rem;
+  opacity: 0.7;
+  font-size: 0.8em;
+}
+
+.branch-head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+
+  h2 {
+    margin: 0;
+    font-size: 1.15rem;
+  }
+
+  .description {
+    margin: 0.2rem 0 0;
+    color: var(--text-muted);
+  }
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-left: 0.4rem;
+  padding: 0 0.5rem;
+  border-radius: 999px;
+  color: var(--accent-text);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 400;
+  letter-spacing: 0;
+  vertical-align: middle;
+}
+
+.error {
+  margin: 0 0 1rem;
+}
+
+.empty {
+  padding: 0.5rem 0;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.25rem;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.05rem 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--accent-text) 40%, transparent);
+  border-radius: 999px;
+  color: var(--accent-text);
+  font-size: 0.75rem;
+}
+
+.member-name {
+  color: var(--text);
+  font-weight: 700;
+  text-decoration: none;
+
+  &:hover {
+    color: var(--accent-text);
+    text-decoration: underline;
+  }
+}
+
+p.meta {
+  margin: -0.4rem 0 1rem;
+}
+
+fieldset.field {
+  display: flex;
+  gap: 1.25rem;
+  border: none;
+  padding: 0;
+
+  legend {
+    margin-bottom: 0.35rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+
+  input {
+    width: auto;
+  }
+}
+
+.success {
+  color: var(--success);
+}

@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <title>Conclave</title>
+    <meta
+      name="description"
+      content="Conclave, le quartier général privé de votre clan : messagerie, présences Discord, jeux, branches et news."
+    />
+    <meta name="color-scheme" content="light dark" />
+    <script>
+      // Applies the faction chosen by the user before the first paint (light: Assassins, dark: Templars)
+      try {
+        document.querySelector('meta[name="color-scheme"]').content =
+          localStorage.getItem('color-scheme') || 'light dark';
+      } catch (e) {}
+    </script>
+    <base href="/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="alternate icon" type="image/x-icon" href="favicon.ico" />
+  </head>
+  <body>
+    <app-root></app-root>
+  </body>
+</html>

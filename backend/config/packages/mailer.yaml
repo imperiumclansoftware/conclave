@@ -1,0 +1,4 @@
+framework:
+    mailer:
+        # The actual transport (SMTP…) is configured in the administration, see App\Mail\SettingsTransport
+        dsn: 'settings://default'

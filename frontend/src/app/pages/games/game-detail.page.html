@@ -1,0 +1,174 @@
+<div class="page">
+  <a class="back" routerLink="/games">← Jeux</a>
+
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+
+  @if (game(); as game) {
+    <header class="hero">
+      @if (consent.src(game.coverUrl); as cover) {
+        <img class="cover" [src]="cover" alt="" referrerpolicy="no-referrer" />
+      }
+      <div class="hero-text">
+        <h1>{{ game.name }}</h1>
+        <p class="meta">
+          @if (game.releaseDate) {
+            <span>Sortie : {{ game.releaseDate }}</span>
+          }
+          @if (game.developers.length) {
+            <span>{{ game.developers.join(', ') }}</span>
+          }
+        </p>
+        @if (game.genres.length) {
+          <ul class="genres">
+            @for (genre of game.genres; track genre) {
+              <li>{{ genre }}</li>
+            }
+          </ul>
+        }
+        @if (game.website) {
+          <a [href]="game.website" target="_blank" rel="noopener noreferrer">Site officiel ↗</a>
+        }
+      </div>
+    </header>
+
+    <div class="columns">
+      <div class="main">
+        @if (game.description) {
+          <section class="card">
+            <h2>À propos</h2>
+            <p class="description">{{ game.description }}</p>
+          </section>
+        }
+
+        @if (game.screenshots.length) {
+          <section aria-labelledby="shots-title">
+            <h2 id="shots-title" class="section-title">Captures d'écran</h2>
+            @if (!consent.externalContent()) {
+              <p class="meta">
+                Les captures sont hébergées par un service externe et ne s'affichent qu'avec votre
+                accord. <app-manage-cookies />
+              </p>
+            } @else {
+              <ul class="shots">
+                @for (shot of game.screenshots; track shot.full; let i = $index) {
+                  <li>
+                    <button
+                      type="button"
+                      (click)="openShot(i)"
+                      [attr.aria-label]="'Agrandir la capture ' + (i + 1)"
+                    >
+                      <img
+                        [src]="shot.thumbnail"
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                        referrerpolicy="no-referrer"
+                      />
+                    </button>
+                  </li>
+                }
+              </ul>
+            }
+          </section>
+        }
+      </div>
+
+      <aside class="side">
+        <section class="card">
+          <h2>{{ game.mine ? 'Mes plateformes' : 'J’y joue aussi' }}</h2>
+          <app-platform-picker
+            legend="Plateformes"
+            [(selected)]="platforms"
+            (selectedChange)="saved.set(false)"
+          />
+          <div class="actions">
+            <button
+              class="btn"
+              type="button"
+              (click)="savePlatforms()"
+              [disabled]="saving() || platforms().length === 0"
+            >
+              {{ game.mine ? 'Enregistrer' : 'Ajouter à mes jeux' }}
+            </button>
+            @if (game.mine) {
+              <button class="link danger" type="button" (click)="remove()">Retirer</button>
+            }
+          </div>
+          @if (saved()) {
+            <p class="saved" role="status">Enregistré.</p>
+          }
+        </section>
+
+        <section class="card">
+          <h2>Dans le clan</h2>
+          @if (game.players.length === 0) {
+            <p class="meta">Personne du clan n'y joue encore.</p>
+          }
+          <ul class="players">
+            @for (player of game.players; track player.user.id) {
+              <li>
+                <app-avatar [member]="player.user" [size]="36" />
+                <span class="player">
+                  <a
+                    class="player-name"
+                    [routerLink]="['/members', player.user.id]"
+                    [appMemberCard]="player.user.id"
+                    >{{ player.user.displayName
+                    }}{{ player.user.id === me()?.id ? ' (vous)' : '' }}</a
+                  >
+                  <app-platform-badges [platforms]="player.platforms" />
+                </span>
+                @if (player.user.id !== me()?.id) {
+                  <button class="link" type="button" (click)="panel.open(player.user.id)">
+                    Écrire
+                  </button>
+                }
+              </li>
+            }
+          </ul>
+        </section>
+      </aside>
+    </div>
+
+    <dialog
+      #lightbox
+      class="lightbox"
+      closedby="any"
+      aria-label="Capture d'écran"
+      (keydown)="onLightboxKey($event)"
+      (click)="onLightboxClick($event)"
+      (close)="lightboxOpen.set(false)"
+    >
+      <!-- Rendered only while open: a closed dialog would still download the full-size picture -->
+      @if (lightboxOpen() && consent.externalContent() && game.screenshots[shot()]; as current) {
+        <img
+          [src]="current.full"
+          referrerpolicy="no-referrer"
+          [alt]="'Capture d’écran ' + (shot() + 1) + ' de ' + game.name"
+        />
+      }
+      <div class="lightbox-bar">
+        <button
+          class="btn btn-ghost"
+          type="button"
+          (click)="moveShot(-1)"
+          aria-label="Capture précédente"
+        >
+          ←
+        </button>
+        <span>{{ shot() + 1 }} / {{ game.screenshots.length }}</span>
+        <button
+          class="btn btn-ghost"
+          type="button"
+          (click)="moveShot(1)"
+          aria-label="Capture suivante"
+        >
+          →
+        </button>
+        <button class="btn" type="button" (click)="lightbox.close()">Fermer</button>
+      </div>
+    </dialog>
+  }
+</div>

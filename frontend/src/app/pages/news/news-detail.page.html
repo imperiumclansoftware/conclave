@@ -1,0 +1,59 @@
+<div class="page">
+  <a class="back" routerLink="/news">← Toutes les news</a>
+
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+
+  @if (news(); as n) {
+    <article class="card">
+      <div class="cover">
+        @if (n.imageUrl) {
+          <img [src]="n.imageUrl" alt="" />
+        } @else {
+          <app-news-cover [seed]="n.title" [title]="n.title" [clanName]="clanName()" />
+        }
+      </div>
+      <div class="content">
+        <h1>{{ n.title }}</h1>
+        <p class="byline">
+          @if (n.author) {
+            <app-avatar [member]="n.author" [size]="28" />
+            <a [routerLink]="['/members', n.author.id]" [appMemberCard]="n.author.id">{{
+              n.author.displayName
+            }}</a>
+            ·
+          }
+          <time [attr.datetime]="n.createdAt">{{ date(n.createdAt) }}</time>
+          @if (n.updatedAt) {
+            <span class="meta">(modifiée le {{ date(n.updatedAt) }})</span>
+          }
+        </p>
+        <div class="body">
+          @for (p of paragraphs(); track $index) {
+            <p>{{ p }}</p>
+          }
+        </div>
+        @if (n.canEdit || n.canDelete) {
+          <div class="actions">
+            @if (n.canEdit) {
+              <a class="btn btn-ghost" [routerLink]="['/news', n.id, 'modifier']"
+                ><app-icon name="write" /> Modifier</a
+              >
+            }
+            @if (n.canDelete) {
+              <button
+                class="btn btn-ghost danger"
+                type="button"
+                (click)="remove()"
+                [disabled]="deleting()"
+              >
+                <app-icon name="remove" /> Supprimer
+              </button>
+            }
+          </div>
+        }
+      </div>
+    </article>
+  }
+</div>
