@@ -88,7 +88,42 @@ final class HttpClientMock
             return self::$catalogDown ? new MockResponse('', ['http_code' => 503]) : $this->steam($url);
         }
 
+        if (str_starts_with($url, 'https://api.themoviedb.org/3/')) {
+            return self::$catalogDown ? new MockResponse('', ['http_code' => 503]) : $this->tmdb($url, $options);
+        }
+
         throw new \LogicException(\sprintf('Unexpected HTTP request in tests: %s %s', $method, $url));
+    }
+
+    /** API key accepted by the fake TMDB (v3 format) */
+    public const TMDB_KEY = '0123456789abcdef0123456789abcdef';
+
+    /** @param array<string, mixed> $options */
+    private function tmdb(string $url, array $options): ResponseInterface
+    {
+        parse_str((string) parse_url($url, \PHP_URL_QUERY), $query);
+        if (self::TMDB_KEY !== ($query['api_key'] ?? null)) {
+            return new JsonMockResponse(['status_message' => 'Invalid API key'], ['http_code' => 401]);
+        }
+        $path = substr((string) parse_url($url, \PHP_URL_PATH), \strlen('/3/'));
+
+        return match (true) {
+            'authentication' === $path => new JsonMockResponse(['success' => true]),
+            'search/movie' === $path => new JsonMockResponse(['results' => str_contains(strtolower((string) ($query['query'] ?? '')), 'dune') ? [
+                ['id' => 438631, 'title' => 'Dune', 'original_title' => 'Dune', 'release_date' => '2021-09-15', 'poster_path' => '/dune.jpg'],
+                ['id' => 693134, 'title' => 'Dune : Deuxième partie', 'original_title' => 'Dune: Part Two', 'release_date' => '2024-02-27', 'poster_path' => null],
+            ] : []]),
+            'movie/438631' === $path => new JsonMockResponse([
+                'id' => 438631, 'title' => 'Dune', 'original_title' => 'Dune', 'release_date' => '2021-09-15',
+                'poster_path' => '/dune.jpg', 'backdrop_path' => '/dune-bg.jpg', 'overview' => 'Paul Atréides…', 'runtime' => 155,
+                'genres' => [['id' => 878, 'name' => 'Science-Fiction'], ['id' => 12, 'name' => 'Aventure']],
+                'credits' => [
+                    'cast' => [['name' => 'Timothée Chalamet', 'character' => 'Paul Atréides'], ['name' => 'Zendaya', 'character' => 'Chani']],
+                    'crew' => [['name' => 'Denis Villeneuve', 'job' => 'Director'], ['name' => 'Hans Zimmer', 'job' => 'Original Music Composer']],
+                ],
+            ]),
+            default => new JsonMockResponse(['status_message' => 'Not found'], ['http_code' => 404]),
+        };
     }
 
     private function steam(string $url): ResponseInterface

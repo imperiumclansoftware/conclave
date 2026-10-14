@@ -83,6 +83,16 @@ final readonly class RealtimeNotifier
         $this->publish([$user], ['type' => 'links']);
     }
 
+    /**
+     * The events of the clan changed (created, updated, deleted, joined).
+     *
+     * @param iterable<User> $members
+     */
+    public function eventsChanged(iterable $members): void
+    {
+        $this->publish($members, ['type' => 'events']);
+    }
+
     /** A video call was created or its participants joined/left the channel. */
     public function callUpdated(VideoCall $call): void
     {

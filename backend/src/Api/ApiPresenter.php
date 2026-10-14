@@ -8,13 +8,19 @@ use App\Entity\BranchRequest;
 use App\Entity\Clan;
 use App\Entity\Conversation;
 use App\Entity\ConversationParticipant;
+use App\Entity\Event;
+use App\Entity\EventParticipant;
+use App\Entity\Film;
 use App\Entity\Game;
 use App\Entity\Message;
 use App\Entity\News;
 use App\Entity\User;
 use App\Entity\UserGame;
 use App\Entity\VideoCall;
+use App\Enum\FilmPlatform;
 use App\Enum\GamePlatform;
+use App\Enum\StreamPlatform;
+use App\Films\FilmsAccess;
 use App\Games\GamesAccess;
 use App\News\NewsPermissions;
 use App\Presence\AppStatus;
@@ -30,6 +36,7 @@ final class ApiPresenter
         private readonly BranchRepository $branches,
         private readonly NewsPermissions $newsPermissions,
         private readonly GamesAccess $gamesAccess,
+        private readonly FilmsAccess $filmsAccess,
     ) {
     }
 
@@ -45,7 +52,7 @@ final class ApiPresenter
         ];
     }
 
-    /** @return array{id: ?int, username: string, displayName: string, role: string, avatarUrl: ?string, clan: array{id: ?int, name: string}, email: ?string, faction: ?string, canPublishNews: bool, canAccessGames: bool} */
+    /** @return array{id: ?int, username: string, displayName: string, role: string, avatarUrl: ?string, clan: array{id: ?int, name: string}, email: ?string, faction: ?string, canPublishNews: bool, canAccessGames: bool, canAccessFilms: bool} */
     public function me(User $user): array
     {
         return $this->user($user) + [
@@ -54,6 +61,7 @@ final class ApiPresenter
             'faction' => $user->getFaction()?->value,
             'canPublishNews' => $this->newsPermissions->canPublish($user),
             'canAccessGames' => $this->gamesAccess->allowed($user),
+            'canAccessFilms' => $this->filmsAccess->allowed($user),
         ];
     }
 
@@ -180,6 +188,89 @@ final class ApiPresenter
             'lastMessage' => $lastMessage ? $this->message($lastMessage) : null,
             'lastReadMessageId' => $conversation->getParticipant($viewer)?->getLastReadMessageId(),
             'unreadCount' => $unreadCount,
+        ];
+    }
+
+    /**
+     * Event, as seen by a member; $rights says what this member can do with it.
+     *
+     * @param array{participate: bool, edit: bool, delete: bool} $rights
+     *
+     * @return array<string, mixed>
+     */
+    public function event(Event $event, User $viewer, array $rights): array
+    {
+        $branch = $event->getBranch();
+        $game = $event->getGame();
+        $author = $event->getCreatedBy();
+        $participants = $event->getParticipants()->map(fn (EventParticipant $p): array => $this->user($p->getUser()))->getValues();
+
+        return [
+            'id' => $event->getId(),
+            'type' => $event->getType()->value,
+            'typeLabel' => $event->getType()->label(),
+            'branch' => ['id' => $branch->getId(), 'name' => $branch->getName(), 'crest' => $branch->getCrest()?->value],
+            'title' => $event->getTitle(),
+            'description' => $event->getDescription(),
+            'startsAt' => $event->getStartsAt()->format(\DATE_ATOM),
+            'endsAt' => $event->getEndsAt()?->format(\DATE_ATOM),
+            'maxParticipants' => $event->getMaxParticipants(),
+            'game' => null !== $game ? ['id' => $game->getId(), 'name' => $game->getName(), 'coverUrl' => $game->getCoverUrl()] : null,
+            'gamePlatform' => self::option($event->getGamePlatform()),
+            'film' => null !== $event->getFilm() ? $this->film($event->getFilm()) : null,
+            'filmPlatform' => self::option($event->getFilmPlatform()),
+            'streamPlatform' => self::option($event->getStreamPlatform()),
+            'link' => $event->getLink(),
+            'theme' => $event->getTheme(),
+            'createdBy' => null !== $author && $author->isActive() ? $this->user($author) : null,
+            'participants' => $participants,
+            'participating' => null !== $event->participantOf($viewer),
+            'full' => $event->isFull(),
+            'over' => $event->isOver(),
+            'canParticipate' => $rights['participate'],
+            'canEdit' => $rights['edit'],
+            'canDelete' => $rights['delete'],
+        ];
+    }
+
+    /** @return array{value: string, label: string}|null */
+    private static function option(GamePlatform|FilmPlatform|StreamPlatform|null $option): ?array
+    {
+        return null !== $option ? ['value' => $option->value, 'label' => $option->label()] : null;
+    }
+
+    /**
+     * Film of an event, shown to every member.
+     *
+     * @return array{tmdbId: int, title: string, year: ?string, posterUrl: ?string}
+     */
+    public function film(Film $film): array
+    {
+        return [
+            'tmdbId' => $film->getTmdbId(),
+            'title' => $film->getTitle(),
+            'year' => $film->getYear(),
+            'posterUrl' => $film->getPosterUrl(),
+        ];
+    }
+
+    /**
+     * Full fiche, for the Cinéphiles.
+     *
+     * @return array<string, mixed>
+     */
+    public function filmDetails(Film $film): array
+    {
+        return $this->film($film) + [
+            'originalTitle' => $film->getOriginalTitle(),
+            'releaseDate' => $film->getReleaseDate(),
+            'backdropUrl' => $film->getBackdropUrl(),
+            'overview' => $film->getOverview(),
+            'genres' => $film->getGenres(),
+            'runtime' => $film->getRuntime(),
+            'directors' => $film->getDirectors(),
+            'cast' => $film->getCast(),
+            'tmdbUrl' => 'https://www.themoviedb.org/movie/'.$film->getTmdbId(),
         ];
     }
 

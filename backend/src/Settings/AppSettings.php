@@ -18,6 +18,7 @@ class AppSettings implements ResetInterface
     public const DISCORD_BOT_TOKEN = 'discord.bot_token';
     public const DISCORD_REDIRECT_URI = 'discord.redirect_uri';
     public const RAWG_API_KEY = 'rawg.api_key';
+    public const TMDB_API_KEY = 'tmdb.api_key';
     public const APP_URL = 'app.url';
     public const MAILER_DSN = 'mailer.dsn';
     public const MAILER_FROM = 'mailer.from';
@@ -30,6 +31,7 @@ class AppSettings implements ResetInterface
         self::DISCORD_BOT_TOKEN => ['DISCORD_BOT_TOKEN', true],
         self::DISCORD_REDIRECT_URI => ['DISCORD_REDIRECT_URI', false],
         self::RAWG_API_KEY => ['RAWG_API_KEY', true],
+        self::TMDB_API_KEY => ['TMDB_API_KEY', true],
         self::APP_URL => ['APP_PUBLIC_URL', false],
         self::MAILER_DSN => ['MAILER_DSN', true],
         self::MAILER_FROM => ['MAILER_FROM', false],

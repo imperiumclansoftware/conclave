@@ -12,7 +12,10 @@ use App\Dto\DiscordSettingsRequest;
 use App\Dto\GeneralSettingsRequest;
 use App\Dto\MailSettingsRequest;
 use App\Dto\RawgSettingsRequest;
+use App\Dto\TmdbSettingsRequest;
 use App\Entity\User;
+use App\Films\FilmCatalogUnavailableException;
+use App\Films\TmdbClient;
 use App\Mail\AppMailer;
 use App\Mail\MailServer;
 use App\Mail\MailServerTester;
@@ -108,6 +111,7 @@ final class AdminController extends AbstractController
                 'gateway' => $gateway->read(),
             ],
             'rawg' => ['apiKey' => $this->secret(AppSettings::RAWG_API_KEY)],
+            'tmdb' => ['apiKey' => $this->secret(AppSettings::TMDB_API_KEY)],
         ]);
     }
 
@@ -135,6 +139,33 @@ final class AdminController extends AbstractController
         }
 
         return $this->settings($gateway, $discord);
+    }
+
+    #[Route('/settings/tmdb', name: 'api_admin_settings_tmdb', methods: ['PUT'])]
+    public function saveTmdb(#[MapRequestPayload] TmdbSettingsRequest $request, GatewayStatus $gateway, DiscordConfig $discord): JsonResponse
+    {
+        if (null !== $request->apiKey) {
+            $this->settings->set(AppSettings::TMDB_API_KEY, trim($request->apiKey));
+        }
+
+        return $this->settings($gateway, $discord);
+    }
+
+    #[Route('/tmdb/test', name: 'api_admin_tmdb_test', methods: ['POST'])]
+    public function testTmdb(TmdbClient $tmdb): JsonResponse
+    {
+        if (!$tmdb->isConfigured()) {
+            return $this->json(['ok' => false, 'checks' => [['label' => 'Clé TMDB', 'ok' => false, 'detail' => 'Aucune clé : les Cinéphiles ne peuvent pas chercher de films.']]]);
+        }
+
+        try {
+            $valid = $tmdb->test();
+            $check = ['label' => 'Clé TMDB', 'ok' => $valid, 'detail' => $valid ? 'Clé acceptée par TMDB.' : 'Clé refusée par TMDB.'];
+        } catch (FilmCatalogUnavailableException) {
+            $check = ['label' => 'Clé TMDB', 'ok' => false, 'detail' => 'TMDB est injoignable, réessayez plus tard.'];
+        }
+
+        return $this->json(['ok' => $check['ok'], 'checks' => [$check]]);
     }
 
     /**

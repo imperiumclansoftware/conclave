@@ -47,7 +47,13 @@ final readonly class GameLibrary
         return $userGame;
     }
 
-    private function findOrFetch(string $source, string $externalId): Game
+    /**
+     * The game, from the local cache or fetched from the catalog (also used by the events).
+     *
+     * @throws CatalogUnavailableException
+     * @throws GameNotFoundException
+     */
+    public function findOrFetch(string $source, string $externalId): Game
     {
         $game = $this->games->findBySource($source, $externalId);
 

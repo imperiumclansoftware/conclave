@@ -33,6 +33,11 @@ framework:
                 max_duration: 15
                 headers:
                     User-Agent: 'ClanApp/1.0'
+            # Films of the Cinéphiles (see src/Films)
+            tmdb.client:
+                base_uri: 'https://api.themoviedb.org/3/'
+                timeout: 8
+                max_duration: 15
 
 when@test:
     framework:
