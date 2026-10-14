@@ -95,6 +95,7 @@ describe('SetupPage', () => {
         faction: null,
         canPublishNews: false,
         canAccessGames: false,
+        canAccessFilms: false,
       },
     });
     await fixture.whenStable();

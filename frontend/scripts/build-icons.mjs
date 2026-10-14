@@ -25,6 +25,8 @@ const ICONS = {
   publish: 'scroll-quill',
   image: 'photo-camera',
   links: 'linked-rings',
+  events: 'calendar',
+  film: 'film-projector',
   settings: 'cog',
   mail: 'envelope',
   video: 'video-camera',

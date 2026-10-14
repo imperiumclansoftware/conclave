@@ -1,0 +1,86 @@
+@let e = event();
+<article class="event" [class.over]="e.over" [class.poster]="!!e.film">
+  @if (picture(); as src) {
+    <a class="picture" [routerLink]="['/evenements', e.id]" tabindex="-1" aria-hidden="true">
+      <img [src]="src" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer" />
+    </a>
+  } @else {
+    <a class="picture empty" [routerLink]="['/evenements', e.id]" tabindex="-1" aria-hidden="true">
+      @if (e.branch.crest) {
+        <app-branch-crest [crest]="e.branch.crest" [size]="40" />
+      }
+    </a>
+  }
+
+  <div class="body">
+    <p class="kicker">
+      @if (e.branch.crest) {
+        <app-branch-crest [crest]="e.branch.crest" [size]="16" />
+      }
+      <span>{{ e.branch.name }}</span> · <span class="type">{{ e.typeLabel }}</span> ·
+      <time [attr.datetime]="e.startsAt">{{ time() }}</time>
+    </p>
+    <h3>
+      <a [routerLink]="['/evenements', e.id]">{{ e.title }}</a>
+    </h3>
+
+    <p class="specifics">
+      @if (e.game) {
+        <span><app-icon name="games" /> {{ e.game.name }}</span>
+      }
+      @if (e.film) {
+        <span
+          ><app-icon name="film" /> {{ e.film.title }}
+          @if (e.film.year) {
+            ({{ e.film.year }})
+          }
+        </span>
+      }
+      @for (p of [e.gamePlatform, e.filmPlatform, e.streamPlatform]; track $index) {
+        @if (p) {
+          <span class="tag">{{ p.label }}</span>
+        }
+      }
+      @if (e.theme) {
+        <span>Thème : {{ e.theme }}</span>
+      }
+    </p>
+
+    <div class="footer">
+      <ul class="people" aria-label="Participants">
+        @for (m of shown(); track m.id) {
+          <li [appMemberCard]="m.id" [title]="m.displayName">
+            <app-avatar [member]="m" [size]="26" />
+          </li>
+        }
+        @if (more()) {
+          <li class="more">+{{ more() }}</li>
+        }
+      </ul>
+      <span class="count">
+        {{ e.participants.length }}
+        @if (e.maxParticipants) {
+          / {{ e.maxParticipants }}
+        }
+        participant(s)
+        @if (e.full && !e.participating) {
+          · <strong>complet</strong>
+        }
+      </span>
+      @if (e.participating && !e.over) {
+        <button
+          class="btn btn-ghost"
+          type="button"
+          [disabled]="busy()"
+          (click)="participate.emit(false)"
+        >
+          Je ne viens plus
+        </button>
+      } @else if (e.canParticipate) {
+        <button class="btn" type="button" [disabled]="busy()" (click)="participate.emit(true)">
+          Je participe
+        </button>
+      }
+    </div>
+  </div>
+</article>

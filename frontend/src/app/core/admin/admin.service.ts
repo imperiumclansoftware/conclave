@@ -41,6 +41,15 @@ export class AdminService {
     return this.http.post<CheckResult>('api/admin/rawg/test', null);
   }
 
+  /** apiKey: "" removes the saved key */
+  saveTmdb(apiKey: string): Observable<AdminSettings> {
+    return this.http.put<AdminSettings>('api/admin/settings/tmdb', { apiKey });
+  }
+
+  testTmdb(): Observable<CheckResult> {
+    return this.http.post<CheckResult>('api/admin/tmdb/test', null);
+  }
+
   saveGeneral(clanName: string, appUrl: string): Observable<AdminSettings> {
     return this.http.put<AdminSettings>('api/admin/settings/general', {
       clanName,

@@ -33,7 +33,7 @@ const TABS: { id: Tab; label: string; icon: IconName }[] = [
   { id: 'general', label: 'Général', icon: 'settings' },
   { id: 'mail', label: 'E-mail', icon: 'mail' },
   { id: 'discord', label: 'Discord', icon: 'discord' },
-  { id: 'catalog', label: 'Catalogue de jeux', icon: 'library' },
+  { id: 'catalog', label: 'Catalogues', icon: 'library' },
 ];
 type Status = { kind: 'success' | 'error'; message: string } | null;
 
@@ -75,6 +75,8 @@ export class AdminPage implements OnInit {
   protected readonly discordCheck = signal<CheckResult | null>(null);
   protected readonly rawgStatus = signal<Status>(null);
   protected readonly rawgCheck = signal<CheckResult | null>(null);
+  protected readonly tmdbStatus = signal<Status>(null);
+  protected readonly tmdbCheck = signal<CheckResult | null>(null);
 
   /** Redirection to declare in the Discord portal: this app's callback route. */
   protected readonly suggestedRedirectUri = new URL('discord/callback', document.baseURI).href;
@@ -90,6 +92,7 @@ export class AdminPage implements OnInit {
     redirectUri: [''],
   });
   protected readonly rawgForm = this.fb.group({ apiKey: [''] });
+  protected readonly tmdbForm = this.fb.group({ apiKey: [''] });
 
   /** The leader picked a tab: the page no longer chooses for them */
   private tabChosen = false;
@@ -204,6 +207,25 @@ export class AdminPage implements OnInit {
     });
   }
 
+  protected async saveTmdb(clear = false): Promise<void> {
+    const apiKey = clear ? '' : this.tmdbForm.getRawValue().apiKey.trim();
+    if (!clear && !apiKey) {
+      return;
+    }
+    await this.run(this.tmdbStatus, async () => {
+      this.apply(await firstValueFrom(this.admin.saveTmdb(apiKey)));
+      this.tmdbCheck.set(null);
+      return clear ? 'Clé TMDB retirée.' : 'Clé TMDB enregistrée.';
+    });
+  }
+
+  protected async testTmdb(): Promise<void> {
+    await this.run(this.tmdbStatus, async () => {
+      this.tmdbCheck.set(await firstValueFrom(this.admin.testTmdb()));
+      return '';
+    });
+  }
+
   protected useSuggestedAppUrl(): void {
     this.generalForm.controls.appUrl.setValue(this.suggestedAppUrl);
   }
@@ -259,6 +281,7 @@ export class AdminPage implements OnInit {
       redirectUri: settings.discord.redirectUri.value ?? '',
     });
     this.rawgForm.setValue({ apiKey: '' });
+    this.tmdbForm.setValue({ apiKey: '' });
   }
 
   private async run(

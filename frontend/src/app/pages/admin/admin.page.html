@@ -338,6 +338,71 @@
           </ul>
         }
       </form>
+
+      <form class="card narrow" [formGroup]="tmdbForm" (ngSubmit)="saveTmdb()" novalidate>
+        <h2>TMDB (films des Cinéphiles)</h2>
+        <p class="meta">
+          Les fiches de films des watch parties viennent de
+          <a
+            href="https://www.themoviedb.org/settings/api"
+            target="_blank"
+            rel="noopener noreferrer"
+            >The Movie Database ↗</a
+          >
+          (compte et clé gratuits). La recherche et les fiches sont réservées aux membres de la
+          branche Cinéphiles.
+        </p>
+        <div class="field">
+          <label for="tmdb-key"
+            >Clé d'API ou jeton d'accès en lecture
+            @if (s.tmdb.apiKey.source === 'env') {
+              <span class="source">.env</span>
+            }
+          </label>
+          <input
+            id="tmdb-key"
+            type="password"
+            formControlName="apiKey"
+            autocomplete="new-password"
+            spellcheck="false"
+            [placeholder]="
+              s.tmdb.apiKey.set
+                ? 'Enregistrée (' + s.tmdb.apiKey.hint + ')'
+                : 'Clé de 32 caractères ou jeton'
+            "
+          />
+        </div>
+        @if (tmdbStatus(); as st) {
+          <p [class]="st.kind" [attr.role]="st.kind === 'error' ? 'alert' : 'status'">
+            {{ st.message }}
+          </p>
+        }
+        <div class="actions">
+          <button class="btn" type="submit" [disabled]="busy()">Enregistrer</button>
+          <button class="btn btn-ghost" type="button" (click)="testTmdb()" [disabled]="busy()">
+            Tester
+          </button>
+          @if (s.tmdb.apiKey.source === 'admin') {
+            <button class="link" type="button" (click)="saveTmdb(true)">Retirer la clé</button>
+          }
+        </div>
+        @if (tmdbCheck(); as check) {
+          <ul class="checks">
+            @for (c of check.checks; track c.label) {
+              <li [class.ok]="c.ok">
+                <span aria-hidden="true">{{ c.ok ? '✓' : '✗' }}</span>
+                <strong>{{ c.label }}</strong>
+                @if (c.detail) {
+                  : {{ c.detail }}
+                }
+              </li>
+            }
+          </ul>
+        }
+        <p class="hint tmdb-credit">
+          Ce produit utilise l'API TMDB mais n'est ni approuvé ni certifié par TMDB.
+        </p>
+      </form>
     }
   </section>
 </div>

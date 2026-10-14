@@ -1,0 +1,216 @@
+<div class="page">
+  <a class="back" [routerLink]="editing() ? ['/evenements', id()] : ['/evenements']"
+    >← {{ editing() ? 'Retour à l’événement' : 'Tous les événements' }}</a
+  >
+  <h1>
+    <app-icon name="events" /> {{ editing() ? 'Modifier l’événement' : 'Créer un événement' }}
+  </h1>
+
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+
+  @if (loaded()) {
+    @if (!editing() && groups().length === 0) {
+      <section class="card">
+        <p>Vous ne faites partie d'aucune branche qui organise des événements.</p>
+        <a [routerLink]="['/account']" [queryParams]="{ onglet: 'branches' }"
+          >Rejoindre une branche</a
+        >
+      </section>
+    } @else {
+      <form class="card" [formGroup]="form" (ngSubmit)="submit()" novalidate>
+        @if (!editing()) {
+          <fieldset class="types">
+            <legend>Type d'événement</legend>
+            @for (g of groups(); track g.branch.id) {
+              <div class="group">
+                <p class="branch">
+                  @if (g.branch.crest) {
+                    <app-branch-crest [crest]="g.branch.crest" [size]="20" />
+                  }
+                  {{ g.branch.name }}
+                </p>
+                <div class="choices">
+                  @for (t of g.types; track t.type) {
+                    <label class="choice" [class.selected]="form.controls.type.value === t.type">
+                      <input type="radio" formControlName="type" [value]="t.type" />
+                      {{ t.label }}
+                    </label>
+                  }
+                </div>
+              </div>
+            }
+          </fieldset>
+        } @else if (selected(); as t) {
+          <p class="fixed-type">
+            @if (t.branch.crest) {
+              <app-branch-crest [crest]="t.branch.crest" [size]="20" />
+            }
+            {{ t.branch.name }} · <strong>{{ t.label }}</strong>
+          </p>
+        }
+
+        @if (selected(); as t) {
+          <!-- Fields of the type -->
+          @if (has('game')) {
+            <div class="field">
+              <label for="event-game">Jeu</label>
+              @if (game(); as g) {
+                <p class="chosen">
+                  <app-icon name="games" /> <strong>{{ g.name }}</strong>
+                  <button class="link" type="button" (click)="game.set(null)">Changer</button>
+                </p>
+              } @else {
+                <app-catalog-picker
+                  inputId="event-game"
+                  placeholder="Rechercher un jeu…"
+                  [search]="searchGames"
+                  (picked)="pickGame($event)"
+                />
+              }
+            </div>
+          }
+          @if (has('gamePlatform')) {
+            <div class="field">
+              <label for="event-game-platform">Plateforme</label>
+              <select id="event-game-platform" formControlName="gamePlatform">
+                <option value="">Choisir…</option>
+                @for (p of gamePlatforms(); track p.value) {
+                  <option [value]="p.value">{{ p.label }}</option>
+                }
+              </select>
+            </div>
+          }
+          @if (has('film')) {
+            <div class="field">
+              <label for="event-film">Film</label>
+              @if (film(); as f) {
+                <p class="chosen">
+                  <app-icon name="film" /> <strong>{{ f.title }}</strong>
+                  @if (f.year) {
+                    ({{ f.year }})
+                  }
+                  <button class="link" type="button" (click)="film.set(null)">Changer</button>
+                </p>
+              } @else {
+                <app-catalog-picker
+                  inputId="event-film"
+                  placeholder="Rechercher un film sur TMDB…"
+                  [search]="searchFilms"
+                  (picked)="pickFilm($event)"
+                />
+              }
+            </div>
+          }
+          @if (has('filmPlatform')) {
+            <div class="field">
+              <label for="event-film-platform">Où le regarder</label>
+              <select id="event-film-platform" formControlName="filmPlatform">
+                <option value="">Choisir…</option>
+                @for (p of catalog()?.filmPlatforms ?? []; track p.value) {
+                  <option [value]="p.value">{{ p.label }}</option>
+                }
+              </select>
+            </div>
+          }
+          @if (has('streamPlatform')) {
+            <div class="field">
+              <label for="event-stream-platform">Diffusé sur</label>
+              <select id="event-stream-platform" formControlName="streamPlatform">
+                <option value="">Choisir…</option>
+                @for (p of catalog()?.streamPlatforms ?? []; track p.value) {
+                  <option [value]="p.value">{{ p.label }}</option>
+                }
+              </select>
+            </div>
+          }
+          @if (has('theme')) {
+            <div class="field">
+              <label for="event-theme"
+                >Thème
+                @if (!required('theme')) {
+                  <span class="optional">(facultatif)</span>
+                }
+              </label>
+              <input id="event-theme" formControlName="theme" maxlength="120" />
+            </div>
+          }
+          @if (has('link')) {
+            <div class="field">
+              <label for="event-link"
+                >Lien
+                @if (!required('link')) {
+                  <span class="optional">(facultatif)</span>
+                }
+              </label>
+              <input
+                id="event-link"
+                type="url"
+                formControlName="link"
+                maxlength="500"
+                placeholder="https://…"
+                spellcheck="false"
+              />
+            </div>
+          }
+
+          <!-- Common fields -->
+          <div class="field">
+            <label for="event-title">Titre</label>
+            <input id="event-title" formControlName="title" required maxlength="120" />
+          </div>
+          <div class="row">
+            <div class="field">
+              <label for="event-start">Début</label>
+              <input id="event-start" type="datetime-local" formControlName="startsAt" required />
+            </div>
+            <div class="field">
+              <label for="event-end">Fin <span class="optional">(facultatif)</span></label>
+              <input
+                id="event-end"
+                type="datetime-local"
+                formControlName="endsAt"
+                [min]="form.controls.startsAt.value"
+              />
+            </div>
+            <div class="field places">
+              <label for="event-places">Places <span class="optional">(facultatif)</span></label>
+              <input
+                id="event-places"
+                type="number"
+                formControlName="maxParticipants"
+                min="2"
+                max="500"
+                inputmode="numeric"
+                placeholder="Illimité"
+              />
+            </div>
+          </div>
+          <div class="field">
+            <label for="event-description"
+              >Description <span class="optional">(facultatif)</span></label
+            >
+            <textarea
+              id="event-description"
+              formControlName="description"
+              rows="5"
+              maxlength="5000"
+            ></textarea>
+          </div>
+
+          <div class="actions">
+            <button class="btn" type="submit" [disabled]="busy()">
+              {{ busy() ? 'Enregistrement…' : editing() ? 'Enregistrer' : 'Créer l’événement' }}
+            </button>
+            <a
+              class="btn btn-ghost"
+              [routerLink]="editing() ? ['/evenements', id()] : ['/evenements']"
+              >Annuler</a
+            >
+          </div>
+        }
+      </form>
+    }
+  }
+</div>

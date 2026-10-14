@@ -1,0 +1,100 @@
+<div class="page">
+  <header class="head">
+    <h1><app-icon name="events" /> Événements</h1>
+    @if (canCreate()) {
+      <a class="btn" routerLink="/evenements/nouveau"
+        ><app-icon name="write" /> Créer un événement</a
+      >
+    }
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Période">
+    <button
+      role="tab"
+      type="button"
+      [attr.aria-selected]="!past()"
+      [class.active]="!past()"
+      (click)="filter({ periode: null })"
+    >
+      À venir
+    </button>
+    <button
+      role="tab"
+      type="button"
+      [attr.aria-selected]="past()"
+      [class.active]="past()"
+      (click)="filter({ periode: 'passes' })"
+    >
+      Passés
+    </button>
+  </div>
+
+  @if (branches.branches().length > 1) {
+    <nav class="filters" aria-label="Filtrer par branche">
+      <button
+        type="button"
+        [class.active]="!branchId()"
+        [attr.aria-pressed]="!branchId()"
+        (click)="filter({ branche: null })"
+      >
+        Toutes les branches
+      </button>
+      @for (b of branches.branches(); track b.id) {
+        <button
+          type="button"
+          [class.active]="branchId() === b.id"
+          [attr.aria-pressed]="branchId() === b.id"
+          (click)="filter({ branche: b.id })"
+        >
+          @if (b.crest) {
+            <app-branch-crest [crest]="b.crest" [size]="16" />
+          }
+          {{ b.name }}
+        </button>
+      }
+    </nav>
+  }
+
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+
+  <div role="tabpanel" aria-live="polite" [attr.aria-busy]="!loaded()">
+    @for (group of days(); track group.day) {
+      <section class="day" [attr.aria-label]="group.day">
+        <h2>{{ group.day }}</h2>
+        <ul>
+          @for (e of group.events; track e.id) {
+            <li>
+              <app-event-card
+                [event]="e"
+                [busy]="busy() === e.id"
+                (participate)="participate(e, $event)"
+              />
+            </li>
+          }
+        </ul>
+      </section>
+    } @empty {
+      @if (loaded() && !error()) {
+        <section class="card empty">
+          <p>{{ past() ? 'Aucun événement passé.' : 'Aucun événement prévu pour l’instant.' }}</p>
+          @if (!past()) {
+            @if (canCreate()) {
+              <a class="btn" routerLink="/evenements/nouveau">Créer le premier</a>
+            } @else {
+              <p class="meta">
+                Les membres des branches organisent ici sessions de jeu, watch parties et autres
+                rendez-vous. Rejoignez une branche depuis
+                <a [routerLink]="['/account']" [queryParams]="{ onglet: 'branches' }"
+                  >votre profil</a
+                >
+                pour en créer.
+              </p>
+            }
+          }
+        </section>
+      }
+    }
+  </div>
+</div>

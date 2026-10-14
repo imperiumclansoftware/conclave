@@ -1,0 +1,82 @@
+<div class="page">
+  <a class="back" routerLink="/evenements">← Événements</a>
+
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+
+  @if (film(); as f) {
+    <article class="card">
+      @if (consent.src(f.backdropUrl); as backdrop) {
+        <img class="backdrop" [src]="backdrop" alt="" referrerpolicy="no-referrer" />
+      }
+      <div class="main">
+        @if (consent.src(f.posterUrl); as poster) {
+          <img
+            class="poster"
+            [src]="poster"
+            [alt]="'Affiche de ' + f.title"
+            referrerpolicy="no-referrer"
+          />
+        }
+        <div class="info">
+          <h1>
+            {{ f.title }}
+            @if (f.year) {
+              <span class="year">({{ f.year }})</span>
+            }
+          </h1>
+          @if (f.originalTitle) {
+            <p class="meta">Titre original : {{ f.originalTitle }}</p>
+          }
+          <p class="meta">
+            @if (runtime()) {
+              {{ runtime() }}
+            }
+            @if (f.genres.length) {
+              · {{ f.genres.join(', ') }}
+            }
+          </p>
+          @if (f.directors.length) {
+            <p><strong>Réalisation :</strong> {{ f.directors.join(', ') }}</p>
+          }
+          @if (f.overview) {
+            <p class="overview">{{ f.overview }}</p>
+          }
+        </div>
+      </div>
+
+      @if (f.cast.length) {
+        <section aria-labelledby="cast-title">
+          <h2 id="cast-title">Distribution</h2>
+          <ul class="cast">
+            @for (c of f.cast; track c.name) {
+              <li>
+                <strong>{{ c.name }}</strong>
+                @if (c.character) {
+                  <span>{{ c.character }}</span>
+                }
+              </li>
+            }
+          </ul>
+        </section>
+      }
+
+      <div class="actions">
+        <a
+          class="btn"
+          [routerLink]="['/evenements/nouveau']"
+          [queryParams]="{ type: 'watch_party' }"
+          ><app-icon name="events" /> Organiser une watch party</a
+        >
+        <a class="btn btn-ghost" [href]="f.tmdbUrl" target="_blank" rel="noopener noreferrer"
+          >Voir sur TMDB ↗</a
+        >
+      </div>
+      <p class="credit">
+        Fiche fournie par The Movie Database (TMDB). Ce produit utilise l'API TMDB mais n'est ni
+        approuvé ni certifié par TMDB.
+      </p>
+    </article>
+  }
+</div>

@@ -18,6 +18,8 @@ export interface Me extends Member {
   canPublishNews: boolean;
   /** Member of the Joueurs branch: the games part is theirs */
   canAccessGames: boolean;
+  /** Member of the Cinéphiles branch: film search and fiches */
+  canAccessFilms: boolean;
 }
 
 export interface Message {
@@ -293,6 +295,7 @@ export interface AdminSettings {
     gateway: GatewayState;
   };
   rawg: { apiKey: SecretSetting };
+  tmdb: { apiKey: SecretSetting };
 }
 
 export interface CheckResult {
@@ -362,4 +365,104 @@ export interface BranchLink {
 export interface BranchLinks {
   branch: BranchRef;
   links: BranchLink[];
+}
+
+export interface Option {
+  value: string;
+  label: string;
+}
+
+export type EventField =
+  'game' | 'gamePlatform' | 'film' | 'filmPlatform' | 'streamPlatform' | 'link' | 'theme';
+
+/** A kind of event of a branch, with its specific fields */
+export interface EventTypeInfo {
+  type: string;
+  label: string;
+  branch: BranchRef;
+  fields: { name: EventField; required: boolean }[];
+  /** Member of the branch */
+  canCreate: boolean;
+}
+
+export interface EventTypes {
+  types: EventTypeInfo[];
+  filmPlatforms: Option[];
+  streamPlatforms: Option[];
+}
+
+/** Film of an event: shown to everybody */
+export interface FilmSummary {
+  tmdbId: number;
+  title: string;
+  year: string | null;
+  posterUrl: string | null;
+}
+
+/** Full fiche: Cinéphiles only */
+export interface FilmDetails extends FilmSummary {
+  originalTitle: string | null;
+  releaseDate: string | null;
+  backdropUrl: string | null;
+  overview: string | null;
+  genres: string[];
+  runtime: number | null;
+  directors: string[];
+  cast: { name: string; character: string | null }[];
+  tmdbUrl: string;
+}
+
+export interface FilmSearchResult extends FilmSummary {
+  originalTitle: string | null;
+}
+
+export interface ClanEvent {
+  id: number;
+  type: string;
+  typeLabel: string;
+  branch: BranchRef;
+  title: string;
+  description: string | null;
+  startsAt: string;
+  endsAt: string | null;
+  maxParticipants: number | null;
+  game: {
+    id: number;
+    name: string;
+    coverUrl: string | null;
+    source: string;
+    externalId: string;
+  } | null;
+  gamePlatform: Option | null;
+  film: FilmSummary | null;
+  filmPlatform: Option | null;
+  streamPlatform: Option | null;
+  link: string | null;
+  theme: string | null;
+  createdBy: Member | null;
+  participants: Member[];
+  participating: boolean;
+  full: boolean;
+  over: boolean;
+  canParticipate: boolean;
+  canEdit: boolean;
+  canDelete: boolean;
+}
+
+/** Creation or update of an event */
+export interface EventInput {
+  type: string;
+  title: string;
+  description: string | null;
+  startsAt: string;
+  endsAt: string | null;
+  maxParticipants: number | null;
+  gameSource: string | null;
+  gameExternalId: string | null;
+  gamePlatform: string | null;
+  tmdbId: number | null;
+  filmPlatform: string | null;
+  streamPlatform: string | null;
+  link: string | null;
+  theme: string | null;
 }

@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import {
   authGuard,
+  filmsGuard,
   gamesGuard,
   guestGuard,
   installedGuard,
@@ -69,6 +70,40 @@ export const routes: Routes = [
       // Messaging lives in a sidebar: former links open it, on the clan page
       { path: 'messages', canActivate: [openChatPanel], children: [] },
       { path: 'messages/:memberId', canActivate: [openChatPanel], children: [] },
+      {
+        path: 'evenements',
+        children: [
+          {
+            path: '',
+            title: 'Événements',
+            loadComponent: () => import('./pages/events/events.page').then((m) => m.EventsPage),
+          },
+          {
+            path: 'nouveau',
+            title: 'Créer un événement',
+            loadComponent: () =>
+              import('./pages/events/event-form.page').then((m) => m.EventFormPage),
+          },
+          {
+            path: ':id',
+            title: 'Événement',
+            loadComponent: () =>
+              import('./pages/events/event-detail.page').then((m) => m.EventDetailPage),
+          },
+          {
+            path: ':id/modifier',
+            title: 'Modifier l’événement',
+            loadComponent: () =>
+              import('./pages/events/event-form.page').then((m) => m.EventFormPage),
+          },
+        ],
+      },
+      {
+        path: 'films/:id',
+        title: 'Film',
+        canActivate: [filmsGuard],
+        loadComponent: () => import('./pages/films/film.page').then((m) => m.FilmPage),
+      },
       {
         path: 'news',
         children: [

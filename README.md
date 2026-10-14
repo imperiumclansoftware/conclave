@@ -49,6 +49,24 @@ Comptes dirigeants et membres, messagerie instantanée entre les membres d'un m�
     l'Ordre selon le thème : *Joueurs* (manette sur épées croisées), *Développeurs* (`</>` dont la barre
     est une lame secrète), *Communicants* (trompette de héraut à bannière) et *Cinéphiles* (clap de
     cinéma), sinon une simple bannière.
+- **Événements** : chaque branche a ses types d'événements, avec leurs champs propres
+  (`App\Enum\EventType`) :
+
+  | Branche | Types | Champs propres |
+  |---|---|---|
+  | Joueurs | Session de jeu, Tournoi | jeu (catalogue Steam/RAWG) et plateforme |
+  | Cinéphiles | Watch party, Ciné-club | film (TMDB) ; plateforme de visionnage pour la watch party |
+  | Développeurs | Réunion, Game jam | lien de visio, thème de la jam |
+  | Communicants | Stream | plateforme de diffusion, lien |
+
+  Tout le clan voit les événements des branches actives (`/evenements` : à venir ou passés, filtre par
+  branche) ; seuls les membres de la branche en créent et s'y inscrivent, avec un nombre de places
+  facultatif. L'organisateur les modifie, les dirigeants peuvent les modifier ou les supprimer. Les
+  listes se mettent à jour en temps réel.
+- **Films (TMDB)** : la clé d'API TMDB (ou le jeton d'accès en lecture) se saisit dans
+  *Administration > Catalogues*. La recherche de films et les fiches (`/films/{id}`) sont réservées aux
+  membres de la branche Cinéphiles ; les autres voient le titre et l'affiche du film d'un événement.
+  Les fiches sont gardées en base et rafraîchies tous les 30 jours.
 - **News** : actualités du clan (titre, texte, image facultative), lues par tous les membres (menu
   *News*). Seuls les membres des branches autorisées dans l'administration (case « Ses membres peuvent
   publier des news »), c'est-à-dire les *Communicants*, les publient : un dirigeant doit rejoindre la
@@ -185,8 +203,9 @@ Xbox Series, Xbox One, Switch, Switch 2, Mobile). Les informations (jaquette, de
 développeurs, captures d'écran) sont récupérées automatiquement :
 
 - **Steam** par défaut : aucune clé nécessaire, descriptions en français, mais jeux PC uniquement ;
-- **RAWG** si `RAWG_API_KEY` est renseignée (`backend/.env.local`) : toutes les plateformes, consoles
-  comprises. Clé gratuite sur https://rawg.io/apidocs.
+- **RAWG** si une clé est renseignée (*Administration > Catalogues*, ou `RAWG_API_KEY`) : toutes les
+  plateformes, consoles comprises. Clé gratuite sur https://rawg.io/apidocs. Si RAWG refuse la clé ou ne
+  répond pas, la recherche repasse sur Steam.
 
 Les fiches sont mises en cache en base (rafraîchies au bout de 30 jours) et les recherches pendant 1 h.
 
@@ -386,6 +405,13 @@ Toutes les routes sauf `setup`, `register`, `login`, `password/*` et `health` ex
 | GET     | `/api/me/branch-links`                  | Liens favoris de mes branches, groupés par branche  |
 | POST    | `/api/clan/branches/{id}/links`         | `{url, title?}` → ajoute un lien (membres)          |
 | DELETE  | `/api/branch-links/{id}`                | Retire un lien (auteur ou dirigeant)                |
+| GET     | `/api/events/types`                     | Types d'événements des branches actives, plateformes |
+| GET     | `/api/events?period=upcoming\|past&branch=` | Événements, du plus proche (ou du plus récent) |
+| POST    | `/api/events`                           | Crée un événement (membres de la branche)           |
+| GET/PUT/DELETE | `/api/events/{id}`               | Détail / modification / suppression                |
+| PUT/DELETE | `/api/events/{id}/participation`     | S'inscrire / se désinscrire                         |
+| GET     | `/api/films/search?q=`, `/api/films/{tmdbId}` | Recherche et fiche TMDB (Cinéphiles)          |
+| PUT     | `/api/admin/settings/tmdb`              | `{apiKey}` → clé TMDB ; `POST /api/admin/tmdb/test` pour la tester |
 | GET     | `/api/members/{id}/card`                | Carte de membre : branches et compteurs             |
 | GET     | `/api/news?before={id}`                 | News, 12 par page, des plus récentes aux anciennes  |
 | GET     | `/api/news/{id}`                        | Une news, avec `canEdit` / `canDelete`              |

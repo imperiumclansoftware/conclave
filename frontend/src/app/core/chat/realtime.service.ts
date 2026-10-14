@@ -13,7 +13,8 @@ export type RealtimeEvent =
   | { type: 'member-left'; userId: number }
   | { type: 'signups' }
   | { type: 'branches' }
-  | { type: 'links' };
+  | { type: 'links' }
+  | { type: 'events' };
 export type RealtimeStatus = 'connecting' | 'connected' | 'disconnected';
 
 interface Subscription {

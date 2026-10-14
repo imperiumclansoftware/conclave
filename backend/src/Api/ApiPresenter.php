@@ -215,7 +215,7 @@ final class ApiPresenter
             'startsAt' => $event->getStartsAt()->format(\DATE_ATOM),
             'endsAt' => $event->getEndsAt()?->format(\DATE_ATOM),
             'maxParticipants' => $event->getMaxParticipants(),
-            'game' => null !== $game ? ['id' => $game->getId(), 'name' => $game->getName(), 'coverUrl' => $game->getCoverUrl()] : null,
+            'game' => null !== $game ? ['id' => $game->getId(), 'name' => $game->getName(), 'coverUrl' => $game->getCoverUrl(), 'source' => $game->getSource(), 'externalId' => $game->getExternalId()] : null,
             'gamePlatform' => self::option($event->getGamePlatform()),
             'film' => null !== $event->getFilm() ? $this->film($event->getFilm()) : null,
             'filmPlatform' => self::option($event->getFilmPlatform()),

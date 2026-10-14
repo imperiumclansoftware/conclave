@@ -1,0 +1,145 @@
+:host {
+  display: block;
+}
+
+.event {
+  display: grid;
+  grid-template-columns: 7.5rem minmax(0, 1fr);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-solid);
+
+  &.over {
+    opacity: 0.75;
+  }
+
+  @media (max-width: 30rem) {
+    grid-template-columns: 5rem minmax(0, 1fr);
+  }
+}
+
+.picture {
+  display: block;
+  min-height: 100%;
+  background: var(--surface-muted);
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 7rem;
+    object-fit: cover;
+  }
+
+  &.empty {
+    display: grid;
+    place-items: center;
+  }
+}
+
+.body {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+  padding: 0.75rem 1rem;
+}
+
+.kicker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3rem;
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+
+  .type {
+    color: var(--accent-text);
+    font-weight: 600;
+  }
+}
+
+h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  overflow-wrap: anywhere;
+
+  a {
+    color: var(--text);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--accent-text);
+      text-decoration: underline;
+    }
+  }
+}
+
+.specifics {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.75rem;
+  margin: 0;
+  font-size: 0.9rem;
+
+  span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  .tag {
+    padding: 0 0.5rem;
+    border-radius: 999px;
+    color: var(--accent-text);
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+    font-size: 0.78rem;
+  }
+}
+
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem 0.75rem;
+  margin-top: 0.25rem;
+
+  .btn {
+    margin-left: auto;
+    padding: 0.3rem 0.8rem;
+    font-size: 0.85rem;
+  }
+}
+
+.people {
+  display: flex;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li + li {
+    margin-left: -0.4rem;
+  }
+
+  li {
+    border: 2px solid var(--surface-solid);
+    border-radius: 50%;
+  }
+
+  .more {
+    display: grid;
+    place-items: center;
+    width: 1.9rem;
+    height: 1.9rem;
+    color: var(--text-muted);
+    background: var(--surface-muted);
+    font-size: 0.75rem;
+  }
+}
+
+.count {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}

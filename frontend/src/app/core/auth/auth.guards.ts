@@ -47,6 +47,15 @@ export const gamesGuard: CanActivateFn = () => {
   );
 };
 
+/** Film fiches: members of the Cinéphiles branch */
+export const filmsGuard: CanActivateFn = () => {
+  const router = inject(Router);
+  return (
+    inject(AuthService).user()?.canAccessFilms === true ||
+    router.createUrlTree(['/account'], { queryParams: { onglet: 'branches' } })
+  );
+};
+
 export const leaderGuard: CanActivateFn = () => {
   const router = inject(Router);
   return inject(AuthService).isLeader() || router.createUrlTree(['/']);

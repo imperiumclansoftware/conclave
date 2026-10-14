@@ -88,6 +88,11 @@ final class HttpClientMock
             return self::$catalogDown ? new MockResponse('', ['http_code' => 503]) : $this->steam($url);
         }
 
+        // Every RAWG key is refused here: the search falls back to Steam
+        if (str_starts_with($url, 'https://api.rawg.io/')) {
+            return new JsonMockResponse(['error' => 'The key is invalid'], ['http_code' => 401]);
+        }
+
         if (str_starts_with($url, 'https://api.themoviedb.org/3/')) {
             return self::$catalogDown ? new MockResponse('', ['http_code' => 503]) : $this->tmdb($url, $options);
         }

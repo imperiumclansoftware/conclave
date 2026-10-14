@@ -17,6 +17,7 @@ function render(role: 'leader' | 'member', pending = 0) {
     faction: null,
     canPublishNews: false,
     canAccessGames: false,
+    canAccessFilms: false,
   };
   TestBed.configureTestingModule({
     imports: [UserMenu],

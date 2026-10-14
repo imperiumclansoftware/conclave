@@ -70,6 +70,18 @@ final class GameTest extends ApiTestCase
         self::assertSame(['steam', '1245620', ['pc'], false], [$results[0]['source'], $results[0]['externalId'], $results[0]['platforms'], $results[0]['inLibrary']]);
     }
 
+    public function testARefusedRawgKeyFallsBackToSteam(): void
+    {
+        $leader = $this->registerClan();
+        $this->api('PUT', '/api/admin/settings/rawg', ['apiKey' => str_repeat('a', 32)], $leader['token']);
+        self::assertFalse($this->api('POST', '/api/admin/rawg/test', token: $leader['token'])['ok'], 'Refused key');
+
+        $results = $this->api('GET', '/api/games/search?q=elden', token: $leader['token']);
+
+        self::assertResponseIsSuccessful();
+        self::assertSame(['steam', 'ELDEN RING'], [$results[0]['source'], $results[0]['name']]);
+    }
+
     public function testShortQueriesReturnNothing(): void
     {
         $leader = $this->registerClan();

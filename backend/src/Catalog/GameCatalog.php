@@ -2,12 +2,14 @@
 
 namespace App\Catalog;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Cache\CacheInterface;
 use Symfony\Contracts\Cache\ItemInterface;
 
 /**
  * Entry point to the external game catalogs: searches RAWG when an API key is configured
- * (all platforms), Steam otherwise (PC only, no key needed).
+ * (all platforms), Steam otherwise (PC only, no key needed), or when RAWG fails (key refused,
+ * service down), so that a broken key does not stop the search.
  */
 final readonly class GameCatalog
 {
@@ -17,6 +19,7 @@ final readonly class GameCatalog
         private SteamCatalog $steam,
         private RawgCatalog $rawg,
         private CacheInterface $cache,
+        private LoggerInterface $logger,
     ) {
     }
 
@@ -33,6 +36,25 @@ final readonly class GameCatalog
     public function search(string $query): array
     {
         $catalog = $this->preferred();
+        if ($catalog === $this->rawg) {
+            try {
+                return $this->searchIn($this->rawg, $query);
+            } catch (CatalogUnavailableException $e) {
+                $this->logger->warning('RAWG search failed, Steam used instead: {error}', ['error' => $e->getMessage()]);
+                $catalog = $this->steam;
+            }
+        }
+
+        return $this->searchIn($catalog, $query);
+    }
+
+    /**
+     * @return list<CatalogGame>
+     *
+     * @throws CatalogUnavailableException
+     */
+    private function searchIn(GameCatalogInterface $catalog, string $query): array
+    {
         $key = \sprintf('catalog_search_%s_%s', $catalog->source(), md5(mb_strtolower(trim($query))));
 
         return $this->cache->get($key, function (ItemInterface $item) use ($catalog, $query): array {

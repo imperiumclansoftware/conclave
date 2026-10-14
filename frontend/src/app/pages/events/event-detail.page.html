@@ -1,0 +1,170 @@
+<div class="page">
+  <a class="back" routerLink="/evenements">← Tous les événements</a>
+
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+
+  @if (event(); as e) {
+    <article class="card">
+      <header class="hero">
+        @if (picture(); as src) {
+          <img
+            class="picture"
+            [class.poster]="!!e.film"
+            [src]="src"
+            alt=""
+            referrerpolicy="no-referrer"
+          />
+        } @else if (e.branch.crest) {
+          <span class="picture crest"
+            ><app-branch-crest [crest]="e.branch.crest" [size]="72"
+          /></span>
+        }
+        <div class="intro">
+          <p class="kicker">
+            @if (e.branch.crest) {
+              <app-branch-crest [crest]="e.branch.crest" [size]="18" />
+            }
+            {{ e.branch.name }} · <strong>{{ e.typeLabel }}</strong>
+            @if (e.over) {
+              · <span class="over">terminé</span>
+            }
+          </p>
+          <h1>{{ e.title }}</h1>
+          <p class="when">
+            <app-icon name="events" /> {{ day() }},
+            <time [attr.datetime]="e.startsAt">{{ time() }}</time>
+          </p>
+          @if (e.createdBy) {
+            <p class="meta">
+              Organisé par
+              <a [routerLink]="['/members', e.createdBy.id]" [appMemberCard]="e.createdBy.id">{{
+                e.createdBy.displayName
+              }}</a>
+            </p>
+          }
+        </div>
+      </header>
+
+      <dl class="facts">
+        @if (e.game) {
+          <div>
+            <dt>Jeu</dt>
+            <dd>
+              @if (auth.user()?.canAccessGames) {
+                <a [routerLink]="['/games', e.game.id]">{{ e.game.name }}</a>
+              } @else {
+                {{ e.game.name }}
+              }
+            </dd>
+          </div>
+        }
+        @if (e.film) {
+          <div>
+            <dt>Film</dt>
+            <dd>
+              @if (auth.user()?.canAccessFilms) {
+                <a [routerLink]="['/films', e.film.tmdbId]">{{ e.film.title }}</a>
+              } @else {
+                {{ e.film.title }}
+              }
+              @if (e.film.year) {
+                ({{ e.film.year }})
+              }
+            </dd>
+          </div>
+        }
+        @if (e.gamePlatform || e.filmPlatform || e.streamPlatform; as p) {
+          <div>
+            <dt>Plateforme</dt>
+            <dd>{{ (e.gamePlatform ?? e.filmPlatform ?? e.streamPlatform)?.label }}</dd>
+          </div>
+        }
+        @if (e.theme) {
+          <div>
+            <dt>Thème</dt>
+            <dd>{{ e.theme }}</dd>
+          </div>
+        }
+        @if (e.link) {
+          <div>
+            <dt>Lien</dt>
+            <dd>
+              <a [href]="e.link" target="_blank" rel="noopener noreferrer">{{ e.link }} ↗</a>
+            </dd>
+          </div>
+        }
+        <div>
+          <dt>Places</dt>
+          <dd>
+            {{ e.participants.length }}
+            @if (e.maxParticipants) {
+              / {{ e.maxParticipants }}
+            }
+            participant(s)
+            @if (e.full) {
+              · complet
+            }
+          </dd>
+        </div>
+      </dl>
+
+      @if (paragraphs().length) {
+        <div class="description">
+          @for (p of paragraphs(); track $index) {
+            <p>{{ p }}</p>
+          }
+        </div>
+      }
+
+      <section aria-labelledby="participants-title">
+        <h2 id="participants-title">Participants</h2>
+        @if (e.participants.length) {
+          <ul class="participants">
+            @for (m of e.participants; track m.id) {
+              <li>
+                <app-avatar [member]="m" [size]="32" />
+                <a [routerLink]="['/members', m.id]" [appMemberCard]="m.id">{{ m.displayName }}</a>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="meta">Personne pour l'instant.</p>
+        }
+        @if (!e.over && !e.participating && !e.canParticipate && !e.full) {
+          <p class="meta">
+            Seuls les membres de la branche {{ e.branch.name }} participent à cet événement.
+          </p>
+        }
+      </section>
+
+      <div class="actions">
+        @if (e.participating && !e.over) {
+          <button
+            class="btn btn-ghost"
+            type="button"
+            [disabled]="busy()"
+            (click)="participate(false)"
+          >
+            Je ne viens plus
+          </button>
+        } @else if (e.canParticipate) {
+          <button class="btn" type="button" [disabled]="busy()" (click)="participate(true)">
+            Je participe
+          </button>
+        }
+        @if (e.canEdit) {
+          <a class="btn btn-ghost" [routerLink]="['/evenements', e.id, 'modifier']"
+            ><app-icon name="write" /> Modifier</a
+          >
+        }
+        @if (e.canDelete) {
+          <button class="btn btn-ghost danger" type="button" [disabled]="busy()" (click)="remove()">
+            <app-icon name="remove" /> Supprimer
+          </button>
+        }
+      </div>
+    </article>
+  }
+</div>
