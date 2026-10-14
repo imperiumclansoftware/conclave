@@ -1,0 +1,72 @@
+@let items = news();
+<section
+  class="carousel card"
+  aria-roledescription="carrousel"
+  aria-labelledby="carousel-title"
+  (pointerdown)="onPointerDown($event)"
+  (pointerup)="onPointerUp($event)"
+  (pointercancel)="onPointerUp($event)"
+>
+  <h2 id="carousel-title" class="visually-hidden">Dernières news</h2>
+
+  <div class="viewport" [attr.aria-live]="playing() ? 'off' : 'polite'">
+    <ul class="slides" [style.translate]="-current() * 100 + '% 0'">
+      @for (n of items; track n.id; let i = $index) {
+        <li
+          class="slide"
+          role="group"
+          aria-roledescription="diapositive"
+          [attr.aria-label]="i + 1 + ' sur ' + items.length"
+          [inert]="i !== current()"
+        >
+          <a class="cover" [routerLink]="['/news', n.id]" tabindex="-1" aria-hidden="true">
+            @if (n.imageUrl) {
+              <img [src]="n.imageUrl" alt="" [attr.loading]="i ? 'lazy' : null" />
+            } @else {
+              <app-news-cover [seed]="n.title" [title]="n.title" [clanName]="clanName()" />
+            }
+          </a>
+          <div class="caption">
+            <p class="meta">
+              {{ date(n.createdAt) }}
+              @if (n.author) {
+                · par {{ n.author.displayName }}
+              }
+            </p>
+            <h3>
+              <a [routerLink]="['/news', n.id]">{{ n.title }}</a>
+            </h3>
+            <p class="excerpt">{{ excerpt(n.body, 160) }}</p>
+          </div>
+        </li>
+      }
+    </ul>
+  </div>
+
+  @if (items.length > 1) {
+    <div class="controls">
+      <button
+        class="arrow"
+        type="button"
+        (click)="paused.set(!paused())"
+        [attr.aria-label]="paused() ? 'Lancer le défilement' : 'Mettre le défilement en pause'"
+        [title]="paused() ? 'Lancer le défilement' : 'Mettre en pause'"
+      >
+        {{ paused() ? '▶' : '❚❚' }}
+      </button>
+      <button class="arrow" type="button" (click)="go(-1)" aria-label="News précédente">‹</button>
+      <div class="dots" role="group" aria-label="Choisir une news">
+        @for (n of items; track n.id; let i = $index) {
+          <button
+            type="button"
+            [class.active]="i === current()"
+            [attr.aria-current]="i === current() ? 'true' : null"
+            [attr.aria-label]="'News ' + (i + 1) + ' : ' + n.title"
+            (click)="show(i)"
+          ></button>
+        }
+      </div>
+      <button class="arrow" type="button" (click)="go(1)" aria-label="News suivante">›</button>
+    </div>
+  }
+</section>

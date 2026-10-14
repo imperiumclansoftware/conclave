@@ -41,12 +41,12 @@ describe('ChatPanelService', () => {
     expect([panel.isOpen(), panel.contactId()]).toEqual([false, null]);
   });
 
-  it('turns former /messages/:memberId links into the sidebar over the clan page', () => {
+  it('turns former /messages/:memberId links into the sidebar over the home page', () => {
     const route = { paramMap: convertToParamMap({ memberId: '5' }) } as ActivatedRouteSnapshot;
 
     const result = TestBed.runInInjectionContext(() => openChatPanel(route, {} as never));
 
-    expect(TestBed.inject(Router).serializeUrl(result as never)).toBe('/clan');
+    expect(TestBed.inject(Router).serializeUrl(result as never)).toBe('/');
     const panel = TestBed.inject(ChatPanelService);
     expect([panel.isOpen(), panel.contactId()]).toEqual([true, 5]);
   });

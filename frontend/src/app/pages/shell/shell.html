@@ -5,6 +5,9 @@
   </a>
 
   <nav aria-label="Navigation principale">
+    <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+      ><app-icon name="home" /><span class="label">Accueil</span></a
+    >
     <a routerLink="/evenements" routerLinkActive="active"
       ><app-icon name="events" /><span class="label">Événements</span></a
     >

@@ -8,6 +8,7 @@ const set = require('@iconify-json/game-icons/icons.json');
 
 /** App icon name => game-icons.net icon */
 const ICONS = {
+  home: 'tower-flag',
   messages: 'quill-ink',
   write: 'quill',
   games: 'gamepad',

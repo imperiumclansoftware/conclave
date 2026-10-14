@@ -1,0 +1,112 @@
+<div class="page">
+  <header class="head">
+    <h1>{{ clanName() }}</h1>
+    <p class="meta">Bienvenue, {{ auth.user()?.displayName }}.</p>
+  </header>
+
+  <!-- Latest news -->
+  @if (newsError(); as error) {
+    <p class="error" role="alert">
+      {{ error }} <button class="link" type="button" (click)="loadNews()">Réessayer</button>
+    </p>
+  } @else if (news().length) {
+    <app-news-carousel [news]="news()" [clanName]="clanName()" />
+  } @else if (newsLoaded()) {
+    <section class="card empty-news">
+      <p class="meta">
+        <app-icon name="news" /> Aucune news pour l'instant.
+        @if (auth.user()?.canPublishNews) {
+          <a routerLink="/news/nouvelle">Publier la première</a>
+        }
+      </p>
+    </section>
+  }
+
+  <div class="columns">
+    <!-- The week's events -->
+    <section class="card block" aria-labelledby="home-events-title">
+      <header class="block-head">
+        <h2 id="home-events-title"><app-icon name="events" /> Les {{ days }} prochains jours</h2>
+        <a routerLink="/evenements/planning">Planning</a>
+      </header>
+
+      @if (eventsError(); as error) {
+        <p class="error" role="alert">
+          {{ error }} <button class="link" type="button" (click)="loadEvents()">Réessayer</button>
+        </p>
+      } @else if (eventDays().length) {
+        <ol class="days">
+          @for (group of eventDays(); track group.day) {
+            <li>
+              <h3>{{ group.day }}</h3>
+              <ul class="events">
+                @for (e of group.events; track e.id) {
+                  <li [attr.data-crest]="e.branch.crest" [class.mine]="e.participating">
+                    <time [attr.datetime]="e.startsAt">{{ time(e) }}</time>
+                    <span class="what">
+                      <a [routerLink]="['/evenements', e.id]">{{ e.title }}</a>
+                      <span class="meta">
+                        @if (e.branch.crest) {
+                          <app-branch-crest [crest]="e.branch.crest" [size]="14" />
+                        }
+                        {{ e.branch.name }} · {{ e.typeLabel }} · {{ e.participants.length }}
+                        participant(s)
+                        @if (e.participating) {
+                          · <strong>vous y êtes</strong>
+                        }
+                      </span>
+                    </span>
+                  </li>
+                }
+              </ul>
+            </li>
+          }
+        </ol>
+      } @else if (eventsLoaded()) {
+        <p class="meta empty">
+          Rien de prévu cette semaine.
+          <a routerLink="/evenements">Voir les événements</a>
+        </p>
+      }
+    </section>
+
+    <!-- Who is connected -->
+    <section class="card block" aria-labelledby="home-online-title">
+      <header class="block-head">
+        <h2 id="home-online-title">
+          <app-icon name="members" /> En ligne
+          <span class="count">{{ online().length }}</span>
+        </h2>
+        <a routerLink="/clan">Le clan</a>
+      </header>
+
+      <ul class="online">
+        @for (member of online(); track member.id) {
+          <li>
+            <app-avatar [member]="member" [size]="36" />
+            <span class="who">
+              <a
+                class="member-name"
+                [routerLink]="['/members', member.id]"
+                [appMemberCard]="member.id"
+                >{{ member.displayName }}</a
+              >
+              <app-presence-badge [userId]="member.id" [withText]="true" />
+            </span>
+            <button
+              class="write"
+              type="button"
+              (click)="panel.open(member.id)"
+              [attr.aria-label]="'Écrire à ' + member.displayName"
+              [title]="'Écrire à ' + member.displayName"
+            >
+              <app-icon name="write" />
+            </button>
+          </li>
+        } @empty {
+          <li class="meta empty">Personne d'autre n'est connecté pour l'instant.</li>
+        }
+      </ul>
+    </section>
+  </div>
+</div>

@@ -25,14 +25,14 @@ export const guestGuard: CanActivateFn = async () => {
   return !(await inject(AuthService).restoreSession()) || router.createUrlTree(['/']);
 };
 
-/** /messages[/:memberId]: opens the messaging sidebar (on that conversation), over the clan page. */
+/** /messages[/:memberId]: opens the messaging sidebar (on that conversation), over the home page. */
 export const openChatPanel: CanActivateFn = (route) => {
   const memberId = Number(route.paramMap.get('memberId'));
   inject(ChatPanelService).open(memberId > 0 ? memberId : null);
-  return inject(Router).createUrlTree(['/clan']);
+  return inject(Router).createUrlTree(['/']);
 };
 
-/** Writing news: leaders and members of a publishing branch */
+/** Writing news: members of a publishing branch (the Communicants) */
 export const newsPublisherGuard: CanActivateFn = () => {
   const router = inject(Router);
   return inject(AuthService).user()?.canPublishNews === true || router.createUrlTree(['/news']);

@@ -19,6 +19,10 @@ Comptes dirigeants et membres, messagerie instantanée entre les membres d'un m�
   (`php bin/console app:setup:code`, ou les journaux), pour que seul l'administrateur du serveur puisse
   le faire, pas le premier venu. Les autres membres demandent ensuite à rejoindre le clan
   (`/register`) et un dirigeant valide leur compte ; un dirigeant peut aussi les ajouter lui-même.
+- **Accueil** (`/`) : carrousel des 5 dernières news (défilement automatique, en pause au survol, au
+  clavier ou sur demande, et d'emblée si l'appareil demande moins d'animations ; balayage sur mobile),
+  événements des 7 prochains jours par jour, et membres connectés dans l'application ou sur Discord,
+  avec un bouton pour leur écrire.
 - **Messagerie** : conversations 1-à-1, uniquement entre membres d'un même clan. Elle s'ouvre
   dans un panneau latéral à droite (petit onglet « Messages » au bord droit, Échap pour le fermer),
   à côté de la page en cours ; sous 64rem de large, le panneau passe par-dessus la page.

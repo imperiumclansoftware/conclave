@@ -62,7 +62,7 @@ final class NewsController extends AbstractController
     }
 
     #[Route('/news', name: 'api_news_create', methods: ['POST'])]
-    #[IsGranted(NewsVoter::PUBLISH, message: 'Seuls les dirigeants et les branches autorisées publient des news.')]
+    #[IsGranted(NewsVoter::PUBLISH, message: 'Seuls les membres des branches autorisées (les Communicants) publient des news.')]
     public function create(
         #[CurrentUser] User $me,
         #[MapRequestPayload] NewsRequest $request,

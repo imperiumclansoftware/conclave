@@ -368,6 +368,35 @@ input[type='checkbox'] {
   padding: 1.25rem 1rem 2rem;
 }
 
+// ---- Branch colours (planning, home page): one per branch, readable in both themes ----
+:root {
+  --branch-players: #b4232a;
+  --branch-developers: #2f7d5b;
+  --branch-communicants: #b9770e;
+  --branch-cinephiles: #6b4fa3;
+  --branch-other: #6b6157;
+}
+
+[data-crest] {
+  --branch: var(--branch-other);
+}
+
+[data-crest='players'] {
+  --branch: var(--branch-players);
+}
+
+[data-crest='developers'] {
+  --branch: var(--branch-developers);
+}
+
+[data-crest='communicants'] {
+  --branch: var(--branch-communicants);
+}
+
+[data-crest='cinephiles'] {
+  --branch: var(--branch-cinephiles);
+}
+
 // ---- Events: list / planning switch, and branch filters (pills) ----
 .view-switch {
   display: flex;

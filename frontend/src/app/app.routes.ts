@@ -66,7 +66,12 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./pages/shell/shell').then((m) => m.Shell),
     children: [
-      { path: '', pathMatch: 'full', redirectTo: 'clan' },
+      {
+        path: '',
+        pathMatch: 'full',
+        title: 'Accueil',
+        loadComponent: () => import('./pages/home/home.page').then((m) => m.HomePage),
+      },
       // Messaging lives in a sidebar: former links open it, on the clan page
       { path: 'messages', canActivate: [openChatPanel], children: [] },
       { path: 'messages/:memberId', canActivate: [openChatPanel], children: [] },
