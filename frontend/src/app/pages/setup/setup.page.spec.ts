@@ -94,6 +94,7 @@ describe('SetupPage', () => {
         email: 'chef@example.com',
         faction: null,
         canPublishNews: false,
+        canAccessGames: false,
       },
     });
     await fixture.whenStable();

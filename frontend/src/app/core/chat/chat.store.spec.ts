@@ -26,6 +26,7 @@ const papa: Me = {
   email: null,
   faction: null,
   canPublishNews: false,
+  canAccessGames: false,
 };
 const lea: Member = { id: 2, username: 'lea', displayName: 'Léa', role: 'member' };
 

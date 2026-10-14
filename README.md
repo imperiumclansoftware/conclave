@@ -178,7 +178,9 @@ Ajouter aussi le domaine à `allowedHosts` (`angular.json`, cible `serve`).
 
 ## Jeux
 
-Chaque membre déclare les jeux auxquels il joue et sur quelles plateformes (PC, PS5, PS4,
+La partie *Jeux* est réservée aux membres de la branche **Joueurs** (active), dirigeants compris s'ils
+l'ont rejointe : pour les autres, pas de menu *Jeux*, ni jeux sur les fiches et cartes de membre, et l'API
+répond 403 (`App\Games\GamesAccess`). Ses membres déclarent les jeux auxquels ils jouent et sur quelles plateformes (PC, PS5, PS4,
 Xbox Series, Xbox One, Switch, Switch 2, Mobile). Les informations (jaquette, description, genres,
 développeurs, captures d'écran) sont récupérées automatiquement :
 

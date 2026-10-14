@@ -49,10 +49,8 @@ export class MyBranches implements OnInit {
     this.error.set(null);
     try {
       await (joined ? this.branches.leave(branch.id) : this.branches.join(branch.id));
-      // The right to publish the news comes with some branches
-      if (branch.publishesNews) {
-        await this.auth.refreshUser();
-      }
+      // Rights come with some branches: publishing the news, the games part
+      await this.auth.refreshUser();
     } catch (e) {
       this.error.set(apiErrorMessage(e));
     } finally {

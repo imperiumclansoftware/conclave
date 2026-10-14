@@ -16,6 +16,8 @@ export interface Me extends Member {
   faction: 'assassin' | 'templar' | null;
   /** Member of a branch allowed to publish the news (the Communicants) */
   canPublishNews: boolean;
+  /** Member of the Joueurs branch: the games part is theirs */
+  canAccessGames: boolean;
 }
 
 export interface Message {
@@ -216,7 +218,8 @@ export interface Branch extends BranchRef {
 }
 
 export interface MemberProfile extends Profile {
-  games: MyGame[];
+  /** null: the games are reserved to the Joueurs branch, which I am not in */
+  games: MyGame[] | null;
 }
 
 export interface SettingValue {
@@ -339,7 +342,8 @@ export interface MemberCard extends Member {
   discordUsername: string | null;
   /** Active branches, by name */
   branches: BranchRef[];
-  stats: { games: number; news: number; branches: number };
+  /** games: null outside of the Joueurs branch */
+  stats: { games: number | null; news: number; branches: number };
 }
 
 /** Favourite link of a branch (links sidebar) */

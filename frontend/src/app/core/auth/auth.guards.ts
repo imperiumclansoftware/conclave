@@ -38,6 +38,15 @@ export const newsPublisherGuard: CanActivateFn = () => {
   return inject(AuthService).user()?.canPublishNews === true || router.createUrlTree(['/news']);
 };
 
+/** The games part: members of the Joueurs branch (otherwise, their profile to join it) */
+export const gamesGuard: CanActivateFn = () => {
+  const router = inject(Router);
+  return (
+    inject(AuthService).user()?.canAccessGames === true ||
+    router.createUrlTree(['/account'], { queryParams: { onglet: 'branches' } })
+  );
+};
+
 export const leaderGuard: CanActivateFn = () => {
   const router = inject(Router);
   return inject(AuthService).isLeader() || router.createUrlTree(['/']);

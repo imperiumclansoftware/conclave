@@ -67,10 +67,12 @@ const monthFormat = new Intl.DateTimeFormat('fr-FR', { month: 'long', year: 'num
           }
 
           <dl class="stats">
-            <div>
-              <dt><app-icon name="games" /> Jeux</dt>
-              <dd>{{ c.stats.games }}</dd>
-            </div>
+            @if (c.stats.games !== null) {
+              <div>
+                <dt><app-icon name="games" /> Jeux</dt>
+                <dd>{{ c.stats.games }}</dd>
+              </div>
+            }
             <div>
               <dt><app-icon name="news" /> News</dt>
               <dd>{{ c.stats.news }}</dd>

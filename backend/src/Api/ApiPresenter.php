@@ -15,6 +15,7 @@ use App\Entity\User;
 use App\Entity\UserGame;
 use App\Entity\VideoCall;
 use App\Enum\GamePlatform;
+use App\Games\GamesAccess;
 use App\News\NewsPermissions;
 use App\Presence\AppStatus;
 use App\Profile\Avatars;
@@ -28,6 +29,7 @@ final class ApiPresenter
     public function __construct(
         private readonly BranchRepository $branches,
         private readonly NewsPermissions $newsPermissions,
+        private readonly GamesAccess $gamesAccess,
     ) {
     }
 
@@ -43,7 +45,7 @@ final class ApiPresenter
         ];
     }
 
-    /** @return array{id: ?int, username: string, displayName: string, role: string, avatarUrl: ?string, clan: array{id: ?int, name: string}, email: ?string, faction: ?string, canPublishNews: bool} */
+    /** @return array{id: ?int, username: string, displayName: string, role: string, avatarUrl: ?string, clan: array{id: ?int, name: string}, email: ?string, faction: ?string, canPublishNews: bool, canAccessGames: bool} */
     public function me(User $user): array
     {
         return $this->user($user) + [
@@ -51,6 +53,7 @@ final class ApiPresenter
             'email' => $user->getEmail(),
             'faction' => $user->getFaction()?->value,
             'canPublishNews' => $this->newsPermissions->canPublish($user),
+            'canAccessGames' => $this->gamesAccess->allowed($user),
         ];
     }
 

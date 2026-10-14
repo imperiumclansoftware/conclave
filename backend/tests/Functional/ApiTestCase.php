@@ -99,6 +99,25 @@ abstract class ApiTestCase extends WebTestCase
         return ['token' => $this->login($username), 'user' => $user];
     }
 
+    /**
+     * Activates the branch with this coat of arms and makes these members join it (leaders join
+     * directly, the others need an approval: use leader tokens or branches without approval).
+     *
+     * @return int the id of the branch
+     */
+    protected function joinBranch(string $leaderToken, string $crest, string ...$tokens): int
+    {
+        $branches = array_column($this->api('GET', '/api/admin/branches', token: $leaderToken), null, 'crest');
+        $id = $branches[$crest]['id'];
+        $this->api('PUT', "/api/admin/branches/$id/active", ['active' => true], $leaderToken);
+        foreach ($tokens as $token) {
+            $this->api('PUT', "/api/clan/branches/$id/membership", token: $token);
+            self::assertResponseIsSuccessful();
+        }
+
+        return $id;
+    }
+
     protected function login(string $username, string $password = 'motdepasse'): string
     {
         $result = $this->api('POST', '/api/login', ['username' => $username, 'password' => $password]);

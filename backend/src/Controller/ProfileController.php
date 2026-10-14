@@ -13,6 +13,7 @@ use App\Entity\Branch;
 use App\Entity\User;
 use App\Enum\AvatarSource;
 use App\Enum\GamerTag;
+use App\Games\GamesAccess;
 use App\Profile\Avatars;
 use App\Profile\AvatarStorage;
 use App\Profile\Gravatar;
@@ -195,7 +196,7 @@ final class ProfileController extends AbstractController
      * Public profile of a clan member, with the games they play.
      */
     #[Route('/members/{id}', name: 'api_member_profile', requirements: ['id' => Requirement::DIGITS], methods: ['GET'])]
-    public function member(User $member, #[CurrentUser] User $user, UserGameRepository $userGames): JsonResponse
+    public function member(User $member, #[CurrentUser] User $user, UserGameRepository $userGames, GamesAccess $games): JsonResponse
     {
         if ($member->getClan()->getId() !== $user->getClan()->getId() || !$member->isActive()) {
             throw new NotFoundHttpException('Membre introuvable.');
@@ -203,7 +204,8 @@ final class ProfileController extends AbstractController
 
         return $this->json($this->presenter->profile($member) + [
             'networks' => self::networks(),
-            'games' => array_map($this->presenter->userGame(...), $userGames->findForUser($member)),
+            // The games part belongs to the Joueurs branch: null for the other members
+            'games' => $games->allowed($user) ? array_map($this->presenter->userGame(...), $userGames->findForUser($member)) : null,
         ]);
     }
 
@@ -211,7 +213,7 @@ final class ProfileController extends AbstractController
      * Summary shown when hovering a member's name: branches and activity in the clan.
      */
     #[Route('/members/{id}/card', name: 'api_member_card', requirements: ['id' => Requirement::DIGITS], methods: ['GET'])]
-    public function card(User $member, #[CurrentUser] User $user, UserGameRepository $userGames, NewsRepository $news, BranchRepository $branches): JsonResponse
+    public function card(User $member, #[CurrentUser] User $user, UserGameRepository $userGames, NewsRepository $news, BranchRepository $branches, GamesAccess $games): JsonResponse
     {
         if ($member->getClan()->getId() !== $user->getClan()->getId() || !$member->isActive()) {
             throw new NotFoundHttpException('Membre introuvable.');
@@ -227,7 +229,7 @@ final class ProfileController extends AbstractController
                 $memberBranches,
             ),
             'stats' => [
-                'games' => $userGames->countForUser($member),
+                'games' => $games->allowed($user) ? $userGames->countForUser($member) : null,
                 'news' => $news->countByAuthor($member),
                 'branches' => \count($memberBranches),
             ],

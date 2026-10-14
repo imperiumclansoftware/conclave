@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Branch;
 use App\Entity\Clan;
 use App\Entity\User;
+use App\Enum\BranchCrest;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -49,6 +50,17 @@ class BranchRepository extends ServiceEntityRepository
             ->select('COUNT(b.id)')
             ->innerJoin('b.members', 'm', 'WITH', 'm = :user')->setParameter('user', $user)
             ->andWhere('b.publishesNews = true')
+            ->andWhere('b.active = true')
+            ->getQuery()->getSingleScalarResult();
+    }
+
+    /** Whether the member belongs to the active branch with this coat of arms (e.g. the Joueurs). */
+    public function isMemberOf(User $user, BranchCrest $crest): bool
+    {
+        return (bool) $this->createQueryBuilder('b')
+            ->select('COUNT(b.id)')
+            ->innerJoin('b.members', 'm', 'WITH', 'm = :user')->setParameter('user', $user)
+            ->andWhere('b.crest = :crest')->setParameter('crest', $crest)
             ->andWhere('b.active = true')
             ->getQuery()->getSingleScalarResult();
     }

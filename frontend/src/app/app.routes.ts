@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import {
   authGuard,
+  gamesGuard,
   guestGuard,
   installedGuard,
   leaderGuard,
@@ -114,6 +115,7 @@ export const routes: Routes = [
       },
       {
         path: 'games',
+        canActivate: [gamesGuard],
         children: [
           {
             path: '',

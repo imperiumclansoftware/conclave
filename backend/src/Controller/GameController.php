@@ -15,6 +15,7 @@ use App\Entity\User;
 use App\Entity\UserGame;
 use App\Enum\GamePlatform;
 use App\Repository\UserGameRepository;
+use App\Security\GamesVoter;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -27,8 +28,13 @@ use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+/**
+ * Games of the members and clan library: the part of the Joueurs branch (see GamesAccess).
+ */
 #[Route('/api', format: 'json')]
+#[IsGranted(GamesVoter::ACCESS, message: 'Les jeux sont réservés aux membres de la branche Joueurs.')]
 final class GameController extends AbstractController
 {
     private const CATALOG_UNAVAILABLE = 'Le service d\'informations sur les jeux est indisponible, réessayez plus tard.';

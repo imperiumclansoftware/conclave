@@ -65,30 +65,33 @@
       </section>
     }
 
-    <section aria-labelledby="games-title">
-      <h2 id="games-title" class="section-title">Jeux ({{ p.games.length }})</h2>
-      @if (p.games.length === 0) {
-        <p class="meta">Aucun jeu déclaré pour l'instant.</p>
-      }
-      <ul class="games">
-        @for (g of p.games; track g.id) {
-          <li>
-            <a [routerLink]="['/games', g.game.id]">
-              @if (consent.src(g.game.coverUrl); as cover) {
-                <img
-                  [src]="cover"
-                  alt=""
-                  loading="lazy"
-                  decoding="async"
-                  referrerpolicy="no-referrer"
-                />
-              }
-              <span class="name">{{ g.game.name }}</span>
-            </a>
-            <app-platform-badges [platforms]="g.platforms" />
-          </li>
+    <!-- The games part belongs to the Joueurs branch: null for the other members -->
+    @if (p.games; as games) {
+      <section aria-labelledby="games-title">
+        <h2 id="games-title" class="section-title">Jeux ({{ games.length }})</h2>
+        @if (games.length === 0) {
+          <p class="meta">Aucun jeu déclaré pour l'instant.</p>
         }
-      </ul>
-    </section>
+        <ul class="games">
+          @for (g of games; track g.id) {
+            <li>
+              <a [routerLink]="['/games', g.game.id]">
+                @if (consent.src(g.game.coverUrl); as cover) {
+                  <img
+                    [src]="cover"
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    referrerpolicy="no-referrer"
+                  />
+                }
+                <span class="name">{{ g.game.name }}</span>
+              </a>
+              <app-platform-badges [platforms]="g.platforms" />
+            </li>
+          }
+        </ul>
+      </section>
+    }
   }
 </div>

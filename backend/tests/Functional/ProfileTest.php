@@ -183,7 +183,8 @@ final class ProfileTest extends ApiTestCase
         $this->api('PUT', '/api/me/profile', ['displayName' => 'Léa', 'bio' => 'Furtive.', 'gamerTags' => ['nintendo' => 'SW-1234-5678-9012']], $lea['token']);
 
         $profile = $this->api('GET', "/api/members/{$lea['user']['id']}", token: $leader['token']);
-        self::assertSame(['Léa', 'Furtive.', ['nintendo' => 'SW-1234-5678-9012'], []], [$profile['displayName'], $profile['bio'], $profile['gamerTags'], $profile['games']]);
+        // The games are only shown to the Joueurs branch (see GameTest)
+        self::assertSame(['Léa', 'Furtive.', ['nintendo' => 'SW-1234-5678-9012'], null], [$profile['displayName'], $profile['bio'], $profile['gamerTags'], $profile['games']]);
         self::assertArrayNotHasKey('email', $profile);
 
         // Pending accounts are not visible

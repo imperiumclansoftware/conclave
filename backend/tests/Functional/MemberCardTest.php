@@ -29,11 +29,13 @@ final class MemberCardTest extends ApiTestCase
         $card = $this->api('GET', "/api/members/{$leaUser['id']}/card", token: $leader['token']);
         self::assertSame(['lea', 'member'], [$card['username'], $card['role']]);
         self::assertSame([['Cinéphiles', 'cinephiles'], ['Joueurs', 'players']], array_map(static fn (array $b): array => [$b['name'], $b['crest']], $card['branches']));
-        self::assertSame(['games' => 1, 'news' => 0, 'branches' => 2], $card['stats']);
+        self::assertSame(['games' => null, 'news' => 0, 'branches' => 2], $card['stats'], 'Seen by the leader, outside of the Joueurs branch');
         self::assertNotEmpty($card['memberSince']);
 
         $leaderCard = $this->api('GET', "/api/members/{$leader['user']['id']}/card", token: $lea);
         self::assertSame(['games' => 0, 'news' => 2, 'branches' => 1], $leaderCard['stats']);
+        // The leader is not in the Joueurs branch: no games on the cards they see
+        self::assertNull($this->api('GET', "/api/members/{$leaUser['id']}/card", token: $leader['token'])['stats']['games']);
 
         // A deactivated branch disappears from the card
         $this->api('PUT', "/api/admin/branches/{$byCrest['cinephiles']['id']}/active", ['active' => false], $leader['token']);

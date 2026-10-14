@@ -6,6 +6,58 @@ use App\Tests\Support\HttpClientMock;
 
 final class GameTest extends ApiTestCase
 {
+    /** Games belong to the Joueurs branch: the accounts of these tests join it */
+    private ?string $leaderToken = null;
+
+    protected function registerClan(string $clanName = 'Martin', string $username = 'papa'): array
+    {
+        $leader = parent::registerClan($clanName, $username);
+        $this->leaderToken = $leader['token'];
+        $this->joinBranch($leader['token'], 'players', $leader['token']);
+
+        return $leader;
+    }
+
+    protected function addMember(string $leaderToken, string $username, string $role = 'member'): array
+    {
+        $member = parent::addMember($leaderToken, $username, $role);
+        $this->joinBranch($leaderToken, 'players', $member['token']);
+
+        return $member;
+    }
+
+    public function testOnlyTheJoueursBranchSeesTheGames(): void
+    {
+        $leader = parent::registerClan();
+        ['token' => $lea, 'user' => $leaUser] = parent::addMember($leader['token'], 'lea');
+
+        // Nobody, not even a leader, outside of the branch
+        self::assertFalse($this->api('GET', '/api/me', token: $leader['token'])['canAccessGames']);
+        foreach (['/api/me/games', '/api/clan/games', '/api/games/platforms', '/api/games/search?q=elden'] as $uri) {
+            $this->api('GET', $uri, token: $leader['token']);
+            self::assertResponseStatusCodeSame(403, $uri);
+        }
+        $result = $this->addElden($leader['token'], ['pc']);
+        self::assertResponseStatusCodeSame(403);
+        self::assertSame('Les jeux sont réservés aux membres de la branche Joueurs.', $result['detail']);
+
+        $players = $this->joinBranch($leader['token'], 'players', $leader['token'], $lea);
+        self::assertTrue($this->api('GET', '/api/me', token: $lea)['canAccessGames']);
+        $this->addElden($lea, ['pc']);
+        self::assertResponseStatusCodeSame(201);
+        self::assertCount(1, $this->api('GET', "/api/members/{$leaUser['id']}", token: $leader['token'])['games']);
+        self::assertSame(1, $this->api('GET', "/api/members/{$leaUser['id']}/card", token: $leader['token'])['stats']['games']);
+
+        // Leaving the branch hides the games again, on the profiles and cards too
+        $this->api('DELETE', "/api/clan/branches/$players/membership", token: $leader['token']);
+        self::assertNull($this->api('GET', "/api/members/{$leaUser['id']}", token: $leader['token'])['games']);
+        self::assertNull($this->api('GET', "/api/members/{$leaUser['id']}/card", token: $leader['token'])['stats']['games']);
+        // A deactivated branch gives no access
+        $this->api('PUT', "/api/admin/branches/$players/active", ['active' => false], $leader['token']);
+        $this->api('GET', '/api/me/games', token: $lea);
+        self::assertResponseStatusCodeSame(403);
+    }
+
     public function testSearchListsCatalogGames(): void
     {
         $leader = $this->registerClan();
