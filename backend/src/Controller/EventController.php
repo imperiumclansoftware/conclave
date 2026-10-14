@@ -22,6 +22,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\ConflictHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
@@ -69,7 +70,13 @@ final class EventController extends AbstractController
         ]);
     }
 
-    /** Upcoming events (and those in progress), or the past ones with ?period=past. */
+    /** Longest range of the planning: a month view with its overflowing weeks */
+    private const MAX_RANGE_DAYS = 45;
+
+    /**
+     * Upcoming events (and those in progress), the past ones with ?period=past, or those between two
+     * instants with ?from=…&to=… (planning).
+     */
     #[Route('', name: 'api_events', methods: ['GET'])]
     public function list(
         #[CurrentUser] User $me,
@@ -77,13 +84,27 @@ final class EventController extends AbstractController
         BranchRepository $branches,
         #[MapQueryParameter] string $period = 'upcoming',
         #[MapQueryParameter] ?int $branch = null,
+        #[MapQueryParameter] ?string $from = null,
+        #[MapQueryParameter] ?string $to = null,
     ): JsonResponse {
         $filter = null !== $branch ? $branches->find($branch) : null;
 
-        return $this->json(array_map(
-            fn (Event $event): array => $this->present($event, $me),
-            $events->forClan($me->getClan(), 'past' === $period, $filter),
-        ));
+        if (null !== $from || null !== $to) {
+            try {
+                $start = new \DateTimeImmutable((string) $from);
+                $end = new \DateTimeImmutable((string) $to);
+            } catch (\Exception $e) {
+                throw new BadRequestHttpException('Dates invalides : utilisez le format ISO 8601.', $e);
+            }
+            if (null === $from || null === $to || $end <= $start || $start->diff($end)->days > self::MAX_RANGE_DAYS) {
+                throw new BadRequestHttpException(\sprintf('Indiquez « from » et « to », sur %d jours au plus.', self::MAX_RANGE_DAYS));
+            }
+            $found = $events->between($me->getClan(), $start, $end, $filter);
+        } else {
+            $found = $events->forClan($me->getClan(), 'past' === $period, $filter);
+        }
+
+        return $this->json(array_map(fn (Event $event): array => $this->present($event, $me), $found));
     }
 
     #[Route('/{id}', name: 'api_event_show', requirements: ['id' => Requirement::DIGITS], methods: ['GET'])]

@@ -47,4 +47,29 @@ class EventRepository extends ServiceEntityRepository
         // The joins prevent setMaxResults: limit the past ones here
         return $past ? \array_slice($events, 0, self::PAST_LIMIT) : $events;
     }
+
+    /**
+     * Events of the active branches taking place, even partly, between two instants (planning).
+     *
+     * @return list<Event>
+     */
+    public function between(Clan $clan, \DateTimeImmutable $from, \DateTimeImmutable $to, ?Branch $branch = null): array
+    {
+        $qb = $this->createQueryBuilder('e')
+            ->innerJoin('e.branch', 'b')->addSelect('b')
+            ->leftJoin('e.participants', 'p')->addSelect('p')
+            ->leftJoin('p.user', 'u')->addSelect('u')
+            ->leftJoin('e.game', 'g')->addSelect('g')
+            ->leftJoin('e.film', 'f')->addSelect('f')
+            ->where('b.clan = :clan')->setParameter('clan', $clan)
+            ->andWhere('b.active = true')
+            ->andWhere('e.startsAt < :to')->setParameter('to', $to)
+            ->andWhere('COALESCE(e.endsAt, e.startsAt) >= :from')->setParameter('from', $from)
+            ->orderBy('e.startsAt', 'ASC');
+        if (null !== $branch) {
+            $qb->andWhere('e.branch = :branch')->setParameter('branch', $branch);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
 }

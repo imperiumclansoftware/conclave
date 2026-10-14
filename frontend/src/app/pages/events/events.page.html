@@ -1,11 +1,13 @@
 <div class="page">
   <header class="head">
     <h1><app-icon name="events" /> Événements</h1>
-    @if (canCreate()) {
-      <a class="btn" routerLink="/evenements/nouveau"
-        ><app-icon name="write" /> Créer un événement</a
-      >
-    }
+    <div class="view-switch" role="group" aria-label="Affichage des événements">
+      <span class="btn current" aria-current="page">Liste</span>
+      <a class="btn btn-ghost" routerLink="/evenements/planning">Planning</a>
+      @if (canCreate()) {
+        <a class="btn" routerLink="/evenements/nouveau"><app-icon name="write" /> Créer</a>
+      }
+    </div>
   </header>
 
   <div class="tabs" role="tablist" aria-label="Période">
@@ -30,7 +32,7 @@
   </div>
 
   @if (branches.branches().length > 1) {
-    <nav class="filters" aria-label="Filtrer par branche">
+    <nav class="pill-filters" aria-label="Filtrer par branche">
       <button
         type="button"
         [class.active]="!branchId()"

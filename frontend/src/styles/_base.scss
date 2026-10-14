@@ -367,3 +367,47 @@ input[type='checkbox'] {
   margin: 0 auto;
   padding: 1.25rem 1rem 2rem;
 }
+
+// ---- Events: list / planning switch, and branch filters (pills) ----
+.view-switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+
+  .current,
+  .current:hover {
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    color: var(--accent-text);
+    cursor: default;
+
+    &::after {
+      display: none;
+    }
+  }
+}
+
+.pill-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+
+  button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.2rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: none;
+    color: var(--text);
+    font-size: 0.875rem;
+    cursor: pointer;
+
+    &.active {
+      border-color: var(--accent);
+      color: var(--accent-contrast);
+      background: var(--accent);
+    }
+  }
+}

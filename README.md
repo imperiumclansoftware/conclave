@@ -63,6 +63,9 @@ Comptes dirigeants et membres, messagerie instantanée entre les membres d'un m�
   branche) ; seuls les membres de la branche en créent et s'y inscrivent, avec un nombre de places
   facultatif. L'organisateur les modifie, les dirigeants peuvent les modifier ou les supprimer. Les
   listes se mettent à jour en temps réel.
+- **Planning du clan** (`/evenements/planning`) : calendrier mensuel des événements, coloré par branche,
+  avec ceux auxquels on participe mis en avant et un filtre par branche ; un « + » sur un jour crée un
+  événement à cette date. Sur mobile, le mois s'affiche en agenda.
 - **Films (TMDB)** : la clé d'API TMDB (ou le jeton d'accès en lecture) se saisit dans
   *Administration > Catalogues*. La recherche de films et les fiches (`/films/{id}`) sont réservées aux
   membres de la branche Cinéphiles ; les autres voient le titre et l'affiche du film d'un événement.
@@ -407,6 +410,7 @@ Toutes les routes sauf `setup`, `register`, `login`, `password/*` et `health` ex
 | DELETE  | `/api/branch-links/{id}`                | Retire un lien (auteur ou dirigeant)                |
 | GET     | `/api/events/types`                     | Types d'événements des branches actives, plateformes |
 | GET     | `/api/events?period=upcoming\|past&branch=` | Événements, du plus proche (ou du plus récent) |
+| GET     | `/api/events?from=&to=&branch=`         | Événements d'une période (dates ISO, 45 jours max), pour le planning |
 | POST    | `/api/events`                           | Crée un événement (membres de la branche)           |
 | GET/PUT/DELETE | `/api/events/{id}`               | Détail / modification / suppression                |
 | PUT/DELETE | `/api/events/{id}/participation`     | S'inscrire / se désinscrire                         |

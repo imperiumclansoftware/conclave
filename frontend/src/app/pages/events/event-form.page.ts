@@ -44,6 +44,8 @@ export class EventFormPage {
   readonly id = input<string>();
   /** ?type=…: type chosen beforehand */
   readonly type = input<string>();
+  /** ?date=2026-10-17: day chosen in the planning */
+  readonly date = input<string>();
 
   protected readonly form = inject(NonNullableFormBuilder).group({
     type: ['', Validators.required],
@@ -275,6 +277,11 @@ export class EventFormPage {
           creatable.find((t) => t.type === type) ?? (creatable.length === 1 ? creatable[0] : null);
         if (preset) {
           this.chooseType(preset.type);
+        }
+        // From the planning: that day, in the evening by default
+        const day = this.date();
+        if (day && /^\d{4}-\d{2}-\d{2}$/.test(day)) {
+          this.form.controls.startsAt.setValue(`${day}T21:00`);
         }
       }
       this.loaded.set(true);

@@ -1,0 +1,152 @@
+<div class="page">
+  <header class="head">
+    <h1><app-icon name="events" /> Planning</h1>
+    <div class="view-switch" role="group" aria-label="Affichage des événements">
+      <a class="btn btn-ghost" routerLink="/evenements">Liste</a>
+      <span class="btn current" aria-current="page">Planning</span>
+      @if (canCreate()) {
+        <a class="btn" routerLink="/evenements/nouveau"><app-icon name="write" /> Créer</a>
+      }
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <div class="nav">
+      <button class="btn btn-ghost" type="button" (click)="shift(-1)" aria-label="Mois précédent">
+        ‹
+      </button>
+      <h2 aria-live="polite">{{ title() }}</h2>
+      <button class="btn btn-ghost" type="button" (click)="shift(1)" aria-label="Mois suivant">
+        ›
+      </button>
+      @if (!isThisMonth()) {
+        <button class="link" type="button" (click)="today()">Aujourd'hui</button>
+      }
+    </div>
+    @if (branches.branches().length > 1) {
+      <nav class="pill-filters" aria-label="Filtrer par branche">
+        <button
+          type="button"
+          [class.active]="!branchId()"
+          [attr.aria-pressed]="!branchId()"
+          (click)="go({ branche: null })"
+        >
+          Toutes
+        </button>
+        @for (b of branches.branches(); track b.id) {
+          <button
+            type="button"
+            [class.active]="branchId() === b.id"
+            [attr.aria-pressed]="branchId() === b.id"
+            (click)="go({ branche: b.id })"
+          >
+            @if (b.crest) {
+              <app-branch-crest [crest]="b.crest" [size]="16" />
+            }
+            {{ b.name }}
+          </button>
+        }
+      </nav>
+    }
+  </div>
+
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+
+  <!-- Month grid (wide screens) -->
+  <table class="month" [attr.aria-busy]="!loaded()" [attr.aria-label]="'Planning de ' + title()">
+    <thead>
+      <tr>
+        @for (d of weekdays; track d) {
+          <th scope="col">
+            <abbr [title]="d">{{ d.slice(0, 3) }}</abbr>
+          </th>
+        }
+      </tr>
+    </thead>
+    <tbody>
+      @for (week of [0, 1, 2, 3, 4, 5]; track week) {
+        @if (days().length > week * 7) {
+          <tr>
+            @for (day of days().slice(week * 7, week * 7 + 7); track day.key) {
+              <td [class.out]="!day.inMonth" [class.today]="day.today" [class.past]="day.past">
+                <div class="cell">
+                  <span class="number" [attr.aria-label]="dayLabel(day.date)">{{
+                    day.date.getDate()
+                  }}</span>
+                  @if (canCreate() && !day.past) {
+                    <a
+                      class="add"
+                      [routerLink]="['/evenements/nouveau']"
+                      [queryParams]="{ date: day.key }"
+                      [attr.aria-label]="'Créer un événement le ' + dayLabel(day.date)"
+                      title="Créer un événement ce jour-là"
+                      >+</a
+                    >
+                  }
+                  <ul>
+                    @for (e of day.events; track e.id) {
+                      <li>
+                        <a
+                          class="chip"
+                          [routerLink]="['/evenements', e.id]"
+                          [attr.data-crest]="e.branch.crest"
+                          [class.mine]="e.participating"
+                          [title]="e.typeLabel + ' · ' + e.title"
+                        >
+                          <span class="time">{{ time(e) }}</span>
+                          <span class="name">{{ e.title }}</span>
+                        </a>
+                      </li>
+                    }
+                  </ul>
+                </div>
+              </td>
+            }
+          </tr>
+        }
+      }
+    </tbody>
+  </table>
+
+  <!-- Agenda (small screens) -->
+  <ol class="agenda">
+    @for (day of agenda(); track day.key) {
+      <li [class.today]="day.today">
+        <h3>
+          {{ dayLabel(day.date) }}
+          @if (day.today) {
+            <span class="badge-today">aujourd'hui</span>
+          }
+        </h3>
+        @if (day.events.length) {
+          <ul>
+            @for (e of day.events; track e.id) {
+              <li>
+                <a
+                  class="chip"
+                  [routerLink]="['/evenements', e.id]"
+                  [attr.data-crest]="e.branch.crest"
+                  [class.mine]="e.participating"
+                >
+                  <span class="time">{{ time(e) }}</span>
+                  <span class="name">{{ e.title }}</span>
+                  <span class="type">{{ e.branch.name }} · {{ e.typeLabel }}</span>
+                </a>
+              </li>
+            }
+          </ul>
+        } @else {
+          <p class="meta">Rien de prévu.</p>
+        }
+      </li>
+    } @empty {
+      @if (loaded()) {
+        <li class="meta">Aucun événement ce mois-ci.</li>
+      }
+    }
+  </ol>
+
+  <p class="legend"><span class="mine-sample"></span> Événements auxquels vous participez</p>
+</div>

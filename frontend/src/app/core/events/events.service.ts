@@ -21,6 +21,15 @@ export class EventsService {
     return firstValueFrom(this.http.get<ClanEvent[]>('api/events', { params }));
   }
 
+  /** Events taking place, even partly, between two instants (planning) */
+  between(from: Date, to: Date, branch: number | null = null): Promise<ClanEvent[]> {
+    const params: Record<string, string> = { from: from.toISOString(), to: to.toISOString() };
+    if (branch) {
+      params['branch'] = String(branch);
+    }
+    return firstValueFrom(this.http.get<ClanEvent[]>('api/events', { params }));
+  }
+
   get(id: number): Promise<ClanEvent> {
     return firstValueFrom(this.http.get<ClanEvent>(`api/events/${id}`));
   }

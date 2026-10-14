@@ -28,31 +28,6 @@
   }
 }
 
-.filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.4rem;
-
-  button {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    padding: 0.2rem 0.75rem;
-    border: 1px solid var(--border);
-    border-radius: 999px;
-    background: none;
-    color: var(--text);
-    font-size: 0.875rem;
-    cursor: pointer;
-
-    &.active {
-      border-color: var(--accent);
-      color: var(--accent-contrast);
-      background: var(--accent);
-    }
-  }
-}
-
 .day {
   margin-bottom: 1.25rem;
 

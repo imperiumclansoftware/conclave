@@ -108,6 +108,25 @@ final class EventTest extends ApiTestCase
         self::assertResponseStatusCodeSame(404);
     }
 
+    public function testThePlanningListsTheEventsOfAPeriod(): void
+    {
+        $leader = $this->registerClan();
+        $this->joinBranch($leader['token'], 'players', $leader['token']);
+        foreach (['2030-05-30T21:00:00+02:00', '2030-06-02T21:00:00+02:00', '2030-07-14T21:00:00+02:00'] as $i => $start) {
+            $this->api('POST', '/api/events', ['title' => "Soirée $i", 'startsAt' => $start, 'endsAt' => null] + $this->gameSession(), $leader['token']);
+        }
+        // Over several days: shown on each of them
+        $this->api('POST', '/api/events', ['title' => 'Marathon', 'startsAt' => '2030-05-31T20:00:00+02:00', 'endsAt' => '2030-06-01T04:00:00+02:00'] + $this->gameSession(), $leader['token']);
+
+        $june = $this->api('GET', '/api/events?from=2030-06-01T00:00:00%2B02:00&to=2030-07-01T00:00:00%2B02:00', token: $leader['token']);
+        self::assertSame(['Marathon', 'Soirée 1'], array_column($june, 'title'));
+
+        $this->api('GET', '/api/events?from=2030-01-01T00:00:00Z&to=2030-12-31T00:00:00Z', token: $leader['token']);
+        self::assertResponseStatusCodeSame(400, 'At most 45 days');
+        $this->api('GET', '/api/events?from=demain&to=2030-06-01T00:00:00Z', token: $leader['token']);
+        self::assertResponseStatusCodeSame(400);
+    }
+
     /** @return array<string, mixed> */
     private function gameSession(): array
     {
