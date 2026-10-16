@@ -4,9 +4,14 @@
 
 Conclave réunit les membres d'un clan dans un espace privé, auto-hébergé, en français :
 
+- **Page d'accueil** : dernières news en carrousel, événements de la semaine, membres en ligne
+- **Événements** propres à chaque branche (sessions de jeu, tournois, watch parties, ciné-clubs,
+  réunions, game jams, streams), avec **planning** mensuel et **salon de discussion** par événement
+- **Notifications** par e-mail et dans le navigateur quand un événement est organisé sur un de vos jeux
 - **Messagerie instantanée** entre membres, messages conservés pour ceux qui sont hors ligne
 - **Présences et visios Discord** : qui est en ligne, à quoi il joue, salons vocaux créés à la demande
 - **Ludothèque** : les jeux de chacun et leurs plateformes, avec fiches et captures (Steam, RAWG)
+- **Films et séries** pour les Cinéphiles, avec fiches TMDB
 - **Branches** à blasons (Joueurs, Développeurs, Communicants, Cinéphiles), avec liens favoris partagés
 - **News** du clan, publiées par la branche des Communicants, avec image ou visuel généré
 - **Administration** : validation des inscriptions, rôles, e-mails, Discord, branches
@@ -23,6 +28,7 @@ servis par [FrankenPHP](https://frankenphp.dev) sur le port 80. Il lui faut seul
 | Tag | Contenu |
 |---|---|
 | `latest` | Dernière version publiée |
+| `0.2.0` | Événements des branches, planning, discussion des événements, notifications, page d'accueil, films et séries (TMDB) |
 | `0.1.2` | Démarrage plus lisible (raison d'un échec de connexion à la base) et plus tolérant |
 | `0.1.1` | Première image publiée |
 
@@ -105,7 +111,7 @@ pour les coller d'un bloc). Générez chaque secret avec `openssl rand -hex 32` 
 CONCLAVE_URL=http://192.168.1.10:8080
 # Port publié sur la machine (doit correspondre à CONCLAVE_URL)
 CONCLAVE_PORT=8080
-# Tag de l'image : latest, ou une version comme 0.1.2
+# Tag de l'image : latest, ou une version comme 0.2.0
 CONCLAVE_VERSION=latest
 
 # Secrets : à conserver précieusement
@@ -142,7 +148,7 @@ Les membres demandent à rejoindre le clan via « S'inscrire » et un dirigeant 
 | `APP_TIMEZONE` | non | Fuseau horaire des dates écrites dans les e-mails (par défaut `Europe/Paris`) |
 | `MERCURE_URL` | non | Hub auquel le serveur publie ; par défaut celui du conteneur. Le worker Discord utilise `http://conclave/.well-known/mercure` |
 
-Les réglages fonctionnels (e-mail SMTP, Discord, clé RAWG) se font dans l'administration et sont stockés
+Les réglages fonctionnels (e-mail SMTP, Discord, clés RAWG et TMDB) se font dans l'administration et sont stockés
 chiffrés en base.
 
 ## Données et sauvegarde
@@ -158,6 +164,8 @@ Sauvegardez les trois. Pour la base : `docker compose exec database pg_dump -U c
 L'image sert du HTTP. Pour un accès depuis Internet, placez-la derrière un reverse proxy qui gère le
 certificat (Traefik, Caddy, Nginx Proxy Manager…), faites-le pointer vers le port publié, et indiquez
 l'adresse `https://…` dans `CONCLAVE_URL`.
+Les notifications du navigateur n'existent qu'en HTTPS : en `http://`, les membres sont prévenus
+par e-mail seulement.
 
 ## Mise à jour
 
