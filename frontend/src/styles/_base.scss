@@ -440,3 +440,34 @@ input[type='checkbox'] {
     }
   }
 }
+
+// ---- States of a service (system dashboard): always an icon and a word, colour adds to them ----
+[data-state='ok'] {
+  --state: var(--success);
+}
+
+[data-state='warning'] {
+  --state: var(--warning);
+}
+
+[data-state='error'] {
+  --state: var(--danger);
+}
+
+[data-state='off'] {
+  --state: var(--text-muted);
+}
+
+.state-glyph {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 1.4rem;
+  height: 1.4rem;
+  border: 1.5px solid var(--state);
+  border-radius: 50%;
+  color: var(--state);
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1;
+}

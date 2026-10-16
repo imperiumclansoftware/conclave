@@ -29,6 +29,12 @@
   @let s = settings();
 
   <!-- Members -->
+  @if (tab() === 'system') {
+    <section id="panel-system" role="tabpanel" aria-labelledby="tab-system">
+      <app-admin-system (openTab)="openTab($event)" />
+    </section>
+  }
+
   @if (tab() === 'signups' || tab() === 'members') {
     <section [id]="'panel-' + tab()" role="tabpanel" [attr.aria-labelledby]="'tab-' + tab()">
       <app-admin-members [view]="tab() === 'signups' ? 'signups' : 'members'" />

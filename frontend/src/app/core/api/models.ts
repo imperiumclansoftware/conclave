@@ -512,3 +512,44 @@ export interface EventInput {
   link: string | null;
   theme: string | null;
 }
+
+/** State of a service on the system dashboard */
+export type ServiceState = 'ok' | 'warning' | 'error' | 'off';
+
+/** Dashboard of the installation (leaders) */
+export interface SystemReport {
+  generatedAt: string;
+  application: {
+    version: string;
+    environment: string;
+    debug: boolean;
+    php: string;
+    symfony: string;
+    timezone: string;
+    publicUrl: string | null;
+  };
+  services: { id: string; label: string; state: ServiceState; detail: string }[];
+  database: {
+    server: string | null;
+    sizeBytes: number;
+    migrations: { executed: number | null; pending: number | null };
+  };
+  storage: {
+    avatarsBytes: number;
+    newsImagesBytes: number;
+    diskFreeBytes: number | null;
+    diskTotalBytes: number | null;
+  };
+  activity: {
+    members: number;
+    pendingSignups: number;
+    online: number;
+    messages24h: number;
+    upcomingEvents: number;
+    news: number;
+    games: number;
+    films: number;
+    /** Oldest first, today last (YYYY-MM-DD in the clan's time zone) */
+    messagesByDay: { day: string; count: number }[];
+  };
+}

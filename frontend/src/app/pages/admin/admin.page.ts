@@ -21,12 +21,15 @@ import { AdminBranchRequests } from './admin-branch-requests';
 import { AdminBranches } from './admin-branches';
 import { AdminMail } from './admin-mail';
 import { AdminMembers } from './admin-members';
+import { AdminSystem } from './admin-system';
 import { Icon } from '../../shared/icon';
 import { IconName } from '../../shared/icons.generated';
 
-type Tab = 'signups' | 'members' | 'branches' | 'general' | 'mail' | 'discord' | 'catalog';
+type Tab =
+  'system' | 'signups' | 'members' | 'branches' | 'general' | 'mail' | 'discord' | 'catalog';
 
 const TABS: { id: Tab; label: string; icon: IconName }[] = [
+  { id: 'system', label: 'Système', icon: 'system' },
   { id: 'signups', label: 'Demandes', icon: 'pending' },
   { id: 'members', label: 'Membres', icon: 'members' },
   { id: 'branches', label: 'Branches', icon: 'branch' },
@@ -44,6 +47,7 @@ const GATEWAY_REFRESH_MS = 10_000;
   imports: [
     ReactiveFormsModule,
     AdminMembers,
+    AdminSystem,
     AdminBranchRequests,
     AdminBranches,
     AdminMail,
@@ -66,7 +70,7 @@ export class AdminPage implements OnInit {
   protected readonly tab = linkedSignal<Tab>(() => {
     const requested = TABS.find((t) => t.id === this.onglet())?.id;
     // Only the URL changes the tab, not a refreshed count of sign-ups
-    return requested ?? (untracked(this.signups.count) > 0 ? 'signups' : 'members');
+    return requested ?? (untracked(this.signups.count) > 0 ? 'signups' : 'system');
   });
   protected readonly settings = signal<AdminSettings | null>(null);
   protected readonly generalStatus = signal<Status>(null);
@@ -107,7 +111,7 @@ export class AdminPage implements OnInit {
         this.signups.count() > 0 &&
         !this.tabChosen &&
         !this.onglet() &&
-        untracked(this.tab) === 'members'
+        untracked(this.tab) === 'system'
       ) {
         this.tab.set('signups');
       }
@@ -119,6 +123,14 @@ export class AdminPage implements OnInit {
       this.apply(await firstValueFrom(this.admin.settings()));
     } catch (e) {
       this.discordStatus.set({ kind: 'error', message: apiErrorMessage(e) });
+    }
+  }
+
+  /** From the dashboard: the tab where a service is set up */
+  protected openTab(id: string): void {
+    const tab = TABS.find((t) => t.id === id);
+    if (tab) {
+      this.selectTab(tab.id);
     }
   }
 

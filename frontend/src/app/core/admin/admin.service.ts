@@ -7,6 +7,7 @@ import {
   CheckResult,
   ClanRole,
   MailSettingsInput,
+  SystemReport,
 } from '../api/models';
 
 export interface DiscordSettingsChanges {
@@ -20,6 +21,10 @@ export interface DiscordSettingsChanges {
 @Injectable({ providedIn: 'root' })
 export class AdminService {
   private readonly http = inject(HttpClient);
+
+  system(): Observable<SystemReport> {
+    return this.http.get<SystemReport>('api/admin/system');
+  }
 
   settings(): Observable<AdminSettings> {
     return this.http.get<AdminSettings>('api/admin/settings');

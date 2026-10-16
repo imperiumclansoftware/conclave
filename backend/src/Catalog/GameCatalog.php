@@ -20,6 +20,7 @@ final readonly class GameCatalog
         private RawgCatalog $rawg,
         private CacheInterface $cache,
         private LoggerInterface $logger,
+        private RawgHealth $rawgHealth,
     ) {
     }
 
@@ -38,9 +39,13 @@ final readonly class GameCatalog
         $catalog = $this->preferred();
         if ($catalog === $this->rawg) {
             try {
-                return $this->searchIn($this->rawg, $query);
+                $results = $this->searchIn($this->rawg, $query);
+                $this->rawgHealth->succeeded();
+
+                return $results;
             } catch (CatalogUnavailableException $e) {
                 $this->logger->warning('RAWG search failed, Steam used instead: {error}', ['error' => $e->getMessage()]);
+                $this->rawgHealth->failed($e->getMessage());
                 $catalog = $this->steam;
             }
         }

@@ -1,0 +1,205 @@
+<section class="card system" aria-labelledby="system-title">
+  <header class="head">
+    <h2 id="system-title"><app-icon name="system" /> Système</h2>
+    <p class="meta">
+      @if (report()) {
+        Mis à jour à {{ updatedAt() }} ·
+      }
+      <button class="link" type="button" (click)="load()" [disabled]="loading()">
+        {{ loading() ? 'Actualisation…' : 'Actualiser' }}
+      </button>
+    </p>
+  </header>
+
+  @if (error()) {
+    <p class="error" role="alert">{{ error() }}</p>
+  }
+
+  @if (report(); as r) {
+    <!-- Overall state -->
+    @if (overall(); as o) {
+      <p class="summary" [attr.data-state]="o.state" role="status">
+        <span class="state-glyph" aria-hidden="true">{{
+          o.state === 'ok' ? '✓' : o.state === 'warning' ? '!' : '✕'
+        }}</span>
+        @switch (o.state) {
+          @case ('ok') {
+            Tout fonctionne.
+          }
+          @case ('warning') {
+            {{ plural(o.problems, 'point à vérifier', 'points à vérifier') }}.
+          }
+          @default {
+            Un service est en panne : {{ plural(o.problems, 'point', 'points') }} à régler.
+          }
+        }
+      </p>
+    }
+
+    <!-- Activity -->
+    <h3>Activité</h3>
+    <ul class="tiles">
+      @for (t of tiles(); track t.label) {
+        <li [class.attention]="t.attention">
+          <span class="value">{{ t.value.toLocaleString('fr-FR') }}</span>
+          <span class="label">
+            @if (t.tab) {
+              <button class="link" type="button" (click)="openTab.emit(t.tab)">
+                {{ t.label }}
+              </button>
+            } @else {
+              {{ t.label }}
+            }
+          </span>
+        </li>
+      }
+    </ul>
+
+    <!-- Messages per day: one series, named by the title -->
+    <figure class="chart">
+      <figcaption>
+        <strong>Messages par jour</strong>
+        <span class="meta"
+          >{{ days().length }} derniers jours · {{ plural(total(), 'message', 'messages') }},
+          discussions des événements comprises</span
+        >
+      </figcaption>
+      <div class="plot" aria-hidden="true">
+        <span class="scale">{{ scaleMax() }}</span>
+        <ol class="bars" (mouseleave)="hovered.set(null)">
+          @for (d of days(); track d.day; let i = $index) {
+            <li
+              (mouseenter)="hovered.set(i)"
+              [class.start]="i < 3"
+              [class.end]="i > days().length - 4"
+            >
+              <span class="bar" [style.height]="barHeight(d.count)" [class.empty]="!d.count"></span>
+              @if (hovered() === i) {
+                <span class="tooltip"
+                  ><strong>{{ day(d.day, true) }}</strong
+                  ><br />{{ plural(d.count, 'message', 'messages') }}</span
+                >
+              }
+              <span class="tick" [class.today]="$last">{{ $last ? 'auj.' : day(d.day) }}</span>
+            </li>
+          }
+        </ol>
+      </div>
+      <!-- The same figures, for screen readers -->
+      <table class="visually-hidden">
+        <caption>
+          Messages par jour
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Jour</th>
+            <th scope="col">Messages</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (d of days(); track d.day) {
+            <tr>
+              <td>{{ day(d.day, true) }}</td>
+              <td>{{ d.count }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </figure>
+
+    <!-- Services -->
+    <h3>Services</h3>
+    <ul class="services">
+      @for (s of r.services; track s.id) {
+        <li [attr.data-state]="s.state">
+          <span class="state-glyph" aria-hidden="true">{{
+            s.state === 'ok' ? '✓' : s.state === 'warning' ? '!' : s.state === 'error' ? '✕' : '–'
+          }}</span>
+          <span class="name">{{ s.label }}</span>
+          <span class="state">{{ stateLabels[s.state] }}</span>
+          <span class="detail">
+            {{ s.detail }}
+            @if (s.state !== 'ok' && serviceTabs[s.id]; as tab) {
+              <button class="link" type="button" (click)="openTab.emit(tab)">Régler</button>
+            }
+          </span>
+        </li>
+      }
+    </ul>
+
+    <!-- Versions, database, storage -->
+    <div class="facts">
+      <section aria-labelledby="facts-app">
+        <h3 id="facts-app">Application</h3>
+        <dl>
+          <dt>Version</dt>
+          <dd>Conclave {{ r.application.version }}</dd>
+          <dt>Environnement</dt>
+          <dd>
+            {{ r.application.environment === 'prod' ? 'Production' : r.application.environment }}
+            @if (r.application.debug) {
+              · débogage actif
+            }
+          </dd>
+          <dt>Logiciels</dt>
+          <dd>PHP {{ r.application.php }} · Symfony {{ r.application.symfony }}</dd>
+          <dt>Fuseau horaire</dt>
+          <dd>{{ r.application.timezone }}</dd>
+        </dl>
+      </section>
+
+      <section aria-labelledby="facts-db">
+        <h3 id="facts-db">Base de données</h3>
+        <dl>
+          <dt>Serveur</dt>
+          <dd>PostgreSQL {{ r.database.server ?? '?' }}</dd>
+          <dt>Taille</dt>
+          <dd>{{ bytes(r.database.sizeBytes) }}</dd>
+          <dt>Migrations</dt>
+          <dd>
+            @if (r.database.migrations.pending === null) {
+              Inconnues
+            } @else if (r.database.migrations.pending === 0) {
+              À jour ({{ r.database.migrations.executed }})
+            } @else {
+              <strong>{{ r.database.migrations.pending }} en attente</strong> : redémarrez le
+              conteneur pour les appliquer
+            }
+          </dd>
+        </dl>
+      </section>
+
+      <section aria-labelledby="facts-storage">
+        <h3 id="facts-storage">Stockage</h3>
+        <dl>
+          <dt>Avatars</dt>
+          <dd>{{ bytes(r.storage.avatarsBytes) }}</dd>
+          <dt>Images des news</dt>
+          <dd>{{ bytes(r.storage.newsImagesBytes) }}</dd>
+          <dt>Disque</dt>
+          <dd>
+            @if (diskUsed(); as disk) {
+              {{ bytes(r.storage.diskFreeBytes!) }} libres sur
+              {{ bytes(r.storage.diskTotalBytes!) }}
+              <span
+                class="meter"
+                role="meter"
+                aria-label="Disque utilisé"
+                aria-valuemin="0"
+                aria-valuemax="100"
+                [attr.aria-valuenow]="disk.percent"
+                [attr.data-full]="disk.percent >= 90"
+                ><span [style.width.%]="disk.percent"></span
+              ></span>
+              <span class="meta">{{ disk.percent }} % utilisés</span>
+            } @else {
+              Inconnu
+            }
+          </dd>
+        </dl>
+      </section>
+    </div>
+  } @else if (!error()) {
+    <p class="meta">Lecture de l'état du système…</p>
+  }
+</section>

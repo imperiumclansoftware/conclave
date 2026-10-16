@@ -17,7 +17,10 @@ RUN npx ng build --configuration production --output-path dist
 # ---- PHP application ----
 FROM dunglas/frankenphp:1-php${PHP_VERSION}-alpine AS app
 
-ENV APP_ENV=prod \
+# Version shown in the administration: docker build --build-arg APP_VERSION=0.3.0 …
+ARG APP_VERSION=dev
+ENV APP_VERSION=${APP_VERSION} \
+    APP_ENV=prod \
     APP_DEBUG=0 \
     COMPOSER_ALLOW_SUPERUSER=1 \
     # Caddy keeps its data (Mercure history…) in the persistent volume

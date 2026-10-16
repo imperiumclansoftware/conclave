@@ -31,6 +31,7 @@ const ICONS = {
   film: 'film-projector',
   series: 'tv',
   settings: 'cog',
+  system: 'heart-beats',
   mail: 'envelope',
   video: 'video-camera',
   search: 'magnifying-glass',

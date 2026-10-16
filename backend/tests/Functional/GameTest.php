@@ -80,6 +80,11 @@ final class GameTest extends ApiTestCase
 
         self::assertResponseIsSuccessful();
         self::assertSame(['steam', 'ELDEN RING'], [$results[0]['source'], $results[0]['name']]);
+
+        // The leaders' dashboard tells them
+        $rawg = array_column($this->api('GET', '/api/admin/system', token: $leader['token'])['services'], null, 'id')['rawg'];
+        self::assertSame('warning', $rawg['state']);
+        self::assertStringContainsString('Steam a pris le relais', $rawg['detail']);
     }
 
     public function testShortQueriesReturnNothing(): void

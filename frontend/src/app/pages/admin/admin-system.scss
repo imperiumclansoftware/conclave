@@ -1,0 +1,302 @@
+:host {
+  display: block;
+}
+
+.system {
+  display: grid;
+  gap: 1rem;
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+  }
+}
+
+h3 {
+  margin: 0.5rem 0 0;
+  font-size: 1rem;
+}
+
+.meta {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.link {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--accent-text);
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.summary {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0.6rem 0.8rem;
+  border: 1px solid var(--state);
+  border-left-width: 4px;
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--state) 8%, transparent);
+  font-weight: 600;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+// Headline figures: a number, and what it counts
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+  gap: 0.6rem;
+
+  li {
+    display: grid;
+    align-content: start;
+    gap: 0.1rem;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+
+    &.attention {
+      border-color: var(--warning);
+    }
+  }
+
+  .value {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+  }
+
+  .label {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+  }
+}
+
+// Bar chart: one series (named by the caption), thin bars from the baseline
+.chart {
+  display: grid;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0.75rem 0.9rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+
+  figcaption {
+    display: grid;
+    gap: 0.1rem;
+  }
+}
+
+.plot {
+  position: relative;
+  // Room for the top of the scale, and under the bars for the days
+  margin-bottom: 1.2rem;
+  padding-left: 2rem;
+}
+
+// Top of the scale, recessive
+.scale {
+  position: absolute;
+  top: -0.55rem;
+  left: 0;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.bars {
+  display: grid;
+  grid-template-columns: repeat(14, minmax(0, 1fr));
+  height: 9rem;
+  // Top gridline and baseline
+  border-top: 1px dashed color-mix(in srgb, var(--border) 70%, transparent);
+  border-bottom: 1px solid var(--border);
+
+  li {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    height: 100%;
+    // The whole column is the hover target
+    cursor: default;
+  }
+}
+
+.bar {
+  width: min(60%, 1.4rem);
+  min-height: 2px;
+  border-radius: 4px 4px 0 0;
+  background: var(--chart-bar);
+  transition: height 0.3s ease;
+
+  &.empty {
+    background: color-mix(in srgb, var(--chart-bar) 25%, transparent);
+  }
+
+  li:hover & {
+    filter: brightness(1.15);
+  }
+}
+
+.tick {
+  position: absolute;
+  top: calc(100% + 0.3rem);
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+
+  &.today {
+    color: var(--text);
+    font-weight: 700;
+  }
+}
+
+// Every other day on small screens
+@media (max-width: 40rem) {
+  .bars li:nth-last-child(even) .tick {
+    visibility: hidden;
+  }
+}
+
+.tooltip {
+  position: absolute;
+  z-index: 2;
+  bottom: calc(100% + 0.3rem);
+  padding: 0.35rem 0.55rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-solid);
+  box-shadow: var(--shadow);
+  color: var(--text);
+  font-size: 0.8rem;
+  white-space: nowrap;
+  pointer-events: none;
+
+  // Inside the chart at both ends
+  .start & {
+    left: 0;
+  }
+
+  .end & {
+    right: 0;
+  }
+}
+
+.services {
+  display: grid;
+  gap: 0.4rem;
+
+  li {
+    display: grid;
+    grid-template-columns: auto minmax(8rem, 12rem) auto minmax(0, 1fr);
+    align-items: center;
+    gap: 0.4rem 0.75rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+
+    @media (max-width: 48rem) {
+      grid-template-columns: auto minmax(0, 1fr) auto;
+
+      .detail {
+        grid-column: 2 / -1;
+      }
+    }
+  }
+
+  .name {
+    font-weight: 700;
+  }
+
+  .state {
+    color: var(--state);
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .detail {
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    overflow-wrap: anywhere;
+  }
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 0.75rem;
+
+  section {
+    padding: 0.6rem 0.9rem 0.8rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  h3 {
+    margin: 0 0 0.4rem;
+  }
+
+  dl {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.3rem 0.75rem;
+    margin: 0;
+    font-size: 0.9rem;
+  }
+
+  dt {
+    color: var(--text-muted);
+  }
+
+  dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+}
+
+.meter {
+  display: block;
+  height: 0.45rem;
+  margin: 0.35rem 0 0.15rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--surface-muted);
+
+  span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--chart-bar);
+  }
+
+  &[data-full='true'] span {
+    background: var(--danger);
+  }
+}

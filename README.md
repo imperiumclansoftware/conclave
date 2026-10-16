@@ -160,8 +160,9 @@ variables de `docker/.env.example` dans *Environment variables* (le fichier ne d
 - **HTTPS** : l'image sert du HTTP. Pour un accès depuis Internet, la placer derrière un reverse proxy
   (Traefik, Caddy, Nginx Proxy Manager…) et indiquer l'adresse `https://…` dans `CONCLAVE_URL`.
 - **Mise à jour** : `docker compose pull && docker compose up -d` (les migrations s'appliquent au démarrage).
-- **Construire l'image** : `docker build -t iemperor/conclave .` à la racine du dépôt (`Dockerfile`, fichiers
-  dans `docker/`).
+- **Construire l'image** : `docker build --build-arg APP_VERSION=0.3.0 -t iemperor/conclave .` à la racine
+  du dépôt (`Dockerfile`, fichiers dans `docker/`) ; `APP_VERSION` est la version affichée dans
+  l'administration (`dev` sans elle).
 
 ## Développement
 
@@ -283,6 +284,12 @@ L'application sert **un seul clan**.
   Les dirigeants sont alertés par e-mail et dans l'app (pastille sur leur nom et dans le menu *Administration*) ; l'inscrit reçoit un
   e-mail quand sa demande est validée (ou refusée : le compte est alors supprimé).
 - **Administration** (menu sous son nom > *Administration*, réservée aux dirigeants) :
+  - *Système* (onglet par défaut, sauf demandes en attente) : tableau de bord actualisé toutes les
+    30 secondes. État de chaque service (base de données, hub temps réel, clés de connexion, adresse
+    publique et HTTPS, e-mail, worker Discord, catalogues RAWG et TMDB, avec la dernière recherche RAWG
+    échouée) et lien pour le régler ; activité (membres, en ligne, demandes, messages, événements…) et
+    messages par jour sur 14 jours ; versions, base (taille, migrations) et stockage (avatars, images,
+    disque). API : `GET /api/admin/system` ;
   - *Demandes* : valider / refuser les inscriptions ;
   - *Membres* : rôles (membre / dirigeant ; le clan garde toujours au moins un dirigeant), retrait,
     ajout direct d'un membre (actif tout de suite) ;
