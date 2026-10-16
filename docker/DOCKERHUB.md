@@ -14,7 +14,8 @@ Conclave réunit les membres d'un clan dans un espace privé, auto-hébergé, en
 - **Films et séries** pour les Cinéphiles, avec fiches TMDB
 - **Branches** à blasons (Joueurs, Développeurs, Communicants, Cinéphiles), avec liens favoris partagés
 - **News** du clan, publiées par la branche des Communicants, avec image ou visuel généré
-- **Administration** : validation des inscriptions, rôles, e-mails, Discord, branches
+- **Administration** : tableau de bord du système (état des services, activité, stockage), validation
+  des inscriptions, rôles, e-mails, Discord, branches
 - Deux thèmes : la **Confrérie** (clair, parchemin) et l'**Ordre** (sombre, pierre et or)
 
 L'image contient toute l'application : l'interface Angular, l'API Symfony et le hub temps réel Mercure,
@@ -28,6 +29,7 @@ servis par [FrankenPHP](https://frankenphp.dev) sur le port 80. Il lui faut seul
 | Tag | Contenu |
 |---|---|
 | `latest` | Dernière version publiée |
+| `0.3.0` | Tableau de bord du système dans l'administration (état des services, activité, stockage) |
 | `0.2.0` | Événements des branches, planning, discussion des événements, notifications, page d'accueil, films et séries (TMDB) |
 | `0.1.2` | Démarrage plus lisible (raison d'un échec de connexion à la base) et plus tolérant |
 | `0.1.1` | Première image publiée |
@@ -111,7 +113,7 @@ pour les coller d'un bloc). Générez chaque secret avec `openssl rand -hex 32` 
 CONCLAVE_URL=http://192.168.1.10:8080
 # Port publié sur la machine (doit correspondre à CONCLAVE_URL)
 CONCLAVE_PORT=8080
-# Tag de l'image : latest, ou une version comme 0.2.0
+# Tag de l'image : latest, ou une version comme 0.3.0
 CONCLAVE_VERSION=latest
 
 # Secrets : à conserver précieusement
