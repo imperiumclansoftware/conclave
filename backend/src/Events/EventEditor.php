@@ -20,7 +20,7 @@ final readonly class EventEditor
     private const FIELD_LABELS = [
         'game' => 'le jeu',
         'gamePlatform' => 'la plateforme de jeu',
-        'film' => 'le film',
+        'film' => 'le film ou la série',
         'filmPlatform' => 'la plateforme de visionnage',
         'streamPlatform' => 'la plateforme de diffusion',
         'link' => 'le lien',
@@ -80,7 +80,7 @@ final readonly class EventEditor
         $fields = $event->getType()->fields();
         try {
             $game = isset($fields['game']) && null !== $values['game'] ? $this->games->findOrFetch((string) $request->gameSource, (string) $request->gameExternalId) : null;
-            $film = isset($fields['film']) && null !== $request->tmdbId ? $this->films->findOrFetch($request->tmdbId) : null;
+            $film = isset($fields['film']) && null !== $request->tmdbId ? $this->films->findOrFetch($request->filmKind, $request->tmdbId) : null;
         } catch (GameNotFoundException $e) {
             throw new UnprocessableEntityHttpException('Ce jeu est introuvable.', $e);
         } catch (\DomainException $e) {

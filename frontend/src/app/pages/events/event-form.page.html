@@ -84,10 +84,11 @@
           }
           @if (has('film')) {
             <div class="field">
-              <label for="event-film">Film</label>
+              <label for="event-film">Film ou série</label>
               @if (film(); as f) {
                 <p class="chosen">
-                  <app-icon name="film" /> <strong>{{ f.title }}</strong>
+                  <app-icon [name]="f.kind === 'tv' ? 'series' : 'film'" />
+                  <strong>{{ f.title }}</strong>
                   @if (f.year) {
                     ({{ f.year }})
                   }
@@ -96,7 +97,7 @@
               } @else {
                 <app-catalog-picker
                   inputId="event-film"
-                  placeholder="Rechercher un film sur TMDB…"
+                  placeholder="Rechercher un film ou une série sur TMDB…"
                   [search]="searchFilms"
                   (picked)="pickFilm($event)"
                 />

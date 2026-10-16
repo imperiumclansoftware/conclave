@@ -30,7 +30,7 @@
       }
       @if (e.film) {
         <span
-          ><app-icon name="film" /> {{ e.film.title }}
+          ><app-icon [name]="e.film.kind === 'tv' ? 'series' : 'film'" /> {{ e.film.title }}
           @if (e.film.year) {
             ({{ e.film.year }})
           }

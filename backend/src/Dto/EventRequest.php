@@ -4,6 +4,7 @@ namespace App\Dto;
 
 use App\Entity\Event;
 use App\Enum\EventType;
+use App\Enum\FilmKind;
 use App\Enum\FilmPlatform;
 use App\Enum\GamePlatform;
 use App\Enum\StreamPlatform;
@@ -31,9 +32,10 @@ final readonly class EventRequest
         #[Assert\Length(max: 50)]
         public ?string $gameExternalId = null,
         public ?GamePlatform $gamePlatform = null,
-        /** Film: from the TMDB search */
+        /** Film or series: from the TMDB search */
         #[Assert\Positive]
         public ?int $tmdbId = null,
+        public FilmKind $filmKind = FilmKind::Movie,
         public ?FilmPlatform $filmPlatform = null,
         public ?StreamPlatform $streamPlatform = null,
         #[Assert\Url(message: 'Adresse invalide : elle commence par https:// ou http://.', protocols: ['http', 'https'], requireTld: true, normalizer: 'trim')]

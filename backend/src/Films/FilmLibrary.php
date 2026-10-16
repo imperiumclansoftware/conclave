@@ -3,11 +3,12 @@
 namespace App\Films;
 
 use App\Entity\Film;
+use App\Enum\FilmKind;
 use App\Repository\FilmRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 
-/** Film fiches kept locally: fetched from TMDB the first time, refreshed when stale. */
+/** Fiches of films and series kept locally: fetched from TMDB the first time, refreshed when stale. */
 final readonly class FilmLibrary
 {
     public function __construct(
@@ -20,14 +21,15 @@ final readonly class FilmLibrary
 
     /**
      * @throws FilmCatalogUnavailableException
-     * @throws \DomainException                when TMDB does not know this film
+     * @throws \DomainException                when TMDB does not know this film or series
      */
-    public function findOrFetch(int $tmdbId): Film
+    public function findOrFetch(FilmKind $kind, int $tmdbId): Film
     {
-        $film = $this->films->findOneBy(['tmdbId' => $tmdbId]);
+        $film = $this->films->findOneBy(['kind' => $kind, 'tmdbId' => $tmdbId]);
         if (null === $film) {
-            $details = $this->tmdb->details($tmdbId) ?? throw new \DomainException('Ce film est introuvable sur TMDB.');
-            $film = new Film($tmdbId, $details);
+            $details = $this->tmdb->details($kind, $tmdbId)
+                ?? throw new \DomainException(FilmKind::Tv === $kind ? 'Cette série est introuvable sur TMDB.' : 'Ce film est introuvable sur TMDB.');
+            $film = new Film($kind, $tmdbId, $details);
             $this->em->persist($film);
 
             return $film;
@@ -35,12 +37,12 @@ final readonly class FilmLibrary
 
         if ($film->isStale()) {
             try {
-                if ($details = $this->tmdb->details($tmdbId)) {
+                if ($details = $this->tmdb->details($kind, $tmdbId)) {
                     $film->refresh($details);
                 }
             } catch (FilmCatalogUnavailableException $e) {
                 // Keep the cached fiche
-                $this->logger->warning('Unable to refresh film {id}: {error}', ['id' => $tmdbId, 'error' => $e->getMessage()]);
+                $this->logger->warning('Unable to refresh {kind} {id}: {error}', ['kind' => $kind->value, 'id' => $tmdbId, 'error' => $e->getMessage()]);
             }
         }
 

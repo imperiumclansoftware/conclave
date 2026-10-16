@@ -59,7 +59,7 @@ Comptes dirigeants et membres, messagerie instantanée entre les membres d'un m�
   | Branche | Types | Champs propres |
   |---|---|---|
   | Joueurs | Session de jeu, Tournoi | jeu (catalogue Steam/RAWG) et plateforme |
-  | Cinéphiles | Watch party, Ciné-club | film (TMDB) ; plateforme de visionnage pour la watch party |
+  | Cinéphiles | Watch party, Ciné-club | film ou série (TMDB) ; plateforme de visionnage pour la watch party |
   | Développeurs | Réunion, Game jam | lien de visio, thème de la jam |
   | Communicants | Stream | plateforme de diffusion, lien |
 
@@ -70,9 +70,10 @@ Comptes dirigeants et membres, messagerie instantanée entre les membres d'un m�
 - **Planning du clan** (`/evenements/planning`) : calendrier mensuel des événements, coloré par branche,
   avec ceux auxquels on participe mis en avant et un filtre par branche ; un « + » sur un jour crée un
   événement à cette date. Sur mobile, le mois s'affiche en agenda.
-- **Films (TMDB)** : la clé d'API TMDB (ou le jeton d'accès en lecture) se saisit dans
-  *Administration > Catalogues*. La recherche de films et les fiches (`/films/{id}`) sont réservées aux
-  membres de la branche Cinéphiles ; les autres voient le titre et l'affiche du film d'un événement.
+- **Films et séries (TMDB)** : la clé d'API TMDB (ou le jeton d'accès en lecture) se saisit dans
+  *Administration > Catalogues*. Une même recherche trouve films et séries ; les fiches (`/films/{id}`,
+  `/series/{id}` : saisons, épisodes, années de diffusion, créateurs) sont réservées aux membres de la
+  branche Cinéphiles ; les autres voient le titre et l'affiche du film ou de la série d'un événement.
   Les fiches sont gardées en base et rafraîchies tous les 30 jours.
 - **News** : actualités du clan (titre, texte, image facultative), lues par tous les membres (menu
   *News*). Seuls les membres des branches autorisées dans l'administration (case « Ses membres peuvent
@@ -418,7 +419,7 @@ Toutes les routes sauf `setup`, `register`, `login`, `password/*` et `health` ex
 | POST    | `/api/events`                           | Crée un événement (membres de la branche)           |
 | GET/PUT/DELETE | `/api/events/{id}`               | Détail / modification / suppression                |
 | PUT/DELETE | `/api/events/{id}/participation`     | S'inscrire / se désinscrire                         |
-| GET     | `/api/films/search?q=`, `/api/films/{tmdbId}` | Recherche et fiche TMDB (Cinéphiles)          |
+| GET     | `/api/films/search?q=`, `/api/films/{movie\|tv}/{tmdbId}` | Recherche (films et séries) et fiche TMDB (Cinéphiles) |
 | PUT     | `/api/admin/settings/tmdb`              | `{apiKey}` → clé TMDB ; `POST /api/admin/tmdb/test` pour la tester |
 | GET     | `/api/members/{id}/card`                | Carte de membre : branches et compteurs             |
 | GET     | `/api/news?before={id}`                 | News, 12 par page, des plus récentes aux anciennes  |

@@ -240,13 +240,14 @@ final class ApiPresenter
     }
 
     /**
-     * Film of an event, shown to every member.
+     * Film or series of an event, shown to every member.
      *
-     * @return array{tmdbId: int, title: string, year: ?string, posterUrl: ?string}
+     * @return array{kind: string, tmdbId: int, title: string, year: ?string, posterUrl: ?string}
      */
     public function film(Film $film): array
     {
         return [
+            'kind' => $film->getKind()->value,
             'tmdbId' => $film->getTmdbId(),
             'title' => $film->getTitle(),
             'year' => $film->getYear(),
@@ -270,7 +271,12 @@ final class ApiPresenter
             'runtime' => $film->getRuntime(),
             'directors' => $film->getDirectors(),
             'cast' => $film->getCast(),
-            'tmdbUrl' => 'https://www.themoviedb.org/movie/'.$film->getTmdbId(),
+            // Series only
+            'endYear' => $film->getEndYear(),
+            'ongoing' => $film->isOngoing(),
+            'seasonCount' => $film->getSeasonCount(),
+            'episodeCount' => $film->getEpisodeCount(),
+            'tmdbUrl' => \sprintf('https://www.themoviedb.org/%s/%d', $film->getKind()->value, $film->getTmdbId()),
         ];
     }
 

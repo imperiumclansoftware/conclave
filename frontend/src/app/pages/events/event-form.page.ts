@@ -4,9 +4,17 @@ import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angula
 import { Router, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { apiErrorMessage } from '../../core/api/api-error';
-import { EventField, EventInput, EventTypeInfo, EventTypes, Option } from '../../core/api/models';
+import {
+  EventField,
+  EventInput,
+  EventTypeInfo,
+  EventTypes,
+  FilmKind,
+  Option,
+} from '../../core/api/models';
 import { EventsService } from '../../core/events/events.service';
 import { FilmsService } from '../../core/films/films.service';
+import { filmKindLabel } from '../films/film-format';
 import { GamesService } from '../../core/games/games.service';
 import { BranchCrest } from '../../shared/branch-crest';
 import { Icon } from '../../shared/icon';
@@ -22,6 +30,7 @@ interface ChosenGame {
 }
 
 interface ChosenFilm {
+  kind: FilmKind;
   tmdbId: number;
   title: string;
   year: string | null;
@@ -110,9 +119,9 @@ export class EventFormPage {
     });
   protected readonly searchFilms = async (query: string): Promise<PickerItem[]> =>
     (await this.films.search(query)).map((f) => ({
-      key: String(f.tmdbId),
+      key: `${f.kind}:${f.tmdbId}`,
       name: f.title,
-      detail: [f.year, f.originalTitle].filter(Boolean).join(' · ') || null,
+      detail: [filmKindLabel(f.kind), f.year, f.originalTitle].filter(Boolean).join(' · '),
       imageUrl: f.posterUrl,
     }));
 
@@ -151,10 +160,12 @@ export class EventFormPage {
   }
 
   protected pickFilm(item: PickerItem): void {
+    const [kind, tmdbId] = item.key.split(':');
     this.film.set({
-      tmdbId: Number(item.key),
+      kind: kind as FilmKind,
+      tmdbId: Number(tmdbId),
       title: item.name,
-      year: item.detail?.slice(0, 4) ?? null,
+      year: item.detail?.match(/\b\d{4}\b/)?.[0] ?? null,
     });
     this.suggestTitle(item.name);
   }
@@ -183,6 +194,7 @@ export class EventFormPage {
       gameExternalId: this.game()?.externalId ?? null,
       gamePlatform: v.gamePlatform || null,
       tmdbId: this.film()?.tmdbId ?? null,
+      filmKind: this.film()?.kind ?? 'movie',
       filmPlatform: v.filmPlatform || null,
       streamPlatform: v.streamPlatform || null,
       link: v.link.trim() || null,
@@ -218,7 +230,7 @@ export class EventFormPage {
     const labels: Record<EventField, string> = {
       game: 'le jeu',
       gamePlatform: 'la plateforme',
-      film: 'le film',
+      film: 'le film ou la série',
       filmPlatform: 'la plateforme de visionnage',
       streamPlatform: 'la plateforme de diffusion',
       link: 'le lien',
@@ -268,7 +280,12 @@ export class EventFormPage {
         );
         this.film.set(
           event.film
-            ? { tmdbId: event.film.tmdbId, title: event.film.title, year: event.film.year }
+            ? {
+                kind: event.film.kind,
+                tmdbId: event.film.tmdbId,
+                title: event.film.title,
+                year: event.film.year,
+              }
             : null,
         );
       } else {

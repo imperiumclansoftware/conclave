@@ -58,7 +58,7 @@ final class EventTest extends ApiTestCase
         self::assertSame([], $this->api('GET', '/api/events', token: $marc));
     }
 
-    public function testCinephilesOrganiseWatchPartiesWithTmdbFilms(): void
+    public function testCinephilesOrganiseWatchPartiesWithTmdbFilmsAndSeries(): void
     {
         $leader = $this->registerClan();
         $this->api('PUT', '/api/admin/settings/tmdb', ['apiKey' => HttpClientMock::TMDB_KEY], $leader['token']);
@@ -73,14 +73,24 @@ final class EventTest extends ApiTestCase
             'gamePlatform' => 'pc',
         ], $lea);
         self::assertResponseStatusCodeSame(201);
-        self::assertSame([['tmdbId' => 438631, 'title' => 'Dune', 'year' => '2021', 'posterUrl' => 'https://image.tmdb.org/t/p/w342/dune.jpg'], 'Netflix', null],
+        self::assertSame([['kind' => 'movie', 'tmdbId' => 438631, 'title' => 'Dune', 'year' => '2021', 'posterUrl' => 'https://image.tmdb.org/t/p/w342/dune.jpg'], 'Netflix', null],
             [$event['film'], $event['filmPlatform']['label'], $event['gamePlatform']]);
         self::assertSame('2030-06-01T19:00:00+00:00', (new \DateTimeImmutable($event['startsAt']))->setTimezone(new \DateTimeZone('UTC'))->format(\DATE_ATOM), 'Same instant');
 
         // The others see the film of the event, but not its fiche
         self::assertSame('Dune', $this->api('GET', "/api/events/{$event['id']}", token: $marc)['film']['title']);
-        $this->api('GET', '/api/films/438631', token: $marc);
+        $this->api('GET', '/api/films/movie/438631', token: $marc);
         self::assertResponseStatusCodeSame(403);
+
+        // A series, for a ciné-club
+        $club = $this->api('POST', '/api/events', [
+            'type' => 'cine_club', 'title' => 'Prophecy, épisode 1', 'startsAt' => '2030-06-08T21:00:00+02:00',
+            'tmdbId' => 90228, 'filmKind' => 'tv',
+        ], $lea);
+        self::assertResponseStatusCodeSame(201);
+        self::assertSame(['tv', 90228, 'Dune : Prophecy'], [$club['film']['kind'], $club['film']['tmdbId'], $club['film']['title']]);
+        $this->api('POST', '/api/events', ['type' => 'cine_club', 'title' => 'Pas une série', 'startsAt' => '2030-06-08T21:00:00+02:00', 'tmdbId' => 438631, 'filmKind' => 'tv'], $lea);
+        self::assertResponseStatusCodeSame(422);
 
         $this->api('POST', '/api/events', ['type' => 'watch_party', 'title' => 'Sans film', 'startsAt' => '2030-06-01T21:00:00+02:00', 'filmPlatform' => 'netflix'], $lea);
         self::assertResponseStatusCodeSame(422);

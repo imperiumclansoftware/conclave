@@ -114,10 +114,21 @@ final class HttpClientMock
 
         return match (true) {
             'authentication' === $path => new JsonMockResponse(['success' => true]),
-            'search/movie' === $path => new JsonMockResponse(['results' => str_contains(strtolower((string) ($query['query'] ?? '')), 'dune') ? [
-                ['id' => 438631, 'title' => 'Dune', 'original_title' => 'Dune', 'release_date' => '2021-09-15', 'poster_path' => '/dune.jpg'],
-                ['id' => 693134, 'title' => 'Dune : Deuxième partie', 'original_title' => 'Dune: Part Two', 'release_date' => '2024-02-27', 'poster_path' => null],
+            'search/multi' === $path => new JsonMockResponse(['results' => str_contains(strtolower((string) ($query['query'] ?? '')), 'dune') ? [
+                ['media_type' => 'movie', 'id' => 438631, 'title' => 'Dune', 'original_title' => 'Dune', 'release_date' => '2021-09-15', 'poster_path' => '/dune.jpg'],
+                ['media_type' => 'tv', 'id' => 90228, 'name' => 'Dune : Prophecy', 'original_name' => 'Dune: Prophecy', 'first_air_date' => '2024-11-17', 'poster_path' => '/prophecy.jpg'],
+                ['media_type' => 'person', 'id' => 1, 'name' => 'Dune Fan'],
+                ['media_type' => 'movie', 'id' => 693134, 'title' => 'Dune : Deuxième partie', 'original_title' => 'Dune: Part Two', 'release_date' => '2024-02-27', 'poster_path' => null],
             ] : []]),
+            'tv/90228' === $path => new JsonMockResponse([
+                'id' => 90228, 'name' => 'Dune : Prophecy', 'original_name' => 'Dune: Prophecy', 'first_air_date' => '2024-11-17',
+                'last_air_date' => '2024-12-22', 'in_production' => true, 'number_of_seasons' => 1, 'number_of_episodes' => 6,
+                'episode_run_time' => [], 'last_episode_to_air' => ['runtime' => 63],
+                'poster_path' => '/prophecy.jpg', 'backdrop_path' => null, 'overview' => 'Les Bene Gesserit…',
+                'genres' => [['id' => 10765, 'name' => 'Science-Fiction & Fantastique']],
+                'created_by' => [['name' => 'Diane Ademu-John'], ['name' => 'Alison Schapker']],
+                'credits' => ['cast' => [['name' => 'Emily Watson', 'character' => 'Valya Harkonnen']], 'crew' => []],
+            ]),
             'movie/438631' === $path => new JsonMockResponse([
                 'id' => 438631, 'title' => 'Dune', 'original_title' => 'Dune', 'release_date' => '2021-09-15',
                 'poster_path' => '/dune.jpg', 'backdrop_path' => '/dune-bg.jpg', 'overview' => 'Paul Atréides…', 'runtime' => 155,

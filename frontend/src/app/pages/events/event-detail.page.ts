@@ -9,6 +9,7 @@ import { ConsentService } from '../../core/consent/consent.service';
 import { EventsService } from '../../core/events/events.service';
 import { Avatar } from '../../shared/avatar';
 import { BranchCrest } from '../../shared/branch-crest';
+import { filmLink } from '../films/film-format';
 import { Icon } from '../../shared/icon';
 import { MemberCardDirective } from '../../shared/member-card.directive';
 import { dayLabel, timeRange } from './event-format';
@@ -20,6 +21,8 @@ import { dayLabel, timeRange } from './event-format';
   styleUrl: './event-detail.page.scss',
 })
 export class EventDetailPage {
+  protected readonly filmLink = filmLink;
+
   private readonly eventsService = inject(EventsService);
   private readonly router = inject(Router);
   protected readonly auth = inject(AuthService);

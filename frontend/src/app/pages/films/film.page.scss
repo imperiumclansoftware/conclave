@@ -47,6 +47,18 @@
   box-shadow: 0 6px 18px rgb(0 0 0 / 0.3);
 }
 
+.kind {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0;
+  color: var(--accent-text);
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .info {
   display: grid;
   flex: 1;

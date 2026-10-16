@@ -62,10 +62,10 @@
         }
         @if (e.film) {
           <div>
-            <dt>Film</dt>
+            <dt>{{ e.film.kind === 'tv' ? 'Série' : 'Film' }}</dt>
             <dd>
               @if (auth.user()?.canAccessFilms) {
-                <a [routerLink]="['/films', e.film.tmdbId]">{{ e.film.title }}</a>
+                <a [routerLink]="filmLink(e.film)">{{ e.film.title }}</a>
               } @else {
                 {{ e.film.title }}
               }

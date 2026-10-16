@@ -112,6 +112,14 @@ export const routes: Routes = [
         path: 'films/:id',
         title: 'Film',
         canActivate: [filmsGuard],
+        data: { kind: 'movie' },
+        loadComponent: () => import('./pages/films/film.page').then((m) => m.FilmPage),
+      },
+      {
+        path: 'series/:id',
+        title: 'Série',
+        canActivate: [filmsGuard],
+        data: { kind: 'tv' },
         loadComponent: () => import('./pages/films/film.page').then((m) => m.FilmPage),
       },
       {

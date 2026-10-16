@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Api\ApiPresenter;
+use App\Enum\FilmKind;
 use App\Films\FilmCatalogUnavailableException;
 use App\Films\FilmLibrary;
 use App\Films\TmdbClient;
@@ -18,13 +19,13 @@ use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 /**
- * Film search and fiches (TMDB): the part of the Cinéphiles branch (see FilmsAccess).
+ * Search and fiches of films and TV series (TMDB): the part of the Cinéphiles branch (see FilmsAccess).
  */
 #[Route('/api/films', format: 'json')]
-#[IsGranted(FilmsVoter::ACCESS, message: 'Les fiches de films sont réservées aux membres de la branche Cinéphiles.')]
+#[IsGranted(FilmsVoter::ACCESS, message: 'Les fiches de films et de séries sont réservées aux membres de la branche Cinéphiles.')]
 final class FilmController extends AbstractController
 {
-    private const UNAVAILABLE = 'La recherche de films est indisponible : TMDB est injoignable ou sa clé n\'est pas configurée.';
+    private const UNAVAILABLE = 'La recherche de films et de séries est indisponible : TMDB est injoignable ou sa clé n\'est pas configurée.';
 
     #[Route('/search', name: 'api_films_search', methods: ['GET'])]
     public function search(TmdbClient $tmdb, #[MapQueryParameter] string $q = ''): JsonResponse
@@ -40,11 +41,12 @@ final class FilmController extends AbstractController
         }
     }
 
-    #[Route('/{tmdbId}', name: 'api_film_show', requirements: ['tmdbId' => Requirement::DIGITS], methods: ['GET'])]
-    public function show(int $tmdbId, FilmLibrary $films, EntityManagerInterface $em, ApiPresenter $presenter): JsonResponse
+    /** /api/films/movie/438631 or /api/films/tv/1399 */
+    #[Route('/{kind}/{tmdbId}', name: 'api_film_show', requirements: ['kind' => 'movie|tv', 'tmdbId' => Requirement::DIGITS], methods: ['GET'])]
+    public function show(FilmKind $kind, int $tmdbId, FilmLibrary $films, EntityManagerInterface $em, ApiPresenter $presenter): JsonResponse
     {
         try {
-            $film = $films->findOrFetch($tmdbId);
+            $film = $films->findOrFetch($kind, $tmdbId);
             $em->flush();
         } catch (\DomainException $e) {
             throw new NotFoundHttpException($e->getMessage(), $e);

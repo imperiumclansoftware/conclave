@@ -391,8 +391,12 @@ export interface EventTypes {
   streamPlatforms: Option[];
 }
 
-/** Film of an event: shown to everybody */
+/** TMDB fiche of a film or a TV series */
+export type FilmKind = 'movie' | 'tv';
+
+/** Film or series of an event: shown to everybody */
 export interface FilmSummary {
+  kind: FilmKind;
   tmdbId: number;
   title: string;
   year: string | null;
@@ -407,8 +411,14 @@ export interface FilmDetails extends FilmSummary {
   overview: string | null;
   genres: string[];
   runtime: number | null;
+  /** Directors of a film, creators of a series */
   directors: string[];
   cast: { name: string; character: string | null }[];
+  /** Series only: year of the last episode once ended, still running, size */
+  endYear: string | null;
+  ongoing: boolean | null;
+  seasonCount: number | null;
+  episodeCount: number | null;
   tmdbUrl: string;
 }
 
@@ -461,6 +471,7 @@ export interface EventInput {
   gameExternalId: string | null;
   gamePlatform: string | null;
   tmdbId: number | null;
+  filmKind: FilmKind;
   filmPlatform: string | null;
   streamPlatform: string | null;
   link: string | null;

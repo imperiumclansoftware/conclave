@@ -28,6 +28,7 @@ const ICONS = {
   links: 'linked-rings',
   events: 'calendar',
   film: 'film-projector',
+  series: 'tv',
   settings: 'cog',
   mail: 'envelope',
   video: 'video-camera',
