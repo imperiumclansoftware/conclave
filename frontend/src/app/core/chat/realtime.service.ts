@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { DestroyRef, Injectable, inject, signal } from '@angular/core';
 import { Subject, firstValueFrom } from 'rxjs';
-import { Member, Message, Presence, VideoCall } from '../api/models';
+import { EventMessage, Member, Message, Presence, VideoCall } from '../api/models';
 
 export type RealtimeEvent =
   | { type: 'message'; message: Message }
@@ -14,7 +14,9 @@ export type RealtimeEvent =
   | { type: 'signups' }
   | { type: 'branches' }
   | { type: 'links' }
-  | { type: 'events' };
+  | { type: 'events' }
+  | { type: 'event-message'; message: EventMessage }
+  | { type: 'event-message-deleted'; eventId: number; messageId: number };
 export type RealtimeStatus = 'connecting' | 'connected' | 'disconnected';
 
 interface Subscription {

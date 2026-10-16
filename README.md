@@ -67,6 +67,10 @@ Comptes dirigeants et membres, messagerie instantanée entre les membres d'un m�
   branche) ; seuls les membres de la branche en créent et s'y inscrivent, avec un nombre de places
   facultatif. L'organisateur les modifie, les dirigeants peuvent les modifier ou les supprimer. Les
   listes se mettent à jour en temps réel.
+- **Discussion des événements** : chaque événement a son salon. Ses participants y écrivent avant et
+  pendant l'événement (jusqu'à sa fin, ou 4 heures après son début s'il n'a pas de fin), tout le clan
+  le lit, en temps réel ; ensuite il reste lisible, en lecture seule. L'auteur retire son message tant
+  que le salon est ouvert, un dirigeant à tout moment.
 - **Planning du clan** (`/evenements/planning`) : calendrier mensuel des événements, coloré par branche,
   avec ceux auxquels on participe mis en avant et un filtre par branche ; un « + » sur un jour crée un
   événement à cette date. Sur mobile, le mois s'affiche en agenda.
@@ -419,6 +423,8 @@ Toutes les routes sauf `setup`, `register`, `login`, `password/*` et `health` ex
 | POST    | `/api/events`                           | Crée un événement (membres de la branche)           |
 | GET/PUT/DELETE | `/api/events/{id}`               | Détail / modification / suppression                |
 | PUT/DELETE | `/api/events/{id}/participation`     | S'inscrire / se désinscrire                         |
+| GET/POST | `/api/events/{id}/messages[?before=]`  | Discussion de l'événement : lire (tout le clan) / écrire (participants, jusqu'à la fin) |
+| DELETE  | `/api/events/{id}/messages/{messageId}` | Retirer un message (auteur tant que c'est ouvert, dirigeants) |
 | GET     | `/api/films/search?q=`, `/api/films/{movie\|tv}/{tmdbId}` | Recherche (films et séries) et fiche TMDB (Cinéphiles) |
 | PUT     | `/api/admin/settings/tmdb`              | `{apiKey}` → clé TMDB ; `POST /api/admin/tmdb/test` pour la tester |
 | GET     | `/api/members/{id}/card`                | Carte de membre : branches et compteurs             |

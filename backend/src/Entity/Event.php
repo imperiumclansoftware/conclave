@@ -20,6 +20,9 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Index(name: 'event_starts_at', columns: ['starts_at'])]
 class Event
 {
+    /** How long the chat room stays open after the start of an event without an end */
+    private const CHAT_OPEN_WITHOUT_END = '+4 hours';
+
     public const TITLE_MAX_LENGTH = 120;
     public const DESCRIPTION_MAX_LENGTH = 5000;
 
@@ -150,6 +153,20 @@ class Event
     public function isOver(\DateTimeImmutable $now = new \DateTimeImmutable()): bool
     {
         return ($this->endsAt ?? $this->startsAt) < $now;
+    }
+
+    /**
+     * The chat room accepts messages until the end of the event; without an end, for a few hours
+     * after its start.
+     */
+    public function getChatClosesAt(): \DateTimeImmutable
+    {
+        return $this->endsAt ?? $this->startsAt->modify(self::CHAT_OPEN_WITHOUT_END);
+    }
+
+    public function isChatOpen(\DateTimeImmutable $now = new \DateTimeImmutable()): bool
+    {
+        return $now < $this->getChatClosesAt();
     }
 
     public function getMaxParticipants(): ?int

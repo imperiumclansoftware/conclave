@@ -200,6 +200,7 @@ final class EventController extends AbstractController
             'participate' => null === $event->participantOf($me) && $this->permissions->canParticipate($me, $event) && !$event->isFull(),
             'edit' => $this->permissions->canEdit($me, $event),
             'delete' => $this->permissions->canDelete($me, $event),
+            'chat' => $this->permissions->canChat($me, $event),
         ]);
     }
 

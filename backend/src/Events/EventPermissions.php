@@ -4,6 +4,7 @@ namespace App\Events;
 
 use App\Entity\Branch;
 use App\Entity\Event;
+use App\Entity\EventMessage;
 use App\Entity\User;
 use App\Enum\EventType;
 use App\Repository\BranchRepository;
@@ -11,6 +12,7 @@ use App\Repository\BranchRepository;
 /**
  * Every member sees the events of the active branches; the members of a branch create its
  * events and join them. The creator edits an event while in the branch; leaders moderate.
+ * Everybody reads the chat room of an event; its participants write in it until the event ends.
  */
 final readonly class EventPermissions
 {
@@ -39,6 +41,20 @@ final readonly class EventPermissions
     public function canParticipate(User $user, Event $event): bool
     {
         return $this->canSee($user, $event) && $user->isActive() && $event->getBranch()->hasMember($user) && !$event->isOver();
+    }
+
+    public function canChat(User $user, Event $event): bool
+    {
+        return $this->canSee($user, $event) && $user->isActive() && null !== $event->participantOf($user) && $event->isChatOpen();
+    }
+
+    /** The author while the room is open, leaders at any time */
+    public function canDeleteMessage(User $user, EventMessage $message): bool
+    {
+        $event = $message->getEvent();
+
+        return $this->canSee($user, $event)
+            && ($user->isLeader() || ($message->getAuthor() === $user && $event->isChatOpen()));
     }
 
     public function canEdit(User $user, Event $event): bool

@@ -9,6 +9,7 @@ use App\Entity\Clan;
 use App\Entity\Conversation;
 use App\Entity\ConversationParticipant;
 use App\Entity\Event;
+use App\Entity\EventMessage;
 use App\Entity\EventParticipant;
 use App\Entity\Film;
 use App\Entity\Game;
@@ -194,7 +195,7 @@ final class ApiPresenter
     /**
      * Event, as seen by a member; $rights says what this member can do with it.
      *
-     * @param array{participate: bool, edit: bool, delete: bool} $rights
+     * @param array{participate: bool, edit: bool, delete: bool, chat: bool} $rights
      *
      * @return array<string, mixed>
      */
@@ -227,6 +228,7 @@ final class ApiPresenter
             'participating' => null !== $event->participantOf($viewer),
             'full' => $event->isFull(),
             'over' => $event->isOver(),
+            'chat' => ['open' => $event->isChatOpen(), 'closesAt' => $event->getChatClosesAt()->format(\DATE_ATOM), 'canWrite' => $rights['chat']],
             'canParticipate' => $rights['participate'],
             'canEdit' => $rights['edit'],
             'canDelete' => $rights['delete'],
@@ -237,6 +239,24 @@ final class ApiPresenter
     private static function option(GamePlatform|FilmPlatform|StreamPlatform|null $option): ?array
     {
         return null !== $option ? ['value' => $option->value, 'label' => $option->label()] : null;
+    }
+
+    /**
+     * Message of an event's chat room, the same for every reader (pushed in real time).
+     *
+     * @return array{id: ?int, eventId: ?int, author: ?array{id: ?int, username: string, displayName: string, role: string, avatarUrl: ?string}, content: string, createdAt: string}
+     */
+    public function eventMessage(EventMessage $message): array
+    {
+        $author = $message->getAuthor();
+
+        return [
+            'id' => $message->getId(),
+            'eventId' => $message->getEvent()->getId(),
+            'author' => null !== $author ? $this->user($author) : null,
+            'content' => $message->getContent(),
+            'createdAt' => $message->getCreatedAt()->format(\DATE_ATOM),
+        ];
     }
 
     /**

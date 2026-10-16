@@ -454,10 +454,32 @@ export interface ClanEvent {
   participating: boolean;
   full: boolean;
   over: boolean;
+  /** Chat room: open until the end of the event (a few hours after its start without an end) */
+  chat: { open: boolean; closesAt: string; canWrite: boolean };
   canParticipate: boolean;
   canEdit: boolean;
   canDelete: boolean;
 }
+
+/** Message of an event's chat room */
+export interface EventMessage {
+  id: number;
+  eventId: number;
+  /** null once the author has left the clan */
+  author: Member | null;
+  content: string;
+  createdAt: string;
+}
+
+export interface EventMessagePage {
+  items: EventMessage[];
+  hasMore: boolean;
+  /** Leaders remove any message */
+  canModerate: boolean;
+}
+
+/** Must match EventMessage::MAX_LENGTH on the API. */
+export const EVENT_MESSAGE_MAX = 2000;
 
 /** Creation or update of an event */
 export interface EventInput {

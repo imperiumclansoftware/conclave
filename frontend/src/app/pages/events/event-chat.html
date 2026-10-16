@@ -1,0 +1,118 @@
+@let e = event();
+<section class="card chat" aria-labelledby="chat-title">
+  <header class="chat-head">
+    <h2 id="chat-title"><app-icon name="messages" /> Discussion</h2>
+    @if (open()) {
+      <span class="state open">Ouverte</span>
+    } @else {
+      <span class="state">Lecture seule</span>
+    }
+  </header>
+
+  <p class="meta rules">
+    @if (!open()) {
+      L'événement est terminé : la discussion reste lisible mais n'accepte plus de messages.
+    } @else if (canWrite()) {
+      Écrivez aux autres participants jusqu'à la fin de l'événement ({{ closing() }}).
+    } @else if (e.canParticipate) {
+      Inscrivez-vous à l'événement pour écrire ici. Tout le clan lit la discussion.
+    } @else {
+      Les participants écrivent ici jusqu'à la fin de l'événement ; tout le clan la lit.
+    }
+  </p>
+
+  <div class="messages" #scroller (scroll)="onScroll()">
+    @if (error()) {
+      <p class="error" role="alert">{{ error() }}</p>
+    }
+    @if (hasMore()) {
+      <button
+        class="btn btn-ghost older"
+        type="button"
+        (click)="loadOlder()"
+        [disabled]="loadingOlder()"
+      >
+        {{ loadingOlder() ? 'Chargement…' : 'Messages précédents' }}
+      </button>
+    }
+
+    <ol role="log" aria-live="polite" aria-label="Messages de la discussion">
+      @for (item of items(); track item.message.id) {
+        @let m = item.message;
+        @if (item.day) {
+          <li class="day" aria-hidden="true">{{ item.day }}</li>
+        }
+        <li class="message" [class.mine]="item.mine" [class.grouped]="!item.showAuthor">
+          <span class="avatar" aria-hidden="true">
+            @if (item.showAuthor && !item.mine && m.author) {
+              <app-avatar [member]="m.author" [size]="32" />
+            }
+          </span>
+          <div class="body">
+            @if (item.showAuthor && !item.mine) {
+              <p class="author">
+                @if (m.author; as a) {
+                  <a [routerLink]="['/members', a.id]" [appMemberCard]="a.id">{{
+                    a.displayName
+                  }}</a>
+                } @else {
+                  Ancien membre
+                }
+              </p>
+            } @else {
+              <span class="visually-hidden"
+                >{{ item.mine ? 'Vous' : (m.author?.displayName ?? 'Ancien membre') }} :</span
+              >
+            }
+            <div class="line">
+              <p class="bubble">{{ m.content }}</p>
+              <time [attr.datetime]="m.createdAt">{{ time(m) }}</time>
+              @if (canDelete(m)) {
+                <button
+                  class="remove"
+                  type="button"
+                  (click)="remove(m)"
+                  aria-label="Retirer ce message"
+                  title="Retirer ce message"
+                >
+                  <app-icon name="remove" />
+                </button>
+              }
+            </div>
+          </div>
+        </li>
+      } @empty {
+        @if (loaded() && !error()) {
+          <li class="empty">
+            {{
+              open() ? 'Aucun message pour l’instant.' : 'Personne n’a écrit dans cette discussion.'
+            }}
+          </li>
+        }
+      }
+    </ol>
+  </div>
+
+  @if (canWrite()) {
+    <form class="composer" (submit)="$event.preventDefault(); send()">
+      @if (sendError()) {
+        <p class="error" role="alert">{{ sendError() }}</p>
+      }
+      <label class="visually-hidden" for="event-chat-composer">Votre message</label>
+      <textarea
+        id="event-chat-composer"
+        #composer
+        rows="2"
+        placeholder="Écrire aux participants…"
+        [value]="draft()"
+        (input)="draft.set(composer.value)"
+        (keydown)="onKeydown($event)"
+        [attr.maxlength]="maxLength"
+        enterkeyhint="send"
+      ></textarea>
+      <button class="btn" type="submit" [disabled]="!draft().trim()">Envoyer</button>
+    </form>
+  } @else if (sendError()) {
+    <p class="error" role="alert">{{ sendError() }}</p>
+  }
+</section>

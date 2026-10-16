@@ -1,0 +1,205 @@
+:host {
+  display: block;
+}
+
+.chat {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.chat-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0;
+    font-size: 1.15rem;
+  }
+}
+
+.state {
+  padding: 0.1rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+
+  &.open {
+    border-color: var(--success);
+    color: var(--success);
+  }
+}
+
+.meta {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+}
+
+.messages {
+  max-height: 26rem;
+  overflow-y: auto;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: color-mix(in srgb, var(--surface-muted) 40%, transparent);
+}
+
+.older {
+  display: block;
+  margin: 0 auto 0.5rem;
+}
+
+ol {
+  display: grid;
+  gap: 0.15rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.day,
+.empty {
+  margin: 0.6rem 0 0.3rem;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.empty {
+  margin: 1.5rem 0;
+}
+
+// Others on the left with their avatar, mine on the right
+.message {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr);
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+
+  &.grouped {
+    margin-top: 0;
+  }
+
+  &.mine {
+    grid-template-columns: minmax(0, 1fr);
+
+    .avatar {
+      display: none;
+    }
+
+    .line {
+      flex-direction: row-reverse;
+    }
+
+    .bubble {
+      border-color: var(--bubble-mine-border);
+      background: var(--bubble-mine);
+      color: var(--bubble-mine-text);
+    }
+  }
+}
+
+.author {
+  margin: 0 0 0.15rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+
+  a {
+    color: var(--text);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--accent-text);
+      text-decoration: underline;
+    }
+  }
+}
+
+.line {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.4rem;
+}
+
+.bubble {
+  max-width: min(36rem, 85%);
+  margin: 0;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid var(--bubble-other-border);
+  border-radius: 10px;
+  background: var(--bubble-other);
+  color: var(--bubble-other-text);
+  overflow-wrap: anywhere;
+  white-space: pre-line;
+}
+
+time {
+  flex: none;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.remove {
+  display: grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: none;
+  color: var(--text-muted);
+  opacity: 0;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--danger);
+  }
+
+  app-icon {
+    width: 0.9rem;
+    height: 0.9rem;
+  }
+}
+
+.message:hover .remove,
+.remove:focus-visible {
+  opacity: 1;
+}
+
+// Touch screens have no hover: keep the button visible
+@media (hover: none) {
+  .remove {
+    opacity: 0.7;
+  }
+}
+
+.composer {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 0.5rem;
+
+  .error {
+    grid-column: 1 / -1;
+    margin: 0;
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 2.75rem;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: color-mix(in srgb, var(--surface-solid) 70%, var(--bg));
+    resize: vertical;
+  }
+}

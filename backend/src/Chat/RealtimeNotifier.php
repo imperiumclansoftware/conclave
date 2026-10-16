@@ -4,6 +4,8 @@ namespace App\Chat;
 
 use App\Api\ApiPresenter;
 use App\Entity\ConversationParticipant;
+use App\Entity\Event;
+use App\Entity\EventMessage;
 use App\Entity\Message;
 use App\Entity\User;
 use App\Entity\VideoCall;
@@ -91,6 +93,22 @@ final readonly class RealtimeNotifier
     public function eventsChanged(iterable $members): void
     {
         $this->publish($members, ['type' => 'events']);
+    }
+
+    /**
+     * A message was posted in an event's chat room: the whole clan reads it.
+     *
+     * @param iterable<User> $members
+     */
+    public function eventMessagePosted(EventMessage $message, iterable $members): void
+    {
+        $this->publish($members, ['type' => 'event-message', 'message' => $this->presenter->eventMessage($message)]);
+    }
+
+    /** @param iterable<User> $members */
+    public function eventMessageDeleted(Event $event, int $messageId, iterable $members): void
+    {
+        $this->publish($members, ['type' => 'event-message-deleted', 'eventId' => $event->getId(), 'messageId' => $messageId]);
     }
 
     /** A video call was created or its participants joined/left the channel. */

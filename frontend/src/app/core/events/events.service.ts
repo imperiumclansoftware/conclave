@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
-import { ClanEvent, EventInput, EventTypes } from '../api/models';
+import { ClanEvent, EventInput, EventMessage, EventMessagePage, EventTypes } from '../api/models';
 
 /** Events of the branches. */
 @Injectable({ providedIn: 'root' })
@@ -44,6 +44,24 @@ export class EventsService {
 
   remove(id: number): Promise<void> {
     return firstValueFrom(this.http.delete<void>(`api/events/${id}`));
+  }
+
+  /** Chat room: the latest messages, or those before a message */
+  messages(id: number, before: number | null = null): Promise<EventMessagePage> {
+    return firstValueFrom(
+      this.http.get<EventMessagePage>(
+        `api/events/${id}/messages`,
+        before ? { params: { before } } : {},
+      ),
+    );
+  }
+
+  postMessage(id: number, content: string): Promise<EventMessage> {
+    return firstValueFrom(this.http.post<EventMessage>(`api/events/${id}/messages`, { content }));
+  }
+
+  deleteMessage(id: number, messageId: number): Promise<void> {
+    return firstValueFrom(this.http.delete<void>(`api/events/${id}/messages/${messageId}`));
   }
 
   join(id: number): Promise<ClanEvent> {

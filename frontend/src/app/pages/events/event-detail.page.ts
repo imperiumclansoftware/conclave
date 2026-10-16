@@ -12,11 +12,12 @@ import { BranchCrest } from '../../shared/branch-crest';
 import { filmLink } from '../films/film-format';
 import { Icon } from '../../shared/icon';
 import { MemberCardDirective } from '../../shared/member-card.directive';
+import { EventChat } from './event-chat';
 import { dayLabel, timeRange } from './event-format';
 
 @Component({
   selector: 'app-event-detail-page',
-  imports: [RouterLink, Avatar, BranchCrest, Icon, MemberCardDirective],
+  imports: [RouterLink, Avatar, BranchCrest, Icon, MemberCardDirective, EventChat],
   templateUrl: './event-detail.page.html',
   styleUrl: './event-detail.page.scss',
 })
