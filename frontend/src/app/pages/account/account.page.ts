@@ -14,6 +14,7 @@ import { PresenceBadge } from '../../shared/presence-badge';
 import { PASSWORD_MIN_LENGTH } from '../user-rules';
 import { DiscordCard } from './discord-card';
 import { MyBranches } from './my-branches';
+import { NotificationSettings } from './notification-settings';
 import { Icon } from '../../shared/icon';
 
 const FLASH: Record<string, string> = {
@@ -30,6 +31,7 @@ const TABS = [
   { id: 'avatar', label: 'Avatar', icon: 'avatar' },
   { id: 'branches', label: 'Branches', icon: 'branch' },
   { id: 'apparence', label: 'Apparence', icon: 'appearance' },
+  { id: 'notifications', label: 'Notifications', icon: 'notifications' },
   { id: 'securite', label: 'Sécurité', icon: 'security' },
   { id: 'discord', label: 'Discord', icon: 'discord' },
 ] as const;
@@ -42,6 +44,7 @@ type Tab = (typeof TABS)[number]['id'];
     RouterLink,
     DiscordCard,
     MyBranches,
+    NotificationSettings,
     PresenceBadge,
     Avatar,
     ManageCookies,

@@ -8,6 +8,7 @@ use App\Dto\AvatarSourceRequest;
 use App\Dto\ChangePasswordRequest;
 use App\Dto\FactionRequest;
 use App\Dto\GravatarRequest;
+use App\Dto\NotificationSettingsRequest;
 use App\Dto\UpdateProfileRequest;
 use App\Entity\Branch;
 use App\Entity\User;
@@ -172,6 +173,16 @@ final class ProfileController extends AbstractController
     public function faction(#[CurrentUser] User $user, #[MapRequestPayload] FactionRequest $request): JsonResponse
     {
         $user->setFaction($request->faction);
+        $this->em->flush();
+
+        return $this->json($this->presenter->me($user));
+    }
+
+    /** Notifications sent by the server (the browser ones are chosen on each device). */
+    #[Route('/me/notifications', name: 'api_my_notifications', methods: ['PUT'])]
+    public function notifications(#[CurrentUser] User $user, #[MapRequestPayload] NotificationSettingsRequest $request): JsonResponse
+    {
+        $user->setGameEventEmails($request->gameEventEmails);
         $this->em->flush();
 
         return $this->json($this->presenter->me($user));

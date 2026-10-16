@@ -10,6 +10,8 @@ x-conclave-environment: &conclave-environment
   JWT_PASSPHRASE: ${JWT_PASSPHRASE:?JWT_PASSPHRASE must be set (openssl rand -hex 32)}
   MERCURE_JWT_SECRET: ${MERCURE_JWT_SECRET:?MERCURE_JWT_SECRET must be set (openssl rand -hex 32)}
   DATABASE_URL: postgresql://conclave:${POSTGRES_PASSWORD}@database:5432/conclave?serverVersion=16&charset=utf8
+  # Time zone of the dates in the e-mails
+  APP_TIMEZONE: ${APP_TIMEZONE:-Europe/Paris}
 
 services:
   conclave:

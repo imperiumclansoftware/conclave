@@ -53,7 +53,7 @@ final class ApiPresenter
         ];
     }
 
-    /** @return array{id: ?int, username: string, displayName: string, role: string, avatarUrl: ?string, clan: array{id: ?int, name: string}, email: ?string, faction: ?string, canPublishNews: bool, canAccessGames: bool, canAccessFilms: bool} */
+    /** @return array{id: ?int, username: string, displayName: string, role: string, avatarUrl: ?string, clan: array{id: ?int, name: string}, email: ?string, faction: ?string, canPublishNews: bool, canAccessGames: bool, canAccessFilms: bool, notifications: array{gameEventEmails: bool}} */
     public function me(User $user): array
     {
         return $this->user($user) + [
@@ -63,6 +63,7 @@ final class ApiPresenter
             'canPublishNews' => $this->newsPermissions->canPublish($user),
             'canAccessGames' => $this->gamesAccess->allowed($user),
             'canAccessFilms' => $this->filmsAccess->allowed($user),
+            'notifications' => ['gameEventEmails' => $user->wantsGameEventEmails()],
         ];
     }
 

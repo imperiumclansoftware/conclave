@@ -20,6 +20,7 @@ import { ThemeService } from '../../core/theme/theme.service';
 import { CallsService } from '../../core/discord/calls.service';
 import { DiscordService } from '../../core/discord/discord.service';
 import { PresenceService } from '../../core/presence/presence.service';
+import { BrowserNotifications } from '../../core/notifications/browser-notifications.service';
 import { UserMenu } from '../../shared/user-menu';
 import { MemberCard } from '../../shared/member-card';
 import { ChatPanelService } from '../../core/chat/chat-panel.service';
@@ -71,9 +72,14 @@ export class Shell implements OnInit {
   constructor() {
     // A leader answered a request to join a branch: the branches and the rights change
     const branches = inject(BranchesService);
+    // A game event on one of the member's games: browser notification, if wanted on this device
+    const notifications = inject(BrowserNotifications);
     inject(RealtimeService)
       .events$.pipe(takeUntilDestroyed())
       .subscribe((event) => {
+        if (event.type === 'event-invitation') {
+          notifications.invitation(event.event);
+        }
         if (event.type === 'branches') {
           void this.auth.refreshUser();
           if (branches.loaded()) {

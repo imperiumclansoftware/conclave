@@ -10,6 +10,7 @@ const set = require('@iconify-json/game-icons/icons.json');
 const ICONS = {
   home: 'tower-flag',
   messages: 'quill-ink',
+  notifications: 'ringing-bell',
   write: 'quill',
   games: 'gamepad',
   clan: 'castle',

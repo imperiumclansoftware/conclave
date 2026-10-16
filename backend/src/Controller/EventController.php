@@ -13,6 +13,7 @@ use App\Enum\FilmPlatform;
 use App\Enum\StreamPlatform;
 use App\Events\EventEditor;
 use App\Events\EventPermissions;
+use App\Events\GameEventInvitations;
 use App\Repository\BranchRepository;
 use App\Repository\EventRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -116,7 +117,7 @@ final class EventController extends AbstractController
     }
 
     #[Route('', name: 'api_event_create', methods: ['POST'])]
-    public function create(#[MapRequestPayload] EventRequest $request, #[CurrentUser] User $me, EventEditor $editor): JsonResponse
+    public function create(#[MapRequestPayload] EventRequest $request, #[CurrentUser] User $me, EventEditor $editor, GameEventInvitations $invitations): JsonResponse
     {
         $event = $editor->create($me, $request);
         $this->em->persist($event);
@@ -126,6 +127,8 @@ final class EventController extends AbstractController
         $this->em->persist($participant);
         $this->em->flush();
         $this->changed();
+        // Those who play its game on its platform hear about it
+        $invitations->invite($event);
 
         return $this->json($this->present($event, $me), Response::HTTP_CREATED);
     }

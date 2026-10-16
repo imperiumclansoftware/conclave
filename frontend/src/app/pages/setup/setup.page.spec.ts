@@ -96,6 +96,7 @@ describe('SetupPage', () => {
         canPublishNews: false,
         canAccessGames: false,
         canAccessFilms: false,
+        notifications: { gameEventEmails: true },
       },
     });
     await fixture.whenStable();

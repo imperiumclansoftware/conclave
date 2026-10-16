@@ -28,6 +28,7 @@ const papa: Me = {
   canPublishNews: false,
   canAccessGames: false,
   canAccessFilms: false,
+  notifications: { gameEventEmails: true },
 };
 const lea: Member = { id: 2, username: 'lea', displayName: 'Léa', role: 'member' };
 

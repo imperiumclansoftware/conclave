@@ -2,11 +2,13 @@
 
 namespace App\Mail;
 
+use App\Entity\Event;
 use App\Entity\User;
 use App\Repository\ClanRepository;
 use App\Settings\AppSettings;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mailer\Transport\TransportInterface;
@@ -23,6 +25,8 @@ final readonly class AppMailer
         private AppSettings $settings,
         private ClanRepository $clans,
         private LoggerInterface $logger,
+        #[Autowire(env: 'APP_TIMEZONE')]
+        private string $timezone,
     ) {
     }
 
@@ -45,6 +49,26 @@ final readonly class AppMailer
                     'link' => $this->link('admin'),
                 ]);
             }
+        }
+    }
+
+    /**
+     * Invites the players of its game to a new event.
+     *
+     * @param iterable<User> $players
+     */
+    public function gameEventOrganised(Event $event, iterable $players): void
+    {
+        $when = new \IntlDateFormatter('fr_FR', \IntlDateFormatter::FULL, \IntlDateFormatter::SHORT, $this->timezone);
+        $context = [
+            'event' => $event,
+            'when' => $when->format($event->getStartsAt()),
+            'link' => $this->link('evenements/'.$event->getId()),
+            'settingsLink' => $this->link('account?onglet=notifications'),
+        ];
+        $subject = \sprintf('%s sur %s : %s', $event->getType()->label(), (string) $event->getGame()?->getName(), $event->getTitle());
+        foreach ($players as $player) {
+            $this->send($player, $subject, 'game_event', $context);
         }
     }
 

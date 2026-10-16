@@ -20,6 +20,19 @@ export interface Me extends Member {
   canAccessGames: boolean;
   /** Member of the Cinéphiles branch: film search and fiches */
   canAccessFilms: boolean;
+  /** Notifications sent by the server (browser ones are chosen on each device) */
+  notifications: { gameEventEmails: boolean };
+}
+
+/** A game event organised on one of the member's games, on their platform */
+export interface EventInvitation {
+  id: number;
+  title: string;
+  typeLabel: string;
+  startsAt: string;
+  game: string | null;
+  platform: string | null;
+  organiser: string | null;
 }
 
 export interface Message {

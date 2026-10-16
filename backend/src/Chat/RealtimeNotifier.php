@@ -96,6 +96,25 @@ final readonly class RealtimeNotifier
     }
 
     /**
+     * A game event was organised: its players are invited (browser notification).
+     *
+     * @param iterable<User> $players
+     */
+    public function gameEventOrganised(Event $event, iterable $players): void
+    {
+        $organiser = $event->getCreatedBy();
+        $this->publish($players, ['type' => 'event-invitation', 'event' => [
+            'id' => $event->getId(),
+            'title' => $event->getTitle(),
+            'typeLabel' => $event->getType()->label(),
+            'startsAt' => $event->getStartsAt()->format(\DATE_ATOM),
+            'game' => $event->getGame()?->getName(),
+            'platform' => $event->getGamePlatform()?->label(),
+            'organiser' => $organiser?->getDisplayName(),
+        ]]);
+    }
+
+    /**
      * A message was posted in an event's chat room: the whole clan reads it.
      *
      * @param iterable<User> $members

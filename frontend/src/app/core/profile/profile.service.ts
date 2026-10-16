@@ -64,6 +64,12 @@ export class ProfileService {
   }
 
   /** Theme of the account (null: follow the device), applied on every device. */
+  setNotifications(notifications: Me['notifications']): Observable<Me> {
+    return this.http
+      .put<Me>('api/me/notifications', notifications)
+      .pipe(tap((me) => this.auth.updateUser({ notifications: me.notifications })));
+  }
+
   setFaction(faction: 'assassin' | 'templar' | null): Observable<Me> {
     return this.http
       .put<Me>('api/me/faction', { faction })

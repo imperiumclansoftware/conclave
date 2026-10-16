@@ -1,0 +1,76 @@
+@let me = auth.user();
+<section class="card" aria-labelledby="notifications-title">
+  <h2 id="notifications-title">Notifications</h2>
+  <p class="meta intro">
+    Quand un membre organise une session de jeu ou un tournoi sur un jeu de votre ludothèque, sur
+    une de vos plateformes, vous êtes prévenu.
+  </p>
+  @if (me && !me.canAccessGames) {
+    <p class="meta note">
+      Ces notifications concernent les membres de la branche Joueurs :
+      <a [routerLink]="['/account']" [queryParams]="{ onglet: 'branches' }">la rejoindre</a>.
+    </p>
+  }
+
+  <fieldset>
+    <legend>Par e-mail</legend>
+    <label class="check">
+      <input
+        type="checkbox"
+        [checked]="me?.notifications?.gameEventEmails ?? true"
+        [disabled]="saving()"
+        (change)="setEmails($any($event.target).checked)"
+      />
+      Recevoir un e-mail pour chaque nouvel événement sur mes jeux
+    </label>
+    @if (me && !me.email) {
+      <p class="meta">
+        Aucune adresse e-mail dans votre profil :
+        <a [routerLink]="['/account']" [queryParams]="{ onglet: 'profil' }">en ajouter une</a>.
+      </p>
+    }
+    @if (status(); as s) {
+      <p [class]="s.kind" [attr.role]="s.kind === 'error' ? 'alert' : 'status'">{{ s.message }}</p>
+    }
+  </fieldset>
+
+  <fieldset>
+    <legend>Dans ce navigateur</legend>
+    @switch (browser.state()) {
+      @case ('on') {
+        <p class="success">Activées sur cet appareil.</p>
+        <div class="actions">
+          <button class="btn btn-ghost" type="button" (click)="tryBrowser()">Essayer</button>
+          <button class="btn btn-ghost" type="button" (click)="browser.disable()">
+            Désactiver
+          </button>
+        </div>
+      }
+      @case ('off') {
+        <button class="btn" type="button" (click)="enableBrowser()">
+          Activer sur cet appareil
+        </button>
+      }
+      @case ('denied') {
+        <p class="error">
+          Le navigateur bloque les notifications de ce site : autorisez-les dans ses réglages (icône
+          à gauche de l'adresse), puis rechargez la page.
+        </p>
+      }
+      @case ('insecure') {
+        <p class="meta">
+          Le navigateur n'autorise les notifications que sur une adresse en
+          <strong>https://</strong>. Un dirigeant peut servir Conclave en HTTPS (reverse proxy) ; en
+          attendant, les e-mails vous préviennent.
+        </p>
+      }
+      @default {
+        <p class="meta">Ce navigateur ne gère pas les notifications.</p>
+      }
+    }
+    <p class="meta">
+      Elles s'affichent tant que Conclave est ouvert dans un onglet, même en arrière-plan. Le choix
+      vaut pour cet appareil seulement.
+    </p>
+  </fieldset>
+</section>

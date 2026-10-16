@@ -18,6 +18,7 @@ function render(role: 'leader' | 'member', pending = 0) {
     canPublishNews: false,
     canAccessGames: false,
     canAccessFilms: false,
+    notifications: { gameEventEmails: true },
   };
   TestBed.configureTestingModule({
     imports: [UserMenu],

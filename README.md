@@ -67,6 +67,15 @@ Comptes dirigeants et membres, messagerie instantanée entre les membres d'un m�
   branche) ; seuls les membres de la branche en créent et s'y inscrivent, avec un nombre de places
   facultatif. L'organisateur les modifie, les dirigeants peuvent les modifier ou les supprimer. Les
   listes se mettent à jour en temps réel.
+- **Notifications des événements de jeu** : quand un membre organise une session de jeu ou un tournoi,
+  les membres de la branche Joueurs qui ont ce jeu dans leur ludothèque, sur la plateforme choisie, sont
+  prévenus (l'organisateur excepté) :
+  - par **e-mail** (si le service d'e-mail est configuré), envoyé après la réponse pour ne pas faire
+    attendre l'organisateur ; chacun peut s'en désabonner dans *Mon profil > Notifications*. Les dates
+    sont écrites dans le fuseau `APP_TIMEZONE` (`Europe/Paris` par défaut) ;
+  - par **notification du navigateur**, à activer sur chaque appareil dans le même onglet. Elles
+    s'affichent tant que Conclave est ouvert dans un onglet, même en arrière-plan, et demandent une
+    adresse en HTTPS (ou localhost).
 - **Discussion des événements** : chaque événement a son salon. Ses participants y écrivent avant et
   pendant l'événement (jusqu'à sa fin, ou 4 heures après son début s'il n'a pas de fin), tout le clan
   le lit, en temps réel ; ensuite il reste lisible, en lecture seule. L'auteur retire son message tant
@@ -423,6 +432,7 @@ Toutes les routes sauf `setup`, `register`, `login`, `password/*` et `health` ex
 | POST    | `/api/events`                           | Crée un événement (membres de la branche)           |
 | GET/PUT/DELETE | `/api/events/{id}`               | Détail / modification / suppression                |
 | PUT/DELETE | `/api/events/{id}/participation`     | S'inscrire / se désinscrire                         |
+| PUT     | `/api/me/notifications`                 | `{gameEventEmails}` : e-mails des événements sur mes jeux |
 | GET/POST | `/api/events/{id}/messages[?before=]`  | Discussion de l'événement : lire (tout le clan) / écrire (participants, jusqu'à la fin) |
 | DELETE  | `/api/events/{id}/messages/{messageId}` | Retirer un message (auteur tant que c'est ouvert, dirigeants) |
 | GET     | `/api/films/search?q=`, `/api/films/{movie\|tv}/{tmdbId}` | Recherche (films et séries) et fiche TMDB (Cinéphiles) |

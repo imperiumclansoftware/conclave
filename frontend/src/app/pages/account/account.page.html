@@ -285,6 +285,17 @@
   </div>
 
   <div
+    id="panel-notifications"
+    role="tabpanel"
+    aria-labelledby="tab-notifications"
+    [hidden]="tab() !== 'notifications'"
+  >
+    @if (tab() === 'notifications') {
+      <app-notification-settings />
+    }
+  </div>
+
+  <div
     id="panel-securite"
     role="tabpanel"
     aria-labelledby="tab-securite"

@@ -42,6 +42,7 @@ x-conclave-environment: &conclave-environment
   JWT_PASSPHRASE: ${JWT_PASSPHRASE:?JWT_PASSPHRASE à renseigner (openssl rand -hex 32)}
   MERCURE_JWT_SECRET: ${MERCURE_JWT_SECRET:?MERCURE_JWT_SECRET à renseigner (openssl rand -hex 32)}
   DATABASE_URL: postgresql://conclave:${POSTGRES_PASSWORD}@database:5432/conclave?serverVersion=16&charset=utf8
+  APP_TIMEZONE: ${APP_TIMEZONE:-Europe/Paris}
 
 services:
   conclave:
@@ -138,6 +139,7 @@ Les membres demandent à rejoindre le clan via « S'inscrire » et un dirigeant 
 | `JWT_PASSPHRASE` | oui | Protège les clés de connexion, générées au premier démarrage |
 | `MERCURE_JWT_SECRET` | oui | Signe les jetons du hub temps réel |
 | `DATABASE_URL` | oui | Connexion PostgreSQL (fournie par le `compose.yaml` ci-dessus) |
+| `APP_TIMEZONE` | non | Fuseau horaire des dates écrites dans les e-mails (par défaut `Europe/Paris`) |
 | `MERCURE_URL` | non | Hub auquel le serveur publie ; par défaut celui du conteneur. Le worker Discord utilise `http://conclave/.well-known/mercure` |
 
 Les réglages fonctionnels (e-mail SMTP, Discord, clé RAWG) se font dans l'administration et sont stockés

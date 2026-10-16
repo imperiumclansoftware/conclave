@@ -78,6 +78,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     // ---- Presence in the app (heartbeats) ----
 
+    /** E-mail when an event is organised on one of the member's games */
+    #[ORM\Column(options: ['default' => true])]
+    private bool $gameEventEmails = true;
+
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $lastSeenAt = null;
 
@@ -222,6 +226,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setAvatarSource(?AvatarSource $avatarSource): void
     {
         $this->avatarSource = $avatarSource;
+    }
+
+    public function wantsGameEventEmails(): bool
+    {
+        return $this->gameEventEmails;
+    }
+
+    public function setGameEventEmails(bool $wanted): void
+    {
+        $this->gameEventEmails = $wanted;
     }
 
     public function getFaction(): ?Faction
