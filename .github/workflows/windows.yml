@@ -1,12 +1,15 @@
-# Builds Conclave for Windows: tests, self-contained application, Inno Setup installer.
-# On a version tag (v0.4.0), the installer is attached to the GitHub release; otherwise it is
-# kept as an artifact of the run (Actions tab).
+# Builds Conclave for Windows: tests, self-contained application (launched once to check it
+# starts), Inno Setup installer. On a version tag (v0.4.0), the installer is attached to the
+# GitHub release; otherwise it is kept as an artifact of the run (Actions tab).
 name: Application Windows
 
 on:
   workflow_dispatch:
   push:
     tags: ['v*']
+    # A change to the application is built and checked (no release)
+    branches: [main]
+    paths: ['windows/**', '.github/workflows/windows.yml']
 
 permissions:
   contents: write
@@ -41,6 +44,22 @@ jobs:
 
       - name: Application
         run: dotnet publish src/Conclave.Desktop -c Release -r win-x64 -p:Version=${{ steps.version.outputs.version }} -o publish
+
+      - name: Launch check
+        run: |
+          if (-not (Test-Path publish/Conclave.pri)) { throw 'Conclave.pri absent de la publication : WinUI ne trouverait pas ses thèmes.' }
+          $log = Join-Path $env:LOCALAPPDATA 'Conclave\conclave.log'
+          Remove-Item $log -ErrorAction SilentlyContinue
+          $app = Start-Process publish/Conclave.exe -PassThru
+          Start-Sleep -Seconds 20
+          $crashed = (Test-Path $log) -and (Select-String -Path $log -Pattern 'Unhandled exception' -Quiet)
+          if ($app.HasExited -or $crashed) {
+            if (Test-Path $log) { Get-Content $log }
+            throw "Conclave ne démarre pas (fermé : $($app.HasExited))."
+          }
+          Stop-Process -Id $app.Id -Force
+          if (Test-Path $log) { Get-Content $log }
+          Write-Output 'Conclave démarre.'
 
       - name: Installer
         run: |

@@ -3,7 +3,7 @@
 ; Installs for the current user, without administrator rights, in %LOCALAPPDATA%\Programs.
 
 #ifndef AppVersion
-  #define AppVersion "0.4.0"
+  #define AppVersion "0.4.1"
 #endif
 #ifndef SourceDir
   #define SourceDir "..\publish"

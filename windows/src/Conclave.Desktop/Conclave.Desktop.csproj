@@ -32,4 +32,19 @@
     <ProjectReference Include="..\Conclave.Desktop.Core\Conclave.Desktop.Core.csproj" />
     <Content Include="Assets\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
+
+  <!--
+    The application's resource index (Conclave.pri, which merges the WinUI themes) is written
+    straight into the output folder, so "dotnet publish" leaves it out for an unpackaged app:
+    without it, WinUI cannot find its themes and the application closes at launch.
+  -->
+  <Target Name="PublishProjectPriFile" AfterTargets="ComputeResolvedFilesToPublishList">
+    <Error Condition="'$(AppxGeneratePriEnabled)' != 'false' and !Exists('$(ProjectPriFullPath)')"
+           Text="Fichier de ressources introuvable : $(ProjectPriFullPath)" />
+    <ItemGroup Condition="Exists('$(ProjectPriFullPath)')">
+      <ResolvedFileToPublish Include="$(ProjectPriFullPath)"
+                             RelativePath="$(ProjectPriFileName)"
+                             CopyToPublishDirectory="PreserveNewest" />
+    </ItemGroup>
+  </Target>
 </Project>

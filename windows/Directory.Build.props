@@ -2,7 +2,7 @@
   <!-- Shared by the projects of the Windows application -->
   <PropertyGroup>
     <!-- Version of the application: dotnet publish -p:Version=0.4.0 -->
-    <Version Condition="'$(Version)' == ''">0.4.0</Version>
+    <Version Condition="'$(Version)' == ''">0.4.1</Version>
     <Company>Imperium Clan Software</Company>
     <Product>Conclave</Product>
     <Copyright>Imperium Clan Software, licence MIT</Copyright>

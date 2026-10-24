@@ -47,6 +47,10 @@ construit `Conclave-Setup-<version>.exe` :
 
 - lancé à la main (onglet *Actions*) : l'installateur est un artefact de l'exécution ;
 - sur un tag `v0.4.0` : l'installateur est joint à la release GitHub de cette version.
+- à chaque modification de `windows/` poussée sur `main` : construction et vérification seulement.
+
+Avant l'installateur, l'étape *Launch check* lance `Conclave.exe` sur la machine Windows de GitHub et échoue si
+l'application se ferme au démarrage ou si `Conclave.pri` manque (ressources de WinUI, voir le `.csproj`).
 
 ### Sur un PC Windows
 
