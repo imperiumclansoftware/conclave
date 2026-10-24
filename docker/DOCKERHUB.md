@@ -8,6 +8,8 @@ Conclave réunit les membres d'un clan dans un espace privé, auto-hébergé, en
 - **Événements** propres à chaque branche (sessions de jeu, tournois, watch parties, ciné-clubs,
   réunions, game jams, streams), avec **planning** mensuel et **salon de discussion** par événement
 - **Notifications** par e-mail et dans le navigateur quand un événement est organisé sur un de vos jeux
+- **Application Windows 11** : notifications Windows (même sans HTTPS), zone de notification, lancement au
+  démarrage ; les membres la téléchargent depuis Conclave
 - **Messagerie instantanée** entre membres, messages conservés pour ceux qui sont hors ligne
 - **Présences et visios Discord** : qui est en ligne, à quoi il joue, salons vocaux créés à la demande
 - **Ludothèque** : les jeux de chacun et leurs plateformes, avec fiches et captures (Steam, RAWG)
@@ -29,6 +31,7 @@ servis par [FrankenPHP](https://frankenphp.dev) sur le port 80. Il lui faut seul
 | Tag | Contenu |
 |---|---|
 | `latest` | Dernière version publiée |
+| `0.4.0` | Application Windows 11 (téléchargeable depuis Conclave), notifications Windows des messages et événements |
 | `0.3.0` | Tableau de bord du système dans l'administration (état des services, activité, stockage) |
 | `0.2.0` | Événements des branches, planning, discussion des événements, notifications, page d'accueil, films et séries (TMDB) |
 | `0.1.2` | Démarrage plus lisible (raison d'un échec de connexion à la base) et plus tolérant |
@@ -113,7 +116,7 @@ pour les coller d'un bloc). Générez chaque secret avec `openssl rand -hex 32` 
 CONCLAVE_URL=http://192.168.1.10:8080
 # Port publié sur la machine (doit correspondre à CONCLAVE_URL)
 CONCLAVE_PORT=8080
-# Tag de l'image : latest, ou une version comme 0.3.0
+# Tag de l'image : latest, ou une version comme 0.4.0
 CONCLAVE_VERSION=latest
 
 # Secrets : à conserver précieusement
