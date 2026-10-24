@@ -35,7 +35,7 @@
   </fieldset>
 
   <fieldset>
-    <legend>Dans ce navigateur</legend>
+    <legend>{{ desktop.active ? 'Dans l’application Windows' : 'Dans ce navigateur' }}</legend>
     @switch (browser.state()) {
       @case ('on') {
         <p class="success">Activées sur cet appareil.</p>
@@ -68,9 +68,19 @@
         <p class="meta">Ce navigateur ne gère pas les notifications.</p>
       }
     }
-    <p class="meta">
-      Elles s'affichent tant que Conclave est ouvert dans un onglet, même en arrière-plan. Le choix
-      vaut pour cet appareil seulement.
-    </p>
+    @if (desktop.active) {
+      <p class="meta">
+        Notifications de Windows, pour les événements sur vos jeux et les messages reçus quand
+        Conclave n'est pas au premier plan. Elles continuent quand la fenêtre est fermée, tant que
+        Conclave reste dans la zone de notification.
+      </p>
+    } @else {
+      <p class="meta">
+        Elles s'affichent tant que Conclave est ouvert dans un onglet, même en arrière-plan. Le
+        choix vaut pour cet appareil seulement.
+        <a href="api/desktop/windows/download">L'application Windows</a> vous prévient aussi fenêtre
+        fermée, et sans HTTPS.
+      </p>
+    }
   </fieldset>
 </section>

@@ -48,6 +48,8 @@ describe('UserMenu', () => {
     ).toEqual([
       ['Mon profil', '/account'],
       ['Administration 2 demande(s)', '/admin'],
+      // In a browser: the Windows application is offered
+      ['Application Windows', 'api/desktop/windows/download'],
     ]);
     // Pending sign-ups are signaled on the button too
     expect(trigger.querySelector('.badge')?.textContent).toContain('2');
@@ -58,6 +60,7 @@ describe('UserMenu', () => {
 
     expect([...el.querySelectorAll('#user-menu a')].map((a) => a.getAttribute('href'))).toEqual([
       '/account',
+      'api/desktop/windows/download',
     ]);
     expect(el.querySelector('button.trigger .badge')).toBeNull();
   });

@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Conclave.Desktop/Conclave.Desktop.csproj" />
+    <Project Path="src/Conclave.Desktop.Core/Conclave.Desktop.Core.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Conclave.Desktop.Core.Tests/Conclave.Desktop.Core.Tests.csproj" />
+  </Folder>
+</Solution>

@@ -23,7 +23,7 @@ export MERCURE_AUDIENCE="${MERCURE_AUDIENCE:-$MERCURE_BROWSER_URL}"
 export DEFAULT_URI="${DEFAULT_URI:-$CONCLAVE_URL}"
 export APP_PUBLIC_URL="${APP_PUBLIC_URL:-$CONCLAVE_URL/}"
 
-mkdir -p /data/avatars /data/news-images /data/setup /data/jwt /data/caddy /data/caddy-config
+mkdir -p /data/avatars /data/news-images /data/downloads /data/setup /data/jwt /data/caddy /data/caddy-config
 
 echo 'Conclave : attente de la base de données…'
 tries=0

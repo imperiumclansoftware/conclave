@@ -3,6 +3,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { SignupsService } from '../core/admin/signups.service';
 import { AuthService } from '../core/auth/auth.service';
 import { Avatar } from './avatar';
+import { DesktopBridge } from '../core/desktop/desktop-bridge.service';
 import { Icon } from './icon';
 
 /**
@@ -60,6 +61,13 @@ import { Icon } from './icon';
                   >
                 }
               </a>
+            </li>
+          }
+          @if (!desktop.active) {
+            <li>
+              <a href="api/desktop/windows/download" (click)="close()"
+                ><app-icon name="desktop" /> Application Windows</a
+              >
             </li>
           }
           <li class="separator">
@@ -166,6 +174,7 @@ import { Icon } from './icon';
   `,
 })
 export class UserMenu {
+  protected readonly desktop = inject(DesktopBridge);
   protected readonly auth = inject(AuthService);
   protected readonly signups = inject(SignupsService);
   private readonly trigger = viewChild<ElementRef<HTMLElement>>('trigger');

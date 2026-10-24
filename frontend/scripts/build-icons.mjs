@@ -30,6 +30,7 @@ const ICONS = {
   events: 'calendar',
   film: 'film-projector',
   series: 'tv',
+  desktop: 'pc',
   settings: 'cog',
   system: 'heart-beats',
   mail: 'envelope',

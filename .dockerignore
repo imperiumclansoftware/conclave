@@ -17,3 +17,6 @@ backend/compose*.yaml
 **/.env.*.local
 backend/config/jwt/*.pem
 docker/.env
+# The Windows application is built apart (GitHub Actions)
+windows
+.github

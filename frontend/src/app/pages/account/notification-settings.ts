@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
 import { apiErrorMessage } from '../../core/api/api-error';
 import { AuthService } from '../../core/auth/auth.service';
+import { DesktopBridge } from '../../core/desktop/desktop-bridge.service';
 import { BrowserNotifications } from '../../core/notifications/browser-notifications.service';
 import { ProfileService } from '../../core/profile/profile.service';
 
@@ -16,6 +17,7 @@ import { ProfileService } from '../../core/profile/profile.service';
 export class NotificationSettings {
   protected readonly auth = inject(AuthService);
   protected readonly browser = inject(BrowserNotifications);
+  protected readonly desktop = inject(DesktopBridge);
   private readonly profiles = inject(ProfileService);
 
   protected readonly saving = signal(false);

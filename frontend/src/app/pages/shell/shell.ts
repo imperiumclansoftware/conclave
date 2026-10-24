@@ -21,6 +21,7 @@ import { CallsService } from '../../core/discord/calls.service';
 import { DiscordService } from '../../core/discord/discord.service';
 import { PresenceService } from '../../core/presence/presence.service';
 import { BrowserNotifications } from '../../core/notifications/browser-notifications.service';
+import { DesktopBridge } from '../../core/desktop/desktop-bridge.service';
 import { UserMenu } from '../../shared/user-menu';
 import { MemberCard } from '../../shared/member-card';
 import { ChatPanelService } from '../../core/chat/chat-panel.service';
@@ -74,11 +75,25 @@ export class Shell implements OnInit {
     const branches = inject(BranchesService);
     // A game event on one of the member's games: browser notification, if wanted on this device
     const notifications = inject(BrowserNotifications);
+    // Unread messages on the taskbar icon of the Windows application
+    const desktop = inject(DesktopBridge);
+    if (desktop.active) {
+      effect(() => desktop.badge(this.chat.totalUnread()));
+    }
     inject(RealtimeService)
       .events$.pipe(takeUntilDestroyed())
       .subscribe((event) => {
         if (event.type === 'event-invitation') {
           notifications.invitation(event.event);
+        }
+        // In the Windows application: a message while the window is not in front
+        if (event.type === 'message' && event.message.senderId !== this.auth.user()?.id) {
+          const sender = this.chat.member(event.message.senderId);
+          notifications.message(
+            sender?.displayName ?? 'Nouveau message',
+            event.message.content,
+            event.message.senderId,
+          );
         }
         if (event.type === 'branches') {
           void this.auth.refreshUser();

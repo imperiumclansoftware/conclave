@@ -122,6 +122,12 @@ En dev, le navigateur ne parle qu'à `localhost:4200` : le proxy Angular (`front
 transmet `/api` à Symfony et `/.well-known/mercure` au hub, ce qui permet au cookie Mercure de
 fonctionner sans configuration CORS.
 
+## Application Windows
+
+Conclave existe aussi en application Windows 11 (WinUI 3) : notifications Windows même sans HTTPS, zone de
+notification, lancement au démarrage, pastille des messages non lus. Les membres la téléchargent depuis
+*menu du compte > Application Windows*. Code, construction et diffusion : [windows/README.md](windows/README.md).
+
 ## Installation avec Docker
 
 L'image [`iemperor/conclave`](https://hub.docker.com/r/iemperor/conclave) contient toute l'application :

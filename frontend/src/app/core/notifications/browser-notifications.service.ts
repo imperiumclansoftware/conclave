@@ -1,8 +1,9 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { EventInvitation } from '../api/models';
+import { DesktopBridge } from '../desktop/desktop-bridge.service';
 
-/** Device preference: the member turned the browser notifications on here */
+/** Device preference: 'on' or 'off', chosen by the member on this device */
 const STORAGE_KEY = 'conclave.browser-notifications';
 
 /**
@@ -40,13 +41,21 @@ export function invitationNotice(invitation: EventInvitation): { title: string; 
 @Injectable({ providedIn: 'root' })
 export class BrowserNotifications {
   private readonly router = inject(Router);
+  private readonly desktop = inject(DesktopBridge);
 
   private readonly permission = signal<NotificationPermission | null>(
     'Notification' in window ? Notification.permission : null,
   );
-  private readonly wanted = signal(readPreference());
+  // In the Windows application, on unless turned off; in a browser, off unless turned on
+  private readonly wanted = signal(
+    this.desktop.active ? readPreference() !== 'off' : readPreference() === 'on',
+  );
 
   readonly state = computed<BrowserNotificationState>(() => {
+    // Windows notifications: no browser permission, no HTTPS needed
+    if (this.desktop.active) {
+      return this.wanted() ? 'on' : 'off';
+    }
     if (this.permission() === null) {
       return 'unsupported';
     }
@@ -61,6 +70,11 @@ export class BrowserNotifications {
 
   /** Asks the browser for the permission if needed; true when the notifications are on */
   async enable(): Promise<boolean> {
+    if (this.desktop.active) {
+      this.wanted.set(true);
+      writePreference(true);
+      return true;
+    }
     if (this.state() === 'unsupported' || this.state() === 'insecure') {
       return false;
     }
@@ -83,9 +97,33 @@ export class BrowserNotifications {
     this.show(title, body, `event-${invitation.id}`, ['/evenements', invitation.id]);
   }
 
+  /**
+   * A private message received while the Windows application is not in front (in a browser,
+   * the tab's title and the messaging sidebar already show it).
+   */
+  message(sender: string, content: string, senderId: number): void {
+    if (!this.desktop.active || document.hasFocus()) {
+      return;
+    }
+    // One notification per person: the latest message replaces the previous one
+    this.show(sender, content.replace(/\s+/g, ' ').trim(), `message-${senderId}`, [
+      '/messages',
+      senderId,
+    ]);
+  }
+
   /** Shows a notification if they are on; a click brings the app back, on the given page */
   show(title: string, body: string, tag: string, link: (string | number)[] | null = null): void {
     if (this.state() !== 'on') {
+      return;
+    }
+    if (this.desktop.active) {
+      this.desktop.notify({
+        title,
+        body,
+        tag,
+        link: link ? this.router.serializeUrl(this.router.createUrlTree(link)) : null,
+      });
       return;
     }
     const notification = new Notification(title, {
@@ -103,21 +141,18 @@ export class BrowserNotifications {
   }
 }
 
-function readPreference(): boolean {
+function readPreference(): 'on' | 'off' | null {
   try {
-    return localStorage.getItem(STORAGE_KEY) === 'on';
+    const value = localStorage.getItem(STORAGE_KEY);
+    return value === 'on' || value === 'off' ? value : null;
   } catch {
-    return false;
+    return null;
   }
 }
 
 function writePreference(on: boolean): void {
   try {
-    if (on) {
-      localStorage.setItem(STORAGE_KEY, 'on');
-    } else {
-      localStorage.removeItem(STORAGE_KEY);
-    }
+    localStorage.setItem(STORAGE_KEY, on ? 'on' : 'off');
   } catch {
     // Storage blocked: the choice lasts until the page is reloaded
   }

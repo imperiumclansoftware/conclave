@@ -155,7 +155,9 @@ chiffrés en base.
 
 ## Données et sauvegarde
 
-- Volume **`/data`** : avatars, images des news, clés de connexion, historique du hub temps réel.
+- Volume **`/data`** : avatars, images des news, clés de connexion, historique du hub temps réel, et
+  `downloads/` : un `Conclave-Setup-x.y.z.exe` déposé là est l'application Windows proposée aux membres (sinon,
+  celle de la release GitHub de la version de l'image).
 - Volume de la base PostgreSQL.
 - Le fichier **`.env`**, surtout `APP_SECRET`.
 
