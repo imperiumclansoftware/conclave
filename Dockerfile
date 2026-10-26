@@ -27,6 +27,12 @@ ENV APP_VERSION=${APP_VERSION} \
     XDG_DATA_HOME=/data/caddy \
     XDG_CONFIG_HOME=/data/caddy-config
 
+# Refuses a base image with a vulnerable PHP (CVE-2026-109618 and CVE-2026-109619, "PHP2Shell":
+# remote code execution without authentication, fixed in 8.4.27). Rebuild with --pull.
+ARG PHP_MIN_VERSION=8.4.27
+RUN php -r 'exit(version_compare(PHP_VERSION, getenv("PHP_MIN_VERSION"), ">=") ? 0 : 1);' \
+    || { echo "PHP $(php -r 'echo PHP_VERSION;') trop ancien : $PHP_MIN_VERSION minimum (failles de sécurité). Reconstruisez avec --pull." >&2; exit 1; }
+
 RUN install-php-extensions pdo_pgsql gd intl pcntl zip \
     && apk add --no-cache curl libcap-utils \
     && cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
