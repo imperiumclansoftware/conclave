@@ -12,6 +12,9 @@ x-conclave-environment: &conclave-environment
   DATABASE_URL: postgresql://conclave:${POSTGRES_PASSWORD}@database:5432/conclave?serverVersion=16&charset=utf8
   # Time zone of the dates in the e-mails
   APP_TIMEZONE: ${APP_TIMEZONE:-Europe/Paris}
+  # Avenger app receiving the members' tickets (« Signaler un problème »); empty: no menu entry
+  AVENGER_URL: ${AVENGER_URL:-}
+  AVENGER_PRODUCT: ${AVENGER_PRODUCT:-conclave}
 
 services:
   conclave:

@@ -56,6 +56,8 @@ x-conclave-environment: &conclave-environment
   MERCURE_JWT_SECRET: ${MERCURE_JWT_SECRET:?MERCURE_JWT_SECRET à renseigner (openssl rand -hex 32)}
   DATABASE_URL: postgresql://conclave:${POSTGRES_PASSWORD}@database:5432/conclave?serverVersion=16&charset=utf8
   APP_TIMEZONE: ${APP_TIMEZONE:-Europe/Paris}
+  AVENGER_URL: ${AVENGER_URL:-}
+  AVENGER_PRODUCT: ${AVENGER_PRODUCT:-conclave}
 
 services:
   conclave:
@@ -153,6 +155,8 @@ Les membres demandent à rejoindre le clan via « S'inscrire » et un dirigeant 
 | `MERCURE_JWT_SECRET` | oui | Signe les jetons du hub temps réel |
 | `DATABASE_URL` | oui | Connexion PostgreSQL (fournie par le `compose.yaml` ci-dessus) |
 | `APP_TIMEZONE` | non | Fuseau horaire des dates écrites dans les e-mails (par défaut `Europe/Paris`) |
+| `AVENGER_URL` | non | Adresse d'un [Avenger](https://github.com/imperiumclansoftware/avenger) : les membres y signalent un problème depuis *menu du compte > Signaler un problème* (vide : pas d'entrée de menu) |
+| `AVENGER_PRODUCT` | non | Produit Avenger qui reçoit les tickets (`conclave` par défaut) |
 | `MERCURE_URL` | non | Hub auquel le serveur publie ; par défaut celui du conteneur. Le worker Discord utilise `http://conclave/.well-known/mercure` |
 
 Les réglages fonctionnels (e-mail SMTP, Discord, clés RAWG et TMDB) se font dans l'administration et sont stockés

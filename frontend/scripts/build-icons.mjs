@@ -45,6 +45,7 @@ const ICONS = {
   library: 'book-cover',
   assassin: 'hooded-assassin',
   eagle: 'eagle-head',
+  feedback: 'talk',
 };
 
 /** Icons drawn for the app (24 × 24 view box), e.g. brand logos absent from game-icons.net */

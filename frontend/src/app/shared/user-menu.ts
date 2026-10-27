@@ -4,6 +4,7 @@ import { SignupsService } from '../core/admin/signups.service';
 import { AuthService } from '../core/auth/auth.service';
 import { Avatar } from './avatar';
 import { DesktopBridge } from '../core/desktop/desktop-bridge.service';
+import { FeedbackService } from '../core/feedback/feedback.service';
 import { Icon } from './icon';
 
 /**
@@ -68,6 +69,13 @@ import { Icon } from './icon';
               <a href="api/desktop/windows/download" (click)="close()"
                 ><app-icon name="desktop" /> Application Windows</a
               >
+            </li>
+          }
+          @if (feedback.available()) {
+            <li>
+              <button type="button" (click)="close(); openFeedback()">
+                <app-icon name="feedback" /> Signaler un problème
+              </button>
             </li>
           }
           <li class="separator">
@@ -177,10 +185,20 @@ export class UserMenu {
   protected readonly desktop = inject(DesktopBridge);
   protected readonly auth = inject(AuthService);
   protected readonly signups = inject(SignupsService);
+  protected readonly feedback = inject(FeedbackService);
   private readonly trigger = viewChild<ElementRef<HTMLElement>>('trigger');
   private readonly panel = viewChild<ElementRef<HTMLElement>>('panel');
 
   readonly logout = output<void>();
+
+  constructor() {
+    // Is there an Avenger to report problems to? (no menu entry otherwise)
+    void this.feedback.load();
+  }
+
+  protected openFeedback(): void {
+    this.feedback.open().catch((error: unknown) => console.error('Signaler un problème :', error));
+  }
 
   /** Places the panel under its button, aligned on its right edge. */
   protected onToggle(event: Event): void {

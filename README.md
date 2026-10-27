@@ -122,6 +122,18 @@ En dev, le navigateur ne parle qu'à `localhost:4200` : le proxy Angular (`front
 transmet `/api` à Symfony et `/.well-known/mercure` au hub, ce qui permet au cookie Mercure de
 fonctionner sans configuration CORS.
 
+## Signaler un problème (Avenger)
+
+Les membres signalent un bug, donnent leur avis ou proposent une fonctionnalité depuis *menu du compte >
+Signaler un problème*. Le formulaire est celui d'[Avenger](https://github.com/imperiumclansoftware/avenger),
+l'application qui suit le projet : son widget s'ouvre par-dessus Conclave, prérempli avec le nom et l'e-mail du
+membre, et l'adresse de la page (sans paramètres) est jointe au ticket.
+
+- `AVENGER_URL` : adresse de l'Avenger, par exemple `https://avenger.example.org` ; vide, l'entrée de menu
+  n'apparaît pas. `AVENGER_PRODUCT` : produit qui reçoit les tickets (`conclave` par défaut).
+- Le script du widget n'est chargé qu'au premier clic (`core/feedback/feedback.service.ts`) ; la configuration
+  est lue par `GET /api/feedback`.
+
 ## Application Windows
 
 Conclave existe aussi en application Windows 11 (WinUI 3) : notifications Windows même sans HTTPS, zone de
@@ -158,6 +170,7 @@ variables de `docker/.env.example` dans *Environment variables* (le fichier ne d
 | `JWT_PASSPHRASE` | Protège les clés de connexion, générées au premier démarrage |
 | `MERCURE_JWT_SECRET` | Signe les jetons du hub temps réel |
 | `POSTGRES_PASSWORD` | Mot de passe de la base PostgreSQL |
+| `AVENGER_URL`, `AVENGER_PRODUCT` | Facultatif : Avenger qui reçoit les tickets du menu « Signaler un problème » (voir plus haut) |
 
 - **Données** : le volume `/data` conserve avatars, images des news, clés de connexion et historique du hub ;
   la base est dans son propre volume. Sauvegarder les deux, plus le fichier `.env`.
@@ -451,6 +464,7 @@ Toutes les routes sauf `setup`, `register`, `login`, `password/*` et `health` ex
 | GET     | `/api/films/search?q=`, `/api/films/{movie\|tv}/{tmdbId}` | Recherche (films et séries) et fiche TMDB (Cinéphiles) |
 | PUT     | `/api/admin/settings/tmdb`              | `{apiKey}` → clé TMDB ; `POST /api/admin/tmdb/test` pour la tester |
 | GET     | `/api/members/{id}/card`                | Carte de membre : branches et compteurs             |
+| GET     | `/api/feedback`                         | `{widgetUrl, product}` du widget de tickets d'Avenger (null : non configuré) |
 | GET     | `/api/news?before={id}`                 | News, 12 par page, des plus récentes aux anciennes  |
 | GET     | `/api/news/{id}`                        | Une news, avec `canEdit` / `canDelete`              |
 | POST    | `/api/news`                             | Multipart `title`, `body`, `image?` → publie        |
