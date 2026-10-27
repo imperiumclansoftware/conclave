@@ -31,6 +31,7 @@ servis par [FrankenPHP](https://frankenphp.dev) sur le port 80. Il lui faut seul
 | Tag | Contenu |
 |---|---|
 | `latest` | Dernière version publiée |
+| `0.4.2` | Nouveau favicon de Conclave ; construction refusée sous PHP 8.4.27 (failles PHP2Shell) |
 | `0.4.1` | Application Windows : corrige sa fermeture au lancement (0.4.0) |
 | `0.4.0` | Application Windows 11 (téléchargeable depuis Conclave), notifications Windows des messages et événements |
 | `0.3.0` | Tableau de bord du système dans l'administration (état des services, activité, stockage) |
@@ -117,7 +118,7 @@ pour les coller d'un bloc). Générez chaque secret avec `openssl rand -hex 32` 
 CONCLAVE_URL=http://192.168.1.10:8080
 # Port publié sur la machine (doit correspondre à CONCLAVE_URL)
 CONCLAVE_PORT=8080
-# Tag de l'image : latest, ou une version comme 0.4.1
+# Tag de l'image : latest, ou une version comme 0.4.2
 CONCLAVE_VERSION=latest
 
 # Secrets : à conserver précieusement
