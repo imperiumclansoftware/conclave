@@ -13,12 +13,18 @@ services:
 ###< symfony/mercure-bundle ###
 
 ###> symfony/mailer ###
+  # Fake mail server for development: catches every e-mail (nothing leaves) and shows them on
+  # https://dev.imperiumclan.fr/absproxy/8025/ (SMTP: docker:1025, no TLS, any login accepted)
   mailer:
     image: axllent/mailpit
+    restart: unless-stopped
     ports:
-      - "1025"
-      - "8025"
+      - "1025:1025"
+      - "8025:8025"
     environment:
       MP_SMTP_AUTH_ACCEPT_ANY: 1
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
+      # Served behind code-server's /absproxy/8025/ path
+      MP_WEBROOT: /absproxy/8025/
+      MP_MAX_MESSAGES: 1000
 ###< symfony/mailer ###

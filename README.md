@@ -195,7 +195,7 @@ PHP 8.4+, Composer, Symfony CLI, Node 24+, Docker.
 # Backend
 cd backend
 composer install
-docker compose up -d --wait                 # PostgreSQL + hub Mercure
+docker compose up -d --wait                 # PostgreSQL, hub Mercure, Mailpit
 php bin/console lexik:jwt:generate-keypair  # une seule fois (clés ignorées par git)
 php bin/console doctrine:migrations:migrate -n
 php bin/console app:setup:code              # code demandé par l'assistant d'installation
@@ -261,6 +261,15 @@ le bot crée sur le serveur Discord du clan un salon vocal privé (visible des s
 et partage d'écran autorisés), prévient les invités par message privé et dans l'app, puis supprime
 le salon quand tout le monde est parti (ou au bout de 15 min si personne ne l'a rejoint).
 Discord ne permet pas d'intégrer un appel dans une page web : « Rejoindre » ouvre Discord.
+
+
+### E-mails en développement (Mailpit)
+
+`docker compose` lance aussi **Mailpit**, un faux serveur d'e-mail : il reçoit tous les e-mails envoyés et
+n'en délivre aucun. Dans *Administration > E-mail*, choisir SMTP `docker` (ou `localhost`), port `1025`, sans
+chiffrement ni identifiant. Les e-mails se lisent sur `http://localhost:8025/absproxy/8025/` (derrière
+code-server : `https://<domaine>/absproxy/8025/`, avec un relais `localhost:8025` vers l'hôte Docker si
+Docker tourne ailleurs).
 
 ### Mise en place
 
