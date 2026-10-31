@@ -84,11 +84,46 @@ export interface ApiProblem {
 }
 
 export type GamePlatform =
-  'pc' | 'ps5' | 'ps4' | 'xbox_series' | 'xbox_one' | 'switch_2' | 'switch' | 'mobile';
+  | 'pc'
+  | 'ps5'
+  | 'ps4'
+  | 'xbox_series'
+  | 'xbox_one'
+  | 'switch_2'
+  | 'switch'
+  | 'mobile'
+  // Retro
+  | 'wii_u'
+  | 'wii'
+  | 'gamecube'
+  | 'n64'
+  | 'snes'
+  | 'nes'
+  | '3ds'
+  | 'ds'
+  | 'gba'
+  | 'gbc'
+  | 'gb'
+  | 'ps3'
+  | 'ps2'
+  | 'ps1'
+  | 'ps_vita'
+  | 'psp'
+  | 'xbox_360'
+  | 'xbox'
+  | 'dreamcast'
+  | 'saturn'
+  | 'mega_drive'
+  | 'master_system'
+  | 'game_gear'
+  | 'neo_geo'
+  | 'atari';
 
 export interface PlatformOption {
   value: GamePlatform;
   label: string;
+  /** Older consoles and handhelds (Nintendo DS, Wii, PlayStation…) */
+  retro: boolean;
 }
 
 export interface Game {

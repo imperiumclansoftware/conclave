@@ -87,6 +87,34 @@ final class GameTest extends ApiTestCase
         self::assertStringContainsString('Steam a pris le relais', $rawg['detail']);
     }
 
+    public function testRetroGamesAreFoundOnTheirOldConsoles(): void
+    {
+        $leader = $this->registerClan();
+        $this->joinBranch($leader['token'], 'players', $leader['token']);
+
+        // Without RAWG, the retro search says why (Steam only has PC games)
+        $this->api('GET', '/api/games/search?q=mario+kart&retro=1', token: $leader['token']);
+        self::assertResponseStatusCodeSame(503);
+        self::assertStringContainsString('clé RAWG', $this->lastError());
+
+        $this->api('PUT', '/api/admin/settings/rawg', ['apiKey' => HttpClientMock::RAWG_KEY], $leader['token']);
+        $all = $this->api('GET', '/api/games/search?q=mario+kart', token: $leader['token']);
+        self::assertSame(['Mario Kart 8 Deluxe', 'Mario Kart Wii', 'Mario Kart DS', 'Mario Kart: Double Dash!!'], array_column($all, 'name'));
+
+        $retro = $this->api('GET', '/api/games/search?q=mario+kart&retro=1', token: $leader['token']);
+        self::assertSame(['Mario Kart Wii', 'Mario Kart DS', 'Mario Kart: Double Dash!!'], array_column($retro, 'name'), 'The Switch game is left out');
+        self::assertSame(['ds'], $retro[1]['platforms'], 'DS and DSi are one platform');
+
+        // Added on its console, like any game
+        $added = $this->api('POST', '/api/me/games', ['source' => 'rawg', 'externalId' => '3003', 'platforms' => ['ds']], $leader['token']);
+        self::assertResponseStatusCodeSame(201);
+        self::assertSame(['ds'], $added['platforms']);
+
+        $platforms = array_column($this->api('GET', '/api/games/platforms', token: $leader['token']), null, 'value');
+        self::assertSame(['Nintendo DS', true], [$platforms['ds']['label'], $platforms['ds']['retro']]);
+        self::assertFalse($platforms['switch']['retro']);
+    }
+
     public function testShortQueriesReturnNothing(): void
     {
         $leader = $this->registerClan();
@@ -132,7 +160,7 @@ final class GameTest extends ApiTestCase
         $this->addElden($leader['token'], []);
         self::assertResponseStatusCodeSame(422);
 
-        $this->addElden($leader['token'], ['dreamcast']);
+        $this->addElden($leader['token'], ['amiga']);
         self::assertResponseStatusCodeSame(422);
     }
 
@@ -205,11 +233,16 @@ final class GameTest extends ApiTestCase
 
         $platforms = $this->api('GET', '/api/games/platforms', token: $leader['token']);
 
-        self::assertContains(['value' => 'ps5', 'label' => 'PS5'], $platforms);
+        self::assertContains(['value' => 'ps5', 'label' => 'PS5', 'retro' => false], $platforms);
     }
 
     private function addElden(string $token, array $platforms): mixed
     {
         return $this->api('POST', '/api/me/games', ['source' => 'steam', 'externalId' => '1245620', 'platforms' => $platforms], $token);
+    }
+
+    private function lastError(): string
+    {
+        return json_decode((string) $this->client->getResponse()->getContent(), true)['detail'];
     }
 }

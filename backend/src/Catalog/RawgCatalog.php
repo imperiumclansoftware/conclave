@@ -28,6 +28,41 @@ final readonly class RawgCatalog implements GameCatalogInterface
         'nintendo-switch' => GamePlatform::Switch,
         'ios' => GamePlatform::Mobile,
         'android' => GamePlatform::Mobile,
+        // Retro (slugs of rawg.io/platforms)
+        'wii-u' => GamePlatform::WiiU,
+        'wii' => GamePlatform::Wii,
+        'gamecube' => GamePlatform::GameCube,
+        'nintendo-64' => GamePlatform::Nintendo64,
+        'snes' => GamePlatform::Snes,
+        'nes' => GamePlatform::Nes,
+        'nintendo-3ds' => GamePlatform::Nintendo3ds,
+        'nintendo-ds' => GamePlatform::NintendoDs,
+        'nintendo-dsi' => GamePlatform::NintendoDs,
+        'game-boy-advance' => GamePlatform::GameBoyAdvance,
+        'game-boy-color' => GamePlatform::GameBoyColor,
+        'game-boy' => GamePlatform::GameBoy,
+        'playstation3' => GamePlatform::Ps3,
+        'playstation2' => GamePlatform::Ps2,
+        'playstation1' => GamePlatform::Ps1,
+        'ps-vita' => GamePlatform::PsVita,
+        'psp' => GamePlatform::Psp,
+        'xbox360' => GamePlatform::Xbox360,
+        'xbox-old' => GamePlatform::Xbox,
+        'dreamcast' => GamePlatform::Dreamcast,
+        'sega-saturn' => GamePlatform::Saturn,
+        'genesis' => GamePlatform::MegaDrive,
+        'sega-cd' => GamePlatform::MegaDrive,
+        'sega-32x' => GamePlatform::MegaDrive,
+        'sega-master-system' => GamePlatform::MasterSystem,
+        'game-gear' => GamePlatform::GameGear,
+        'neogeo' => GamePlatform::NeoGeo,
+        'atari-2600' => GamePlatform::Atari,
+        'atari-5200' => GamePlatform::Atari,
+        'atari-7800' => GamePlatform::Atari,
+        'atari-8-bit' => GamePlatform::Atari,
+        'atari-st' => GamePlatform::Atari,
+        'atari-lynx' => GamePlatform::Atari,
+        'jaguar' => GamePlatform::Atari,
     ];
 
     public function __construct(
@@ -49,7 +84,35 @@ final readonly class RawgCatalog implements GameCatalogInterface
 
     public function search(string $query): array
     {
-        $data = $this->get('games', ['search' => $query, 'page_size' => 12, 'search_precise' => 'true']);
+        return \array_slice($this->find($query, 12), 0, 12);
+    }
+
+    /**
+     * Games released on a retro platform (Nintendo DS, Wii, PlayStation…): RAWG ranks the recent
+     * games first, so more results are asked for and the others left out.
+     *
+     * @return list<CatalogGame>
+     *
+     * @throws CatalogUnavailableException
+     */
+    public function searchRetro(string $query): array
+    {
+        $retro = array_filter(
+            $this->find($query, 40),
+            static fn (CatalogGame $game): bool => [] !== array_filter($game->platforms, static fn (GamePlatform $p): bool => $p->isRetro()),
+        );
+
+        return \array_slice(array_values($retro), 0, 12);
+    }
+
+    /**
+     * @return list<CatalogGame>
+     *
+     * @throws CatalogUnavailableException
+     */
+    private function find(string $query, int $size): array
+    {
+        $data = $this->get('games', ['search' => $query, 'page_size' => $size, 'search_precise' => 'true']);
 
         return array_values(array_map(
             fn (array $game): CatalogGame => new CatalogGame(

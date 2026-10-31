@@ -8,6 +8,7 @@ use App\Catalog\CatalogUnavailableException;
 use App\Catalog\GameCatalog;
 use App\Catalog\GameLibrary;
 use App\Catalog\GameNotFoundException;
+use App\Catalog\RetroCatalogUnavailableException;
 use App\Dto\AddGameRequest;
 use App\Dto\UpdateGamePlatformsRequest;
 use App\Entity\Game;
@@ -49,16 +50,17 @@ final class GameController extends AbstractController
     public function platforms(): JsonResponse
     {
         return $this->json(array_map(
-            static fn (GamePlatform $p): array => ['value' => $p->value, 'label' => $p->label()],
+            static fn (GamePlatform $p): array => ['value' => $p->value, 'label' => $p->label(), 'retro' => $p->isRetro()],
             GamePlatform::cases(),
         ));
     }
 
     /**
-     * Searches the external catalog (Steam, or RAWG when configured).
+     * Searches the external catalog (Steam, or RAWG when configured); ?retro=1: the games of the
+     * older consoles only (RAWG).
      */
     #[Route('/games/search', name: 'api_game_search', methods: ['GET'])]
-    public function search(#[CurrentUser] User $user, GameCatalog $catalog, #[MapQueryParameter] string $q = ''): JsonResponse
+    public function search(#[CurrentUser] User $user, GameCatalog $catalog, #[MapQueryParameter] string $q = '', #[MapQueryParameter] bool $retro = false): JsonResponse
     {
         $query = trim($q);
         if (mb_strlen($query) < 2 || mb_strlen($query) > 100) {
@@ -66,7 +68,9 @@ final class GameController extends AbstractController
         }
 
         try {
-            $results = $catalog->search($query);
+            $results = $retro ? $catalog->searchRetro($query) : $catalog->search($query);
+        } catch (RetroCatalogUnavailableException $e) {
+            throw new ServiceUnavailableHttpException(null, $e->getMessage(), $e);
         } catch (CatalogUnavailableException $e) {
             throw new ServiceUnavailableHttpException(null, self::CATALOG_UNAVAILABLE, $e);
         }

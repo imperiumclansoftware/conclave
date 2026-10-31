@@ -22,7 +22,19 @@
           [value]="query()"
           (input)="query.set(searchInput.value)"
         />
+        <label class="chip chip-toggle retro-toggle">
+          <input type="checkbox" [checked]="retro()" (change)="retro.set(!retro())" />
+          Jeux rétro
+        </label>
       </form>
+      <p class="hint">
+        @if (retro()) {
+          Nintendo DS, Wii, GameCube, PlayStation, Mega Drive… : uniquement les jeux sortis sur ces
+          consoles.
+        } @else {
+          Un jeu de Nintendo DS, de Wii ou de PlayStation ? Cochez « Jeux rétro ».
+        }
+      </p>
     </search>
 
     <p class="status" role="status">
@@ -68,6 +80,7 @@
               <div class="add-form">
                 <app-platform-picker
                   legend="Sur quelles plateformes y jouez-vous ?"
+                  [suggested]="result.platforms"
                   [(selected)]="addPlatforms"
                 />
                 <div class="actions">

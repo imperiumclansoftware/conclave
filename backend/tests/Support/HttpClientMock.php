@@ -88,9 +88,9 @@ final class HttpClientMock
             return self::$catalogDown ? new MockResponse('', ['http_code' => 503]) : $this->steam($url);
         }
 
-        // Every RAWG key is refused here: the search falls back to Steam
+        // RAWG accepts RAWG_KEY only; any other key is refused (the search falls back to Steam)
         if (str_starts_with($url, 'https://api.rawg.io/')) {
-            return new JsonMockResponse(['error' => 'The key is invalid'], ['http_code' => 401]);
+            return $this->rawg($url);
         }
 
         if (str_starts_with($url, 'https://api.themoviedb.org/3/')) {
@@ -98,6 +98,45 @@ final class HttpClientMock
         }
 
         throw new \LogicException(\sprintf('Unexpected HTTP request in tests: %s %s', $method, $url));
+    }
+
+    /** API key accepted by the fake RAWG */
+    public const RAWG_KEY = 'abcdefabcdefabcdefabcdefabcdef12';
+
+    /** @return list<array<string, mixed>> recent games first, as on RAWG */
+    private static function rawgGames(): array
+    {
+        $platforms = static fn (string ...$slugs): array => array_map(static fn (string $slug): array => ['platform' => ['slug' => $slug]], $slugs);
+
+        return [
+            ['id' => 3001, 'name' => 'Mario Kart 8 Deluxe', 'released' => '2017-04-28', 'background_image' => null, 'platforms' => $platforms('nintendo-switch')],
+            ['id' => 3002, 'name' => 'Mario Kart Wii', 'released' => '2008-04-10', 'background_image' => null, 'platforms' => $platforms('wii')],
+            ['id' => 3003, 'name' => 'Mario Kart DS', 'released' => '2005-11-14', 'background_image' => null, 'platforms' => $platforms('nintendo-ds', 'nintendo-dsi')],
+            ['id' => 3004, 'name' => 'Mario Kart: Double Dash!!', 'released' => '2003-11-07', 'background_image' => null, 'platforms' => $platforms('gamecube')],
+        ];
+    }
+
+    private function rawg(string $url): ResponseInterface
+    {
+        parse_str((string) parse_url($url, \PHP_URL_QUERY), $query);
+        if (self::RAWG_KEY !== ($query['key'] ?? null)) {
+            return new JsonMockResponse(['error' => 'The key is invalid'], ['http_code' => 401]);
+        }
+        $games = str_contains(strtolower((string) ($query['search'] ?? '')), 'mario kart') ? self::rawgGames() : [];
+
+        $path = (string) parse_url($url, \PHP_URL_PATH);
+        if (preg_match('#/games/(\d+)/screenshots$#', $path)) {
+            return new JsonMockResponse(['results' => []]);
+        }
+        if (preg_match('#/games/(\d+)$#', $path, $m)) {
+            $game = array_values(array_filter(self::rawgGames(), static fn (array $g): bool => (string) $g['id'] === $m[1]))[0] ?? null;
+
+            return null === $game
+                ? new JsonMockResponse(['detail' => 'Not found.'], ['http_code' => 404])
+                : new JsonMockResponse($game + ['description_raw' => 'Course de karts.', 'genres' => [['name' => 'Racing']], 'developers' => [['name' => 'Nintendo']], 'website' => null]);
+        }
+
+        return new JsonMockResponse(['count' => \count($games), 'results' => $games]);
     }
 
     /** API key accepted by the fake TMDB (v3 format) */

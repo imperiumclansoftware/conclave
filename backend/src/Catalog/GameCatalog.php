@@ -54,6 +54,35 @@ final readonly class GameCatalog
     }
 
     /**
+     * Retro games (Nintendo DS, Wii, PlayStation…): RAWG only, Steam has PC games alone.
+     *
+     * @return list<CatalogGame>
+     *
+     * @throws RetroCatalogUnavailableException when RAWG has no key or refuses it
+     */
+    public function searchRetro(string $query): array
+    {
+        if (!$this->rawg->isConfigured()) {
+            throw new RetroCatalogUnavailableException('La recherche de jeux rétro passe par RAWG : un dirigeant doit enregistrer une clé RAWG dans Administration > Catalogues.');
+        }
+
+        $key = \sprintf('catalog_search_retro_%s', md5(mb_strtolower(trim($query))));
+        try {
+            $results = $this->cache->get($key, function (ItemInterface $item) use ($query): array {
+                $item->expiresAfter(self::SEARCH_CACHE_TTL);
+
+                return $this->rawg->searchRetro($query);
+            });
+            $this->rawgHealth->succeeded();
+
+            return $results;
+        } catch (CatalogUnavailableException $e) {
+            $this->rawgHealth->failed($e->getMessage());
+            throw new RetroCatalogUnavailableException('La recherche de jeux rétro passe par RAWG, qui refuse la clé enregistrée ou ne répond pas : un dirigeant peut la vérifier dans Administration > Catalogues.', 0, $e);
+        }
+    }
+
+    /**
      * @return list<CatalogGame>
      *
      * @throws CatalogUnavailableException

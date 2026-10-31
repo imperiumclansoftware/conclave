@@ -14,7 +14,26 @@
     font-size: 1.1rem;
   }
 
+  // The search field, then the « Jeux rétro » switch
+  form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 0.75rem;
+  }
+
+  .retro-toggle {
+    flex: none;
+  }
+
+  .hint {
+    margin: 0.4rem 0 0;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+  }
+
   input[type='search'] {
+    flex: 1 1 16rem;
     width: 100%;
     padding: 0.7rem 0.9rem;
     border: 1px solid var(--border);

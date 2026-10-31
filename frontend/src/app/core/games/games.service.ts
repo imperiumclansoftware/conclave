@@ -30,8 +30,11 @@ export class GamesService {
     return this.labels().get(platform) ?? platform;
   }
 
-  search(query: string): Observable<CatalogGame[]> {
-    return this.http.get<CatalogGame[]>('api/games/search', { params: { q: query } });
+  /** retro: the games of the older consoles only (RAWG) */
+  search(query: string, retro = false): Observable<CatalogGame[]> {
+    return this.http.get<CatalogGame[]>('api/games/search', {
+      params: retro ? { q: query, retro: 1 } : { q: query },
+    });
   }
 
   myGames(): Observable<MyGame[]> {

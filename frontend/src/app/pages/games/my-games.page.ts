@@ -38,15 +38,17 @@ export class MyGamesPage implements OnInit {
   private readonly games = inject(GamesService);
 
   protected readonly query = signal('');
+  /** Only the games of the older consoles (Nintendo DS, Wii, PlayStation…) */
+  protected readonly retro = signal(false);
+  private readonly criteria = computed(() => ({ q: this.query().trim(), retro: this.retro() }));
   protected readonly search = toSignal(
-    toObservable(this.query).pipe(
-      map((q) => q.trim()),
+    toObservable(this.criteria).pipe(
       debounceTime(SEARCH_DEBOUNCE_MS),
-      distinctUntilChanged(),
-      switchMap((q) =>
+      distinctUntilChanged((a, b) => a.q === b.q && a.retro === b.retro),
+      switchMap(({ q, retro }) =>
         q.length < 2
           ? of<SearchState>({ status: 'idle' })
-          : this.games.search(q).pipe(
+          : this.games.search(q, retro).pipe(
               map((results): SearchState => ({ status: 'done', results })),
               startWith<SearchState>({ status: 'loading' }),
               catchError((e) => of<SearchState>({ status: 'error', message: apiErrorMessage(e) })),
@@ -71,8 +73,10 @@ export class MyGamesPage implements OnInit {
         return 'Recherche des informations…';
       case 'done':
         return state.results.length === 0
-          ? 'Aucun jeu trouvé.'
-          : `${state.results.length} résultat(s), source : ${state.results[0].source === 'rawg' ? 'RAWG' : 'Steam'}.`;
+          ? this.retro()
+            ? 'Aucun jeu rétro trouvé.'
+            : 'Aucun jeu trouvé.'
+          : `${state.results.length} résultat(s)${this.retro() ? ' sur consoles rétro' : ''}, source : ${state.results[0].source === 'rawg' ? 'RAWG' : 'Steam'}.`;
       default:
         return '';
     }
