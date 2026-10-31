@@ -1,0 +1,32 @@
+framework:
+    html_sanitizer:
+        sanitizers:
+            # News and event descriptions written with the editor: formatting and links only
+            app.rich_text_sanitizer:
+                allow_elements:
+                    p: []
+                    br: []
+                    strong: []
+                    em: []
+                    u: []
+                    s: []
+                    h2: []
+                    h3: []
+                    ul: []
+                    ol: []
+                    li: []
+                    blockquote: []
+                    # class="button": a link shown as a button (RichText keeps no other class)
+                    a: [href, class]
+                # Pasted from elsewhere: the tag goes, its text stays (scripts and styles go entirely)
+                block_elements: [span, div, font, b, i, small, big, mark, code, pre, sub, sup, h1, h4, h5, h6,
+                    section, article, header, footer, main, aside, nav, figure, figcaption, center, abbr, cite,
+                    time, label, dl, dt, dd, table, thead, tbody, tfoot, tr, td, th, caption]
+                allowed_link_schemes: [http, https, mailto]
+                # Links to pages of Conclave (/evenements/4)
+                allow_relative_links: true
+                force_attributes:
+                    a:
+                        rel: noopener noreferrer nofollow
+                        target: _blank
+                max_input_length: 200000

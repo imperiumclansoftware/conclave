@@ -8,6 +8,8 @@ import {
   signal,
   untracked,
 } from '@angular/core';
+import { RichTextEditor } from '../../shared/rich-text-editor/rich-text-editor';
+import { richTextValidator } from '../../shared/rich-text-editor/rich-text';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -24,7 +26,7 @@ const IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 /** Writing a news (/news/nouvelle) or editing one (/news/:id/modifier). */
 @Component({
   selector: 'app-news-form-page',
-  imports: [ReactiveFormsModule, RouterLink, Icon, NewsCover],
+  imports: [RichTextEditor, ReactiveFormsModule, RouterLink, Icon, NewsCover],
   templateUrl: './news-form.page.html',
   styleUrl: './news-form.page.scss',
 })
@@ -43,10 +45,8 @@ export class NewsFormPage {
       '',
       [Validators.required, Validators.maxLength(NEWS_TITLE_MAX), Validators.pattern(/\S/)],
     ],
-    body: [
-      '',
-      [Validators.required, Validators.maxLength(NEWS_BODY_MAX), Validators.pattern(/\S/)],
-    ],
+    // HTML of the editor: the text is counted, not the formatting
+    body: ['', richTextValidator({ max: NEWS_BODY_MAX, required: true })],
   });
   private readonly value = toSignal(this.form.valueChanges, {
     initialValue: this.form.getRawValue(),
@@ -67,7 +67,6 @@ export class NewsFormPage {
     () => this.newImageUrl() ?? (this.removeImage() ? null : this.savedImage()),
   );
   protected readonly titleLength = computed(() => this.value().title?.length ?? 0);
-  protected readonly bodyLength = computed(() => this.value().body?.length ?? 0);
   protected readonly clanName = computed(() => this.auth.user()?.clan.name ?? '');
   /** The default visual derives from the title: the preview is the published visual */
   protected readonly title = computed(() => this.value().title?.trim() ?? '');
@@ -116,7 +115,7 @@ export class NewsFormPage {
     const { title, body } = this.form.getRawValue();
     const input = {
       title: title.trim(),
-      body: body.trim(),
+      body,
       image: this.newImage(),
       removeImage: this.removeImage(),
     };

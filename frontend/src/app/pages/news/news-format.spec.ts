@@ -1,4 +1,4 @@
-import { excerpt, paragraphs } from './news-format';
+import { excerpt, plainText } from './news-format';
 
 describe('news format', () => {
   it('cuts the excerpt on a word', () => {
@@ -8,7 +8,18 @@ describe('news format', () => {
     );
   });
 
-  it('splits paragraphs on blank lines and keeps single line breaks', () => {
-    expect(paragraphs('Un\ndeux\n\n\nTrois\n\n')).toEqual(['Un\ndeux', 'Trois']);
+  it('reads the words of the editor HTML', () => {
+    expect(
+      plainText(
+        '<h2>Programme</h2><p>Un &amp; <a href="https://example.org" class="button">deux</a></p><p>Trois<br>quatre</p>',
+      ),
+    ).toBe('Programme\nUn & deux\nTrois\nquatre');
+    expect(plainText('Texte sans balise')).toBe('Texte sans balise');
+  });
+
+  it('cuts the excerpt of the editor HTML on a word', () => {
+    expect(
+      excerpt('<p>Rendez-vous <strong>samedi</strong> soir</p><p>pour la grande soirée</p>', 30),
+    ).toBe('Rendez-vous samedi soir pour…');
   });
 });

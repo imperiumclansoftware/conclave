@@ -41,12 +41,6 @@ export class EventDetailPage {
     const e = this.event();
     return this.consent.src(e?.film?.posterUrl ?? e?.game?.coverUrl ?? null);
   });
-  protected readonly paragraphs = computed(() =>
-    (this.event()?.description ?? '')
-      .split(/\n{2,}/)
-      .map((p) => p.trim())
-      .filter(Boolean),
-  );
 
   constructor() {
     effect(() => {

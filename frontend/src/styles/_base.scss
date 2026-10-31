@@ -80,7 +80,9 @@ textarea {
 }
 
 // ---- Buttons: a blade glint sweeps across on hover ----
-.btn {
+// A link shown as a button in a text written with the editor has the same style
+.btn,
+.rich-text a.button {
   position: relative;
   overflow: hidden;
   display: inline-flex;
@@ -182,7 +184,8 @@ textarea {
   margin-bottom: 1rem;
 
   label,
-  legend {
+  legend,
+  .label {
     font-family: var(--font-display);
     font-size: 0.8rem;
     font-weight: 600;
@@ -470,4 +473,66 @@ input[type='checkbox'] {
   font-size: 0.8rem;
   font-weight: 700;
   line-height: 1;
+}
+
+// ---- Text written with the editor (news, event descriptions), and the editor itself ----
+.rich-text {
+  overflow-wrap: anywhere;
+
+  > :first-child {
+    margin-top: 0;
+  }
+
+  > :last-child {
+    margin-bottom: 0;
+  }
+
+  p,
+  ul,
+  ol,
+  blockquote {
+    margin: 0 0 0.9em;
+  }
+
+  h2,
+  h3 {
+    margin: 1.2em 0 0.5em;
+    line-height: 1.25;
+  }
+
+  h2 {
+    font-size: 1.3rem;
+  }
+
+  h3 {
+    font-size: 1.1rem;
+  }
+
+  ul,
+  ol {
+    padding-left: 1.4em;
+  }
+
+  li > p {
+    margin: 0;
+  }
+
+  blockquote {
+    padding: 0.2em 0 0.2em 1em;
+    border-left: 3px solid var(--accent);
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  a:not(.button) {
+    color: var(--accent-text);
+    text-decoration: underline;
+    text-underline-offset: 0.15em;
+  }
+
+  // A link shown as a button: the .btn style (see .btn), placed in the text
+  a.button {
+    margin: 0.2em 0;
+    vertical-align: middle;
+  }
 }

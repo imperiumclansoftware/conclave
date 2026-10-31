@@ -8,6 +8,7 @@ use App\Enum\FilmKind;
 use App\Enum\FilmPlatform;
 use App\Enum\GamePlatform;
 use App\Enum\StreamPlatform;
+use App\Validator\RichTextLength;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
@@ -19,7 +20,8 @@ final readonly class EventRequest
         #[Assert\NotBlank(message: 'Donnez un titre à l\'événement.', normalizer: 'trim')]
         #[Assert\Length(max: Event::TITLE_MAX_LENGTH, normalizer: 'trim')]
         public string $title = '',
-        #[Assert\Length(max: Event::DESCRIPTION_MAX_LENGTH, normalizer: 'trim')]
+        /** HTML of the editor (or plain text) */
+        #[RichTextLength(max: Event::DESCRIPTION_MAX_LENGTH, maxMessage: 'La description dépasse {{ limit }} caractères.')]
         public ?string $description = null,
         #[Assert\NotNull(message: 'Indiquez la date et l\'heure de début.')]
         public ?\DateTimeImmutable $startsAt = null,

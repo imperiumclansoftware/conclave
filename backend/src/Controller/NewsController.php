@@ -9,6 +9,7 @@ use App\Entity\User;
 use App\News\NewsImageStorage;
 use App\Repository\NewsRepository;
 use App\Security\NewsVoter;
+use App\Text\RichText;
 use App\Validator\NewsImage;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -38,6 +39,7 @@ final class NewsController extends AbstractController
         private readonly ApiPresenter $presenter,
         private readonly EntityManagerInterface $em,
         private readonly NewsImageStorage $images,
+        private readonly RichText $richText,
     ) {
     }
 
@@ -68,7 +70,7 @@ final class NewsController extends AbstractController
         #[MapRequestPayload] NewsRequest $request,
         #[MapUploadedFile(new NewsImage())] ?UploadedFile $image = null,
     ): JsonResponse {
-        $news = new News($me->getClan(), $me, $request->cleanTitle(), $request->cleanBody());
+        $news = new News($me->getClan(), $me, $request->cleanTitle(), (string) $this->richText->clean($request->body));
         if (null !== $image) {
             $this->storeImage($news, $image);
         }
@@ -89,7 +91,7 @@ final class NewsController extends AbstractController
         $this->sameClan($news, $me);
         $this->denyAccessUnlessGranted(NewsVoter::EDIT, $news, 'Vous ne pouvez pas modifier cette news.');
 
-        $news->edit($request->cleanTitle(), $request->cleanBody());
+        $news->edit($request->cleanTitle(), (string) $this->richText->clean($request->body));
         if (null !== $image) {
             $this->storeImage($news, $image);
         } elseif ($request->removeImage) {

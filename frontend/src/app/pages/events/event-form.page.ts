@@ -1,3 +1,5 @@
+import { RichTextEditor } from '../../shared/rich-text-editor/rich-text-editor';
+import { richTextValidator } from '../../shared/rich-text-editor/rich-text';
 import { Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -39,7 +41,7 @@ interface ChosenFilm {
 /** Creation (/evenements/nouveau) or update (/evenements/:id/modifier) of an event. */
 @Component({
   selector: 'app-event-form-page',
-  imports: [ReactiveFormsModule, RouterLink, BranchCrest, Icon, CatalogPicker],
+  imports: [RichTextEditor, ReactiveFormsModule, RouterLink, BranchCrest, Icon, CatalogPicker],
   templateUrl: './event-form.page.html',
   styleUrl: './event-form.page.scss',
 })
@@ -62,7 +64,8 @@ export class EventFormPage {
     startsAt: ['', Validators.required],
     endsAt: [''],
     maxParticipants: [null as number | null, [Validators.min(2), Validators.max(500)]],
-    description: ['', Validators.maxLength(5000)],
+    // HTML of the editor: the text is counted, not the formatting
+    description: ['', richTextValidator({ max: 5000 })],
     gamePlatform: [''],
     filmPlatform: [''],
     streamPlatform: [''],
@@ -186,7 +189,7 @@ export class EventFormPage {
     const input: EventInput = {
       type: v.type,
       title: v.title.trim(),
-      description: v.description.trim() || null,
+      description: v.description || null,
       startsAt: fromLocalInput(v.startsAt)!,
       endsAt: fromLocalInput(v.endsAt),
       maxParticipants: v.maxParticipants || null,

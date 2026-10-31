@@ -10,6 +10,7 @@ use App\Entity\Event;
 use App\Entity\User;
 use App\Films\FilmCatalogUnavailableException;
 use App\Films\FilmLibrary;
+use App\Text\RichText;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 use Symfony\Component\HttpKernel\Exception\UnprocessableEntityHttpException;
@@ -31,6 +32,7 @@ final readonly class EventEditor
         private EventPermissions $permissions,
         private GameLibrary $games,
         private FilmLibrary $films,
+        private RichText $richText,
     ) {
     }
 
@@ -56,7 +58,7 @@ final readonly class EventEditor
         $startsAt = $request->startsAt ?? throw new UnprocessableEntityHttpException('Indiquez la date et l\'heure de début.');
         $event->describe(
             trim(preg_replace('/\s+/', ' ', $request->title)),
-            EventRequest::clean($request->description),
+            $this->richText->clean($request->description),
             $startsAt,
             $request->endsAt,
             $request->maxParticipants,

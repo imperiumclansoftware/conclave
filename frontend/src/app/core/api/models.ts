@@ -370,7 +370,7 @@ export interface BranchJoinRequest {
 export interface News {
   id: number;
   title: string;
-  /** Plain text, paragraphs separated by blank lines */
+  /** HTML of the editor, cleaned by the server: formatting and links (class "button": a button) */
   body: string;
   /** null: default visual (NewsCover) */
   imageUrl: string | null;

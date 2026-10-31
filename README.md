@@ -88,6 +88,12 @@ Comptes dirigeants et membres, messagerie instantanée entre les membres d'un m�
   `/series/{id}` : saisons, épisodes, années de diffusion, créateurs) sont réservées aux membres de la
   branche Cinéphiles ; les autres voient le titre et l'affiche du film ou de la série d'un événement.
   Les fiches sont gardées en base et rafraîchies tous les 30 jours.
+- **Éditeur de texte** des news et des descriptions d'événements : gras, italique, souligné, barré,
+  titres, listes, citations et liens (Ctrl+K), chaque lien affiché en texte ou en **bouton** au style du
+  site. Le serveur garde ce seul HTML (`App\Text\RichText`, `config/packages/html_sanitizer.yaml`) :
+  scripts, styles et images retirés, liens en `http(s)`, `mailto` ou vers une page de Conclave, ouverts
+  dans un nouvel onglet ; les limites (10 000 caractères pour une news, 5 000 pour une description)
+  portent sur le texte, pas sur la mise en forme.
 - **News** : actualités du clan (titre, texte, image facultative), lues par tous les membres (menu
   *News*). Seuls les membres des branches autorisées dans l'administration (case « Ses membres peuvent
   publier des news »), c'est-à-dire les *Communicants*, les publient : un dirigeant doit rejoindre la
@@ -239,14 +245,20 @@ Ajouter aussi le domaine à `allowedHosts` (`angular.json`, cible `serve`).
 
 La partie *Jeux* est réservée aux membres de la branche **Joueurs** (active), dirigeants compris s'ils
 l'ont rejointe : pour les autres, pas de menu *Jeux*, ni jeux sur les fiches et cartes de membre, et l'API
-répond 403 (`App\Games\GamesAccess`). Ses membres déclarent les jeux auxquels ils jouent et sur quelles plateformes (PC, PS5, PS4,
-Xbox Series, Xbox One, Switch, Switch 2, Mobile). Les informations (jaquette, description, genres,
+répond 403 (`App\Games\GamesAccess`). Ses membres déclarent les jeux auxquels ils jouent et sur quelles plateformes : actuelles (PC, PS5, PS4,
+Xbox Series, Xbox One, Switch, Switch 2, Mobile) ou **rétro** (Nintendo de la NES à la Wii U et du Game Boy à
+la 3DS, PlayStation 1 à 3, PSP, PS Vita, Xbox, Xbox 360, Dreamcast, Saturn, Mega Drive, Master System, Game
+Gear, Neo Geo, Atari). Les informations (jaquette, description, genres,
 développeurs, captures d'écran) sont récupérées automatiquement :
 
 - **Steam** par défaut : aucune clé nécessaire, descriptions en français, mais jeux PC uniquement ;
 - **RAWG** si une clé est renseignée (*Administration > Catalogues*, ou `RAWG_API_KEY`) : toutes les
   plateformes, consoles comprises. Clé gratuite sur https://rawg.io/apidocs. Si RAWG refuse la clé ou ne
   répond pas, la recherche repasse sur Steam.
+
+La case **Jeux rétro** de la recherche ne garde que les jeux sortis sur une console rétro
+(`GET /api/games/search?q=…&retro=1`). Elle passe uniquement par RAWG : sans clé valable, elle le dit
+(Steam n'a que des jeux PC).
 
 Les fiches sont mises en cache en base (rafraîchies au bout de 30 jours) et les recherches pendant 1 h.
 

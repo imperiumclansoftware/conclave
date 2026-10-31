@@ -9,7 +9,8 @@
     {{ event.type.label }} · {{ when }}
     {% if event.maxParticipants %}<br>{{ event.participants|length }} / {{ event.maxParticipants }} places prises{% endif %}
   </p>
-  {% if event.description %}<p>{{ event.description|nl2br }}</p>{% endif %}
+  {# Cleaned when saved (RichText): formatting and links only #}
+  {% if description %}<div>{{ description|raw }}</div>{% endif %}
   {% if link %}{% include 'emails/_button.html.twig' with { label: 'Voir l\'événement et s\'inscrire' } %}{% endif %}
   <p style="color:#6b5a45;font-size:13px;">
     Vous recevez cet e-mail parce que ce jeu figure dans votre ludothèque sur cette plateforme.

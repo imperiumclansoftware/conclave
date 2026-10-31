@@ -55,17 +55,16 @@
         <span class="hint" id="news-title-count">{{ titleLength() }} / {{ titleMax }}</span>
       </div>
       <div class="field">
-        <label for="news-body">Texte</label>
-        <textarea
-          id="news-body"
+        <span class="label" id="news-body-label">Texte</span>
+        <app-rich-text-editor
           formControlName="body"
-          required
-          rows="12"
-          [maxlength]="bodyMax"
-          aria-describedby="news-body-hint"
-        ></textarea>
+          labelledBy="news-body-label"
+          describedBy="news-body-hint"
+          [maxLength]="bodyMax"
+        />
         <span class="hint" id="news-body-hint"
-          >Laissez une ligne vide entre les paragraphes. {{ bodyLength() }} / {{ bodyMax }}</span
+          >Mise en forme et liens : sélectionnez du texte puis « Lien » (Ctrl+K) ; un lien peut
+          s'afficher en bouton.</span
         >
       </div>
 

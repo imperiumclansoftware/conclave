@@ -1,0 +1,203 @@
+<div class="editor" [class.disabled]="disabled()">
+  <div class="toolbar" role="toolbar" aria-label="Mise en forme" [attr.aria-controls]="id">
+    <div class="group">
+      <button
+        type="button"
+        title="Gras (Ctrl+B)"
+        aria-label="Gras"
+        [attr.aria-pressed]="isActive('bold')"
+        (click)="run('bold')"
+      >
+        <b>G</b>
+      </button>
+      <button
+        type="button"
+        title="Italique (Ctrl+I)"
+        aria-label="Italique"
+        [attr.aria-pressed]="isActive('italic')"
+        (click)="run('italic')"
+      >
+        <i>I</i>
+      </button>
+      <button
+        type="button"
+        title="Souligné (Ctrl+U)"
+        aria-label="Souligné"
+        [attr.aria-pressed]="isActive('underline')"
+        (click)="run('underline')"
+      >
+        <u>S</u>
+      </button>
+      <button
+        type="button"
+        title="Barré"
+        aria-label="Barré"
+        [attr.aria-pressed]="isActive('strike')"
+        (click)="run('strike')"
+      >
+        <s>B</s>
+      </button>
+    </div>
+    <div class="group">
+      <button
+        type="button"
+        title="Titre"
+        aria-label="Titre"
+        [attr.aria-pressed]="isActive('heading', { level: 2 })"
+        (click)="run('h2')"
+      >
+        T1
+      </button>
+      <button
+        type="button"
+        title="Sous-titre"
+        aria-label="Sous-titre"
+        [attr.aria-pressed]="isActive('heading', { level: 3 })"
+        (click)="run('h3')"
+      >
+        T2
+      </button>
+      <button
+        type="button"
+        title="Liste à puces"
+        aria-label="Liste à puces"
+        [attr.aria-pressed]="isActive('bulletList')"
+        (click)="run('bulletList')"
+      >
+        •≡
+      </button>
+      <button
+        type="button"
+        title="Liste numérotée"
+        aria-label="Liste numérotée"
+        [attr.aria-pressed]="isActive('orderedList')"
+        (click)="run('orderedList')"
+      >
+        1.
+      </button>
+      <button
+        type="button"
+        title="Citation"
+        aria-label="Citation"
+        [attr.aria-pressed]="isActive('blockquote')"
+        (click)="run('blockquote')"
+      >
+        ❝
+      </button>
+    </div>
+    <div class="group">
+      <button
+        type="button"
+        class="link-button"
+        title="Lien (Ctrl+K)"
+        [attr.aria-pressed]="isActive('link')"
+        [attr.aria-expanded]="linkOpen()"
+        [attr.aria-controls]="id + '-link'"
+        (click)="openLink()"
+      >
+        🔗 Lien
+      </button>
+    </div>
+    <div class="group end">
+      <button
+        type="button"
+        title="Annuler (Ctrl+Z)"
+        aria-label="Annuler"
+        [disabled]="!canUndo()"
+        (click)="run('undo')"
+      >
+        ↶
+      </button>
+      <button
+        type="button"
+        title="Rétablir (Ctrl+Y)"
+        aria-label="Rétablir"
+        [disabled]="!canRedo()"
+        (click)="run('redo')"
+      >
+        ↷
+      </button>
+    </div>
+  </div>
+
+  @if (linkOpen()) {
+    <div
+      class="link-panel"
+      role="group"
+      [id]="id + '-link'"
+      aria-label="Lien"
+      (keydown)="onLinkKeydown($event)"
+    >
+      <label>
+        Adresse
+        <input
+          #hrefField
+          type="text"
+          inputmode="url"
+          autocomplete="off"
+          spellcheck="false"
+          placeholder="https://… ou une adresse e-mail"
+          [value]="linkHref()"
+          (input)="linkHref.set($any($event.target).value)"
+          [attr.aria-invalid]="!!linkError()"
+          [attr.aria-describedby]="linkError() ? id + '-link-error' : null"
+        />
+      </label>
+      @if (linkNeedsText()) {
+        <label>
+          Texte du lien
+          <input
+            type="text"
+            placeholder="Par défaut : l'adresse"
+            [value]="linkText()"
+            (input)="linkText.set($any($event.target).value)"
+          />
+        </label>
+      }
+      <fieldset class="styles">
+        <legend>Afficher comme</legend>
+        <label class="style">
+          <input
+            type="radio"
+            [name]="id + '-style'"
+            value="text"
+            [checked]="linkStyle() === 'text'"
+            (change)="linkStyle.set('text')"
+          />
+          <span class="rich-text"><a>un lien dans le texte</a></span>
+        </label>
+        <label class="style">
+          <input
+            type="radio"
+            [name]="id + '-style'"
+            value="button"
+            [checked]="linkStyle() === 'button'"
+            (change)="linkStyle.set('button')"
+          />
+          <span class="rich-text"><a class="button">un bouton</a></span>
+        </label>
+      </fieldset>
+      @if (linkError(); as error) {
+        <p class="error" role="alert" [id]="id + '-link-error'">{{ error }}</p>
+      }
+      <div class="actions">
+        <button type="button" class="btn" (click)="applyLink()">
+          {{ linkEditing() ? 'Modifier le lien' : 'Ajouter le lien' }}
+        </button>
+        @if (linkEditing()) {
+          <button type="button" class="btn btn-ghost" (click)="removeLink()">
+            Retirer le lien
+          </button>
+        }
+        <button type="button" class="link" (click)="cancelLink()">Annuler</button>
+      </div>
+    </div>
+  }
+
+  <div class="area" #area [id]="id"></div>
+</div>
+@if (maxLength(); as max) {
+  <span class="counter" [class.over]="length() > max" aria-live="polite"
+    >{{ length() }} / {{ max }}</span
+  >
+}

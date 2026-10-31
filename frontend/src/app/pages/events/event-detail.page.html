@@ -110,12 +110,9 @@
         </div>
       </dl>
 
-      @if (paragraphs().length) {
-        <div class="description">
-          @for (p of paragraphs(); track $index) {
-            <p>{{ p }}</p>
-          }
-        </div>
+      @if (e.description) {
+        <!-- HTML cleaned by the server, then by Angular -->
+        <div class="description rich-text" [innerHTML]="e.description"></div>
       }
 
       <section aria-labelledby="participants-title">

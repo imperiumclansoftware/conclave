@@ -37,7 +37,8 @@ final class NewsTest extends ApiTestCase
 
         $news = $this->post('/api/news', ['title' => '  Soirée   Valhalla ', 'body' => "Rendez-vous samedi.\r\n\r\n\r\n\r\nVenez nombreux !"], $lea, $this->image(1200, 600));
         self::assertResponseStatusCodeSame(201);
-        self::assertSame(['Soirée Valhalla', "Rendez-vous samedi.\n\nVenez nombreux !", 'lea', true, true],
+        // Plain text becomes paragraphs (the editor sends HTML)
+        self::assertSame(['Soirée Valhalla', '<p>Rendez-vous samedi.</p><p>Venez nombreux !</p>', 'lea', true, true],
             [$news['title'], $news['body'], $news['author']['username'], $news['canEdit'], $news['canDelete']]);
         self::assertMatchesRegularExpression('#^api/news-images/[a-f0-9]{32}\.webp$#', $news['imageUrl']);
 
@@ -105,7 +106,7 @@ final class NewsTest extends ApiTestCase
         self::assertNull($news['updatedAt']);
 
         $edited = $this->post("/api/news/{$news['id']}", ['title' => 'Annonce modifiée', 'body' => 'Nouveau texte'], $leader['token']);
-        self::assertSame(['Annonce modifiée', 'Nouveau texte', $news['imageUrl']], [$edited['title'], $edited['body'], $edited['imageUrl']], 'The image is kept');
+        self::assertSame(['Annonce modifiée', '<p>Nouveau texte</p>', $news['imageUrl']], [$edited['title'], $edited['body'], $edited['imageUrl']], 'The image is kept');
         self::assertNotNull($edited['updatedAt']);
 
         $edited = $this->post("/api/news/{$news['id']}", ['title' => 'Annonce', 'body' => 'Texte', 'removeImage' => '1'], $leader['token']);

@@ -8,7 +8,7 @@ import { Avatar } from '../../shared/avatar';
 import { Icon } from '../../shared/icon';
 import { MemberCardDirective } from '../../shared/member-card.directive';
 import { NewsCover } from '../../shared/news-cover';
-import { newsDate, paragraphs } from './news-format';
+import { newsDate } from './news-format';
 
 @Component({
   selector: 'app-news-detail-page',
@@ -27,7 +27,6 @@ export class NewsDetailPage {
   protected readonly news = signal<News | null>(null);
   protected readonly error = signal<string | null>(null);
   protected readonly deleting = signal(false);
-  protected readonly paragraphs = computed(() => paragraphs(this.news()?.body ?? ''));
   protected readonly clanName = computed(() => this.auth.user()?.clan.name ?? '');
   protected readonly date = newsDate;
 

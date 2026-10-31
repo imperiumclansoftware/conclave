@@ -189,15 +189,14 @@
             </div>
           </div>
           <div class="field">
-            <label for="event-description"
-              >Description <span class="optional">(facultatif)</span></label
+            <span class="label" id="event-description-label"
+              >Description <span class="optional">(facultatif)</span></span
             >
-            <textarea
-              id="event-description"
+            <app-rich-text-editor
               formControlName="description"
-              rows="5"
-              maxlength="5000"
-            ></textarea>
+              labelledBy="event-description-label"
+              [maxLength]="5000"
+            />
           </div>
 
           <div class="actions">

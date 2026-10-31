@@ -6,6 +6,7 @@ use App\Entity\Event;
 use App\Entity\User;
 use App\Repository\ClanRepository;
 use App\Settings\AppSettings;
+use App\Text\RichText;
 use Psr\Log\LoggerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -65,6 +66,7 @@ final readonly class AppMailer
             'when' => $when->format($event->getStartsAt()),
             'link' => $this->link('evenements/'.$event->getId()),
             'settingsLink' => $this->link('account?onglet=notifications'),
+            'description' => null !== $event->getDescription() ? RichText::forEmail($event->getDescription()) : null,
         ];
         $subject = \sprintf('%s sur %s : %s', $event->getType()->label(), (string) $event->getGame()?->getName(), $event->getTitle());
         foreach ($players as $player) {

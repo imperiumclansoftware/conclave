@@ -29,11 +29,8 @@
             <span class="meta">(modifiée le {{ date(n.updatedAt) }})</span>
           }
         </p>
-        <div class="body">
-          @for (p of paragraphs(); track $index) {
-            <p>{{ p }}</p>
-          }
-        </div>
+        <!-- HTML cleaned by the server, then by Angular -->
+        <div class="body rich-text" [innerHTML]="n.body"></div>
         @if (n.canEdit || n.canDelete) {
           <div class="actions">
             @if (n.canEdit) {
