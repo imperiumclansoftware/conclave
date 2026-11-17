@@ -28,7 +28,7 @@
 	}
 
 	# API: Symfony
-	@api path /api/* /bundles/*
+	@api path /api/* /bundles/* /oauth/*
 	handle @api {
 		php_server
 	}

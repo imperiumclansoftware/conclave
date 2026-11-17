@@ -22,6 +22,8 @@ export interface Me extends Member {
   canAccessFilms: boolean;
   /** Notifications sent by the server (browser ones are chosen on each device) */
   notifications: { gameEventEmails: boolean };
+  /** Chose to appear on the clan's public site (Imperium Clan portal); off by default */
+  publicProfile: boolean;
 }
 
 /** A game event organised on one of the member's games, on their platform */

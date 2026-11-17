@@ -118,6 +118,13 @@ the setup code. Uploads, keys, setup code and downloads live in `/data`, symlink
   at sending time. Mail failures are logged, never block the request; game-event e-mails are queued and
   sent on `kernel.terminate` (`GameEventInvitations`). `AppSettings::version()` lets the Discord worker
   reload when settings change.
+- **Public portal export** (`src/OAuth`, `src/Portal`, ADR `docs/adr/0001-clients-oauth-portail.md`): the
+  Imperium Clan portal gets an opaque token from `POST /oauth/token` (client credentials, HTTP Basic,
+  Argon2id-hashed client secrets, tokens stored as SHA-256, 300 s) and reads `GET /api/portal/members`
+  through its own firewall (`BearerTokenAuthenticator`, scope → `ROLE_OAUTH_PORTAL_MEMBERS`). Only active
+  members with `publicProfile` are exported, keyed by the immutable `User::publicSub` (future OIDC `sub`).
+  Its contract is fixed by the portal: never rename fields. Avatars must be served from Conclave's host
+  (`PortalAvatars`: signed URLs, local WebP copy of Gravatar/Discord). Clients: `app:oauth:client:*`.
 - **Concurrency**: `symfony/lock` (`LOCK_DSN=flock`) guards installation (`app-setup`) and keeps a single
   Discord gateway worker; the setup code is rate-limited (`config/packages/rate_limiter.yaml`).
 - **Rich text** (news, event descriptions): the Tiptap editor's HTML is sanitized server-side by

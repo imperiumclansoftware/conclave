@@ -5,3 +5,8 @@ framework:
             policy: sliding_window
             limit: 10
             interval: '15 minutes'
+        # OAuth2 token endpoint (machine clients, e.g. the public portal every 15 minutes)
+        oauth_token:
+            policy: sliding_window
+            limit: 10
+            interval: '1 minute'

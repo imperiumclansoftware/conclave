@@ -102,6 +102,8 @@ export class AccountPage implements OnInit {
   });
   protected readonly avatarStatus = signal<Status>(null);
   protected readonly profileStatus = signal<Status>(null);
+  protected readonly publicStatus = signal<Status>(null);
+  protected readonly publicSaving = signal(false);
   protected readonly passwordStatus = signal<Status>(null);
   protected readonly busy = signal<'avatar' | 'profile' | 'password' | null>(null);
   protected readonly bioMax = 280;
@@ -205,6 +207,24 @@ export class AccountPage implements OnInit {
       this.applyAvatar(await firstValueFrom(this.profiles.chooseAvatar(source)));
       return 'Avatar mis à jour.';
     });
+  }
+
+  protected async setPublicProfile(visible: boolean): Promise<void> {
+    this.publicSaving.set(true);
+    this.publicStatus.set(null);
+    try {
+      await firstValueFrom(this.profiles.setPublicProfile(visible));
+      this.publicStatus.set({
+        kind: 'success',
+        message: visible
+          ? 'Vous apparaîtrez sur le site public du clan (mise à jour sous 15 minutes).'
+          : 'Vous n’apparaîtrez plus sur le site public du clan (retrait sous 15 minutes).',
+      });
+    } catch (e) {
+      this.publicStatus.set({ kind: 'error', message: apiErrorMessage(e) });
+    } finally {
+      this.publicSaving.set(false);
+    }
   }
 
   protected async chooseFaction(

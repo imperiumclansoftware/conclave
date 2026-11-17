@@ -27,6 +27,8 @@ final class HttpClientMock
     /** E-mail addresses having a Gravatar */
     public const GRAVATAR_EMAILS = ['ezio@example.com'];
     public static bool $gravatarDown = false;
+    /** Gravatar pictures downloaded (GET), e.g. by the portal avatars cache */
+    public static int $gravatarDownloads = 0;
 
     /** Whether the fake Discord application has the presence intent enabled. */
     public static bool $presenceIntent = true;
@@ -44,6 +46,7 @@ final class HttpClientMock
         self::$channels = [];
         self::$presenceIntent = true;
         self::$gravatarDown = false;
+        self::$gravatarDownloads = 0;
     }
 
     /** @return list<array{method: string, path: string, body: mixed}> */
@@ -80,8 +83,19 @@ final class HttpClientMock
             }
             $hash = basename((string) parse_url($url, \PHP_URL_PATH));
             $known = array_map(static fn (string $e): string => hash('sha256', $e), self::GRAVATAR_EMAILS);
+            if (!\in_array($hash, $known, true)) {
+                return new MockResponse('', ['http_code' => 404]);
+            }
+            if ('GET' !== $method) {
+                return new MockResponse('');
+            }
+            ++self::$gravatarDownloads;
+            $image = imagecreatetruecolor(80, 80);
+            ob_start();
+            imagepng($image);
+            $png = (string) ob_get_clean();
 
-            return new MockResponse('', ['http_code' => \in_array($hash, $known, true) ? 200 : 404]);
+            return new MockResponse($png, ['response_headers' => ['content-type' => 'image/png', 'content-length' => (string) \strlen($png)]]);
         }
 
         if (str_starts_with($url, 'https://store.steampowered.com/')) {

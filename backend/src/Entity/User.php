@@ -96,6 +96,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $discordActivity = null;
 
+    // ---- Clan's public site (Imperium Clan portal) ----
+
+    /**
+     * Opaque and stable public identifier, generated once and never changed: the "sub" of the portal
+     * export, and of the future OpenID Connect login. Never the database id, Discord id or username.
+     */
+    #[ORM\Column(length: 22, unique: true)]
+    private string $publicSub;
+
+    /** The member chose to appear on the clan's public site (off by default) */
+    #[ORM\Column(options: ['default' => false])]
+    private bool $publicProfile = false;
+
     public function __construct(
         #[ORM\ManyToOne(inversedBy: 'members')]
         #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
@@ -108,6 +121,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         private ClanRole $clanRole,
     ) {
         $this->createdAt = new \DateTimeImmutable();
+        $this->publicSub = rtrim(strtr(base64_encode(random_bytes(16)), '+/', '-_'), '=');
     }
 
     public function getId(): ?int
@@ -298,6 +312,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->discordId = $this->discordUsername = $this->discordAvatar = null;
         $this->discordStatus = $this->discordActivity = null;
+    }
+
+    public function getPublicSub(): string
+    {
+        return $this->publicSub;
+    }
+
+    public function isPublicProfile(): bool
+    {
+        return $this->publicProfile;
+    }
+
+    public function setPublicProfile(bool $visible): void
+    {
+        $this->publicProfile = $visible;
     }
 
     public function getLastSeenAt(): ?\DateTimeImmutable

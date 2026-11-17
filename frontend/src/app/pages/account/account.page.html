@@ -109,6 +109,30 @@
       }
       <button class="btn" type="submit" [disabled]="busy() === 'profile'">Enregistrer</button>
     </form>
+
+    <section class="card" aria-labelledby="public-site-title">
+      <h2 id="public-site-title">Site public du clan</h2>
+      <label class="check">
+        <input
+          type="checkbox"
+          [checked]="auth.user()?.publicProfile ?? false"
+          [disabled]="publicSaving()"
+          (change)="setPublicProfile($any($event.target).checked)"
+          aria-describedby="public-site-hint"
+        />
+        Apparaître sur le site public du clan
+      </label>
+      <p class="hint" id="public-site-hint">
+        Le portail Imperium Clan affiche alors votre nom affiché, votre présentation, vos branches
+        et votre avatar. Jamais votre e-mail, votre identifiant de connexion, votre compte Discord
+        ni votre présence. Vous pouvez retirer ce choix à tout moment.
+      </p>
+      @if (publicStatus(); as s) {
+        <p [class]="s.kind" [attr.role]="s.kind === 'error' ? 'alert' : 'status'">
+          {{ s.message }}
+        </p>
+      }
+    </section>
   </div>
 
   <div id="panel-avatar" role="tabpanel" aria-labelledby="tab-avatar" [hidden]="tab() !== 'avatar'">

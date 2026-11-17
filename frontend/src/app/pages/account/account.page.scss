@@ -260,3 +260,10 @@ textarea {
     font-size: 1.2rem;
   }
 }
+
+.check {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}

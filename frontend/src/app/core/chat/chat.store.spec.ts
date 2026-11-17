@@ -29,6 +29,7 @@ const papa: Me = {
   canAccessGames: false,
   canAccessFilms: false,
   notifications: { gameEventEmails: true },
+  publicProfile: false,
 };
 const lea: Member = { id: 2, username: 'lea', displayName: 'Léa', role: 'member' };
 

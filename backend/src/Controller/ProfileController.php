@@ -9,6 +9,7 @@ use App\Dto\ChangePasswordRequest;
 use App\Dto\FactionRequest;
 use App\Dto\GravatarRequest;
 use App\Dto\NotificationSettingsRequest;
+use App\Dto\PublicProfileRequest;
 use App\Dto\UpdateProfileRequest;
 use App\Entity\Branch;
 use App\Entity\User;
@@ -183,6 +184,16 @@ final class ProfileController extends AbstractController
     public function notifications(#[CurrentUser] User $user, #[MapRequestPayload] NotificationSettingsRequest $request): JsonResponse
     {
         $user->setGameEventEmails($request->gameEventEmails);
+        $this->em->flush();
+
+        return $this->json($this->presenter->me($user));
+    }
+
+    /** Explicit choice to appear on the clan's public site (Imperium Clan portal), off by default. */
+    #[Route('/me/public-profile', name: 'api_my_public_profile', methods: ['PUT'])]
+    public function publicProfile(#[CurrentUser] User $user, #[MapRequestPayload] PublicProfileRequest $request): JsonResponse
+    {
+        $user->setPublicProfile((bool) $request->visible);
         $this->em->flush();
 
         return $this->json($this->presenter->me($user));

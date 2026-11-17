@@ -28,7 +28,26 @@ final readonly class AvatarStorage
      */
     public function store(User $user, File $image): void
     {
-        $source = @imagecreatefromstring((string) file_get_contents($image->getPathname()));
+        $webp = self::toWebp((string) file_get_contents($image->getPathname()));
+
+        if (!is_dir($this->directory)) {
+            mkdir($this->directory, 0o775, true);
+        }
+        $name = bin2hex(random_bytes(16)).'.webp';
+        file_put_contents($this->path($name), $webp);
+
+        $this->remove($user);
+        $user->setAvatarFile($name);
+    }
+
+    /**
+     * Any image GD reads, cropped to a centered square and resized to SIZE×SIZE, as WebP bytes.
+     *
+     * @throws \InvalidArgumentException when the image cannot be read
+     */
+    public static function toWebp(string $bytes): string
+    {
+        $source = '' === $bytes ? false : @imagecreatefromstring($bytes);
         if (false === $source) {
             throw new \InvalidArgumentException('Image illisible.');
         }
@@ -41,14 +60,10 @@ final readonly class AvatarStorage
         imagesavealpha($avatar, true);
         imagecopyresampled($avatar, $source, 0, 0, intdiv($width - $side, 2), intdiv($height - $side, 2), self::SIZE, self::SIZE, $side, $side);
 
-        if (!is_dir($this->directory)) {
-            mkdir($this->directory, 0o775, true);
-        }
-        $name = bin2hex(random_bytes(16)).'.webp';
-        imagewebp($avatar, $this->path($name), 85);
+        ob_start();
+        imagewebp($avatar, null, 85);
 
-        $this->remove($user);
-        $user->setAvatarFile($name);
+        return (string) ob_get_clean();
     }
 
     public function remove(User $user): void

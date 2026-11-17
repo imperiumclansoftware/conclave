@@ -360,6 +360,55 @@ Les secrets saisis dans l'administration (DSN du mail, jetons Discord, clé RAWG
   e-mail (visible des seuls dirigeants), présentation, identifiants de jeu (PSN, Xbox, Steam,
   Nintendo, Epic, Battle.net), mot de passe, compte Discord.
 - **Fiche publique** de chaque membre (`/members/{id}`) : présence, identifiants à copier, jeux.
+- **Site public du clan** (*Profil*) : case « Apparaître sur le site public du clan », décochée par
+  défaut. Cochée, le portail Imperium Clan affiche le nom affiché, la présentation, les branches et
+  l'avatar du membre (voir ci-dessous).
+
+## Portail Imperium Clan (export des membres)
+
+Le site public du clan, [Imperium Clan](https://github.com/imperiumclansoftware/imperium-clan), affiche
+les membres qui l'ont accepté en les lisant dans Conclave toutes les 15 minutes. Conclave fournit pour
+cela un flux OAuth2 *client credentials* minimal (décision : [ADR 0001](docs/adr/0001-clients-oauth-portail.md)) :
+
+1. `POST /oauth/token` : le portail s'authentifie en HTTP Basic (`client_id:client_secret`) et reçoit un
+   jeton opaque valable 5 minutes (portée `portal:members`) ;
+2. `GET /api/portal/members` avec ce jeton : la liste complète des membres validés et consentants.
+
+Seuls sont exportés un identifiant public stable (`sub`, jamais l'id SQL ni Discord), le nom affiché, la
+présentation, les blasons des branches et l'avatar. Jamais l'e-mail, l'identifiant de connexion, le compte
+Discord, le rôle ni la présence. Les avatars sont servis par Conclave lui-même : Gravatar et Discord passent
+par une copie locale sous une URL signée.
+
+### Créer le client du portail
+
+Le client se crée en ligne de commande. Le secret n'est affiché **qu'une fois** : seule son empreinte
+Argon2id est conservée.
+
+```bash
+# Déploiement Docker (stack Portainer « conclave » sur Altair), dans le conteneur web :
+docker exec -it conclave-conclave-1 php bin/console app:oauth:client:create --name="Portail" --scope=portal:members
+
+# En développement :
+php bin/console app:oauth:client:create --name="Portail" --scope=portal:members
+```
+
+Reportez ensuite dans la stack du portail :
+
+| Variable du portail | Valeur |
+|---|---|
+| `CONCLAVE_URL` | Adresse publique HTTPS de Conclave, **identique** à son `CONCLAVE_URL` (ex. `https://www.imperiumclan.fr`) : le portail n'accepte les avatars que depuis cet hôte |
+| `CONCLAVE_CLIENT_ID` | `client_id` affiché (`cc_…`) |
+| `CONCLAVE_CLIENT_SECRET` | `client_secret` affiché |
+
+Puis redéployez la stack du portail. La synchronisation suivante (15 minutes au plus) importe les membres
+qui ont coché la case de leur profil.
+
+```bash
+php bin/console app:oauth:client:list            # clients, état, dernière utilisation
+php bin/console app:oauth:client:revoke <n°|client_id>   # révocation immédiate, jetons compris
+```
+
+En cas de fuite du secret : révoquez le client, créez-en un nouveau et mettez à jour la stack du portail.
 
 ## Pages légales et cookies
 
@@ -417,7 +466,8 @@ Pour la base de test : `php bin/console doctrine:database:create --env=test` (un
 ## API
 
 Toutes les routes sauf `setup`, `register`, `login`, `password/*` et `health` exigent
-`Authorization: Bearer <jwt>`.
+`Authorization: Bearer <jwt>`. Exceptions : `/oauth/token` (identifiants de client en HTTP Basic) et
+`/api/portal/members` (jeton de client OAuth2, pas un JWT de membre).
 
 | Méthode | Route                                   | Description                                         |
 |---------|-----------------------------------------|-----------------------------------------------------|
@@ -480,6 +530,10 @@ Toutes les routes sauf `setup`, `register`, `login`, `password/*` et `health` ex
 | GET/PUT/DELETE | `/api/events/{id}`               | Détail / modification / suppression                |
 | PUT/DELETE | `/api/events/{id}/participation`     | S'inscrire / se désinscrire                         |
 | PUT     | `/api/me/notifications`                 | `{gameEventEmails}` : e-mails des événements sur mes jeux |
+| PUT     | `/api/me/public-profile`                | `{visible}` : apparaître sur le site public du clan (désactivé par défaut) |
+| POST    | `/oauth/token`                          | OAuth2 `client_credentials` (HTTP Basic, 10 / min / adresse) → `{access_token, token_type, expires_in, scope}` |
+| GET     | `/api/portal/members`                   | Jeton de client portée `portal:members` : membres consentants `{items: [{sub, pseudo, title, bio, branches, avatarUrl}]}` |
+| GET     | `/api/portal/avatars/{sub}/{signature}.webp` | Avatar Gravatar/Discord d'un membre exporté (public, URL signée, copie locale) |
 | GET/POST | `/api/events/{id}/messages[?before=]`  | Discussion de l'événement : lire (tout le clan) / écrire (participants, jusqu'à la fin) |
 | DELETE  | `/api/events/{id}/messages/{messageId}` | Retirer un message (auteur tant que c'est ouvert, dirigeants) |
 | GET     | `/api/films/search?q=`, `/api/films/{movie\|tv}/{tmdbId}` | Recherche (films et séries) et fiche TMDB (Cinéphiles) |

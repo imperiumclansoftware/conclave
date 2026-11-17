@@ -193,6 +193,20 @@ docker compose up -d
 Les migrations de la base s'appliquent au démarrage. Pour rester sur une version précise, indiquez-la dans
 `CONCLAVE_VERSION`.
 
+## Portail Imperium Clan
+
+Le site public du clan lit les membres qui ont coché « Apparaître sur le site public du clan » dans leur
+profil (OAuth2 *client credentials*). Pour le brancher, créez son client dans le conteneur web ; le secret
+n'est affiché qu'une fois :
+
+```bash
+docker exec -it conclave-conclave-1 php bin/console app:oauth:client:create --name="Portail" --scope=portal:members
+```
+
+Reportez `client_id` et `client_secret` dans `CONCLAVE_CLIENT_ID` et `CONCLAVE_CLIENT_SECRET` de la stack
+du portail, avec `CONCLAVE_URL` = l'adresse publique HTTPS de Conclave (la même que son `CONCLAVE_URL`).
+`app:oauth:client:list` et `app:oauth:client:revoke <n°>` gèrent les clients.
+
 ## Détails techniques
 
 - Base `dunglas/frankenphp` (PHP 8.4, Alpine), utilisateur non root, port 80.

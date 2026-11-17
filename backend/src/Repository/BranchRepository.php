@@ -78,4 +78,31 @@ class BranchRepository extends ServiceEntityRepository
 
         return $qb->getQuery()->getOneOrNullResult();
     }
+
+    /**
+     * Crests of the active branches of each of these members, in one query.
+     *
+     * @param list<User> $members
+     *
+     * @return array<int, list<string>> member id => crests
+     */
+    public function crestsByMember(array $members): array
+    {
+        if ([] === $members) {
+            return [];
+        }
+        $rows = $this->getEntityManager()->createQuery(
+            'SELECT b.crest AS crest, m.id AS member FROM App\Entity\Branch b JOIN b.members m
+             WHERE b.active = true AND b.crest IS NOT NULL AND m IN (:members)
+             ORDER BY b.crest'
+        )->setParameter('members', $members)->getArrayResult();
+
+        $crests = [];
+        foreach ($rows as $row) {
+            $crest = $row['crest'] instanceof \BackedEnum ? $row['crest']->value : (string) $row['crest'];
+            $crests[(int) $row['member']][] = $crest;
+        }
+
+        return $crests;
+    }
 }

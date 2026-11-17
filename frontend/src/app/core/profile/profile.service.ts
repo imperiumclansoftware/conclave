@@ -70,6 +70,13 @@ export class ProfileService {
       .pipe(tap((me) => this.auth.updateUser({ notifications: me.notifications })));
   }
 
+  /** Appear (or not) on the clan's public site: display name, presentation, branches, avatar. */
+  setPublicProfile(visible: boolean): Observable<Me> {
+    return this.http
+      .put<Me>('api/me/public-profile', { visible })
+      .pipe(tap((me) => this.auth.updateUser({ publicProfile: me.publicProfile })));
+  }
+
   setFaction(faction: 'assassin' | 'templar' | null): Observable<Me> {
     return this.http
       .put<Me>('api/me/faction', { faction })

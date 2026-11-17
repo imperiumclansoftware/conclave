@@ -97,6 +97,7 @@ describe('SetupPage', () => {
         canAccessGames: false,
         canAccessFilms: false,
         notifications: { gameEventEmails: true },
+        publicProfile: false,
       },
     });
     await fixture.whenStable();
