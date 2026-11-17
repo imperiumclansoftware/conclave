@@ -31,6 +31,7 @@ servis par [FrankenPHP](https://frankenphp.dev) sur le port 80. Il lui faut seul
 | Tag | Contenu |
 |---|---|
 | `latest` | Dernière version publiée |
+| `0.7.0` | Portail Imperium Clan : les membres qui le souhaitent (case du profil) apparaissent sur le site public du clan ; clients OAuth2 `app:oauth:client:*` |
 | `0.6.1` | Les messages d'erreur s'affichent en clair (code d'installation incorrect, accès réservé à une branche…) au lieu de « Forbidden » |
 | `0.6.0` | Éditeur de texte pour les news et les événements (liens en texte ou en bouton) ; jeux rétro (Nintendo DS, Wii, PlayStation…) |
 | `0.5.0` | « Signaler un problème » : tickets envoyés à Avenger depuis le menu du compte (`AVENGER_URL`) |
