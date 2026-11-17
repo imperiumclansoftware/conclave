@@ -31,6 +31,7 @@ servis par [FrankenPHP](https://frankenphp.dev) sur le port 80. Il lui faut seul
 | Tag | Contenu |
 |---|---|
 | `latest` | Dernière version publiée |
+| `0.8.0` | Connexion au portail Imperium Clan avec le compte Conclave (OpenID Connect, page « Autoriser ») ; correctifs de sécurité des dépendances |
 | `0.7.0` | Portail Imperium Clan : les membres qui le souhaitent (case du profil) apparaissent sur le site public du clan ; clients OAuth2 `app:oauth:client:*` |
 | `0.6.1` | Les messages d'erreur s'affichent en clair (code d'installation incorrect, accès réservé à une branche…) au lieu de « Forbidden » |
 | `0.6.0` | Éditeur de texte pour les news et les événements (liens en texte ou en bouton) ; jeux rétro (Nintendo DS, Wii, PlayStation…) |
