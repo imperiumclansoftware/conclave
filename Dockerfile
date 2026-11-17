@@ -58,6 +58,7 @@ RUN composer dump-autoload --no-dev --classmap-authoritative \
     && ln -s /data/news-images var/news-images \
     && ln -s /data/downloads var/downloads \
     && ln -s /data/setup var/setup \
+    && ln -s /data/oidc var/oidc \
     && ln -s /data/jwt config/jwt \
     && chown -R www-data:www-data /data var \
     # Port 80 without running as root

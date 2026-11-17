@@ -2,7 +2,10 @@
 
 namespace App\Controller;
 
+use App\Enum\OAuthScope;
+use App\OAuth\AuthorizationError;
 use App\OAuth\ClientCredentials;
+use App\OAuth\OpenIdConnect;
 use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -18,6 +21,7 @@ final class OAuthTokenController extends AbstractController
 {
     public function __construct(
         private readonly ClientCredentials $credentials,
+        private readonly OpenIdConnect $oidc,
         private readonly LoggerInterface $logger,
     ) {
     }
@@ -45,8 +49,11 @@ final class OAuthTokenController extends AbstractController
         if ('' === $grantType) {
             return self::error(400, 'invalid_request', 'Paramètre grant_type manquant.');
         }
+        if ('authorization_code' === $grantType) {
+            return $this->authorizationCode($request, $client);
+        }
         if ('client_credentials' !== $grantType) {
-            return self::error(400, 'unsupported_grant_type', 'Seul le flux client_credentials est accepté.');
+            return self::error(400, 'unsupported_grant_type', 'Flux accepté : client_credentials ou authorization_code.');
         }
 
         // No scope asked: every scope of the client (RFC 6749 §3.3)
@@ -64,6 +71,27 @@ final class OAuthTokenController extends AbstractController
             'expires_in' => ClientCredentials::TOKEN_TTL,
             'scope' => implode(' ', $scopes),
         ], 200, self::noStore());
+    }
+
+    /** OpenID Connect: one-time code + PKCE verifier → access token and ID token. */
+    private function authorizationCode(Request $request, \App\Entity\OAuthClient $client): JsonResponse
+    {
+        if (!$client->hasScope(OAuthScope::OpenId->value)) {
+            return self::error(400, 'unauthorized_client', 'Ce client n’est pas autorisé à connecter des membres.');
+        }
+        try {
+            $response = $this->oidc->exchange(
+                $client,
+                $request->request->getString('code'),
+                $request->request->getString('redirect_uri'),
+                $request->request->getString('code_verifier'),
+                $this->oidc->issuer($request->getSchemeAndHttpHost()),
+            );
+        } catch (AuthorizationError $e) {
+            return self::error(400, $e->error, $e->description);
+        }
+
+        return new JsonResponse($response, 200, self::noStore());
     }
 
     /** @return array{?string, string} client id (null when absent) and secret */

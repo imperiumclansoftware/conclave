@@ -29,6 +29,10 @@ class OAuthClient
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $lastUsedAt = null;
 
+    /** @var list<string> exact redirect URIs accepted for the OpenID Connect sign-in */
+    #[ORM\Column(type: Types::JSON, options: ['default' => '[]'])]
+    private array $redirectUris = [];
+
     /**
      * @param list<string> $scopes values of App\Enum\OAuthScope
      */
@@ -69,6 +73,35 @@ class OAuthClient
     public function getScopes(): array
     {
         return $this->scopes;
+    }
+
+    /** @return list<string> */
+    public function getRedirectUris(): array
+    {
+        return $this->redirectUris;
+    }
+
+    /** @param list<string> $uris */
+    public function setRedirectUris(array $uris): void
+    {
+        $this->redirectUris = array_values(array_unique($uris));
+    }
+
+    /** Exact comparison (no prefix, no wildcard), as OAuth 2.1 requires */
+    public function allowsRedirectUri(string $uri): bool
+    {
+        return \in_array($uri, $this->redirectUris, true);
+    }
+
+    /** @param list<string> $scopes */
+    public function setScopes(array $scopes): void
+    {
+        $this->scopes = array_values(array_unique($scopes));
+    }
+
+    public function hasScope(string $scope): bool
+    {
+        return \in_array($scope, $this->scopes, true);
     }
 
     public function getCreatedAt(): \DateTimeImmutable

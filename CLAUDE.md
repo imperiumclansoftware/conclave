@@ -125,6 +125,11 @@ the setup code. Uploads, keys, setup code and downloads live in `/data`, symlink
   members with `publicProfile` are exported, keyed by the immutable `User::publicSub` (future OIDC `sub`).
   Its contract is fixed by the portal: never rename fields. Avatars must be served from Conclave's host
   (`PortalAvatars`: signed URLs, local WebP copy of Gravatar/Discord). Clients: `app:oauth:client:*`.
+- **OpenID Connect provider** (`App\OAuth\OpenIdConnect`, ADR `docs/adr/0002-fournisseur-openid-connect.md`):
+  authorization code + mandatory PKCE S256 for clients with scope `openid` and registered redirect URIs.
+  `/oauth/authorize` hands a signed request to the app page `/autoriser` (consent, sign-in first if
+  needed); codes are one-time, 60 s, SHA-256; ID tokens RS256 with a dedicated key (`OidcKeys`, var/oidc),
+  `sub` = `User::publicSub`, `profile` adds `name` and `branches`.
 - **Concurrency**: `symfony/lock` (`LOCK_DSN=flock`) guards installation (`app-setup`) and keeps a single
   Discord gateway worker; the setup code is rate-limited (`config/packages/rate_limiter.yaml`).
 - **Rich text** (news, event descriptions): the Tiptap editor's HTML is sanitized server-side by

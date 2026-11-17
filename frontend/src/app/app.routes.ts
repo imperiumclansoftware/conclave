@@ -19,6 +19,13 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/setup/setup.page').then((m) => m.SetupPage),
   },
   {
+    // OpenID Connect consent (Imperium Clan portal…): handles its own sign-in redirect
+    path: 'autoriser',
+    canActivate: [installedGuard],
+    title: 'Autoriser une application',
+    loadComponent: () => import('./pages/authorize/authorize.page').then((m) => m.AuthorizePage),
+  },
+  {
     path: 'login',
     canActivate: [installedGuard, guestGuard],
     title: 'Connexion',

@@ -10,6 +10,12 @@ enum OAuthScope: string
     /** Read the members who chose to appear on the clan's public site (Imperium Clan portal) */
     case PortalMembers = 'portal:members';
 
+    /** OpenID Connect sign-in: identifies the member (sub) to the client */
+    case OpenId = 'openid';
+
+    /** With openid: display name and branches of the member in the ID token */
+    case Profile = 'profile';
+
     /** Security role given to a request authenticated by a token carrying this scope */
     public function role(): string
     {

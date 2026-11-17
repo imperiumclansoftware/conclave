@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, input, signal } from '@angular/core';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
@@ -16,6 +16,9 @@ import { ManageCookies } from '../../shared/manage-cookies';
 export class LoginPage {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
+
+  /** ?retour=/autoriser?… : page to go back to after signing in (internal path only) */
+  readonly retour = input<string>();
 
   protected readonly form = inject(NonNullableFormBuilder).group({
     username: ['', Validators.required],
@@ -36,11 +39,18 @@ export class LoginPage {
     try {
       const { username, password } = this.form.getRawValue();
       await firstValueFrom(this.auth.login(username.trim().toLowerCase(), password));
-      await this.router.navigate(['/']);
+      await this.router.navigateByUrl(safeReturn(this.retour()) ?? '/');
     } catch (e) {
       this.error.set(apiErrorMessage(e));
     } finally {
       this.pending.set(false);
     }
   }
+}
+
+/** Internal path only (no //host or scheme): no open redirect after signing in. */
+export function safeReturn(value: string | undefined): string | null {
+  return value && value.startsWith('/') && !value.startsWith('//') && !value.includes('\\')
+    ? value
+    : null;
 }

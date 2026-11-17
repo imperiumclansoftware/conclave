@@ -25,12 +25,13 @@ final class OAuthClientListCommand
 
         $date = static fn (?\DateTimeImmutable $d): string => $d?->format('d/m/Y H:i') ?? '—';
         $io->table(
-            ['N°', 'Libellé', 'client_id', 'Portées', 'État', 'Créé le', 'Dernière utilisation'],
+            ['N°', 'Libellé', 'client_id', 'Portées', 'Retours', 'État', 'Créé le', 'Dernière utilisation'],
             array_map(static fn ($c): array => [
                 $c->getId(),
                 $c->getName(),
                 $c->getClientId(),
                 implode(' ', $c->getScopes()),
+                implode("\n", $c->getRedirectUris()) ?: '—',
                 $c->isActive() ? 'actif' : 'révoqué le '.$date($c->getRevokedAt()),
                 $date($c->getCreatedAt()),
                 $date($c->getLastUsedAt()),

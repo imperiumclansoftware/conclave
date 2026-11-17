@@ -208,6 +208,15 @@ Reportez `client_id` et `client_secret` dans `CONCLAVE_CLIENT_ID` et `CONCLAVE_C
 du portail, avec `CONCLAVE_URL` = l'adresse publique HTTPS de Conclave (la même que son `CONCLAVE_URL`).
 `app:oauth:client:list` et `app:oauth:client:revoke <n°>` gèrent les clients.
 
+Connexion au portail avec le compte Conclave (0.8.0) : ajoutez au client du portail les portées `openid`
+et `profile` et son adresse de retour (le secret ne change pas) :
+
+```bash
+docker exec -it conclave-conclave-1 php bin/console app:oauth:client:update <n°> \
+  --scope=portal:members --scope=openid --scope=profile \
+  --redirect-uri=https://<adresse du portail>/api/auth/conclave/callback
+```
+
 ## Détails techniques
 
 - Base `dunglas/frankenphp` (PHP 8.4, Alpine), utilisateur non root, port 80.

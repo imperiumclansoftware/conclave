@@ -4,6 +4,7 @@ namespace App\OAuth;
 
 use App\Entity\OAuthAccessToken;
 use App\Entity\OAuthClient;
+use App\Entity\User;
 use App\Enum\OAuthScope;
 use App\Repository\OAuthAccessTokenRepository;
 use App\Repository\OAuthClientRepository;
@@ -32,10 +33,11 @@ class ClientCredentials
 
     /**
      * @param list<OAuthScope> $scopes
+     * @param list<string>     $redirectUris
      *
      * @return array{OAuthClient, string} the client and its secret, shown once and never stored
      */
-    public function createClient(string $name, array $scopes): array
+    public function createClient(string $name, array $scopes, array $redirectUris = []): array
     {
         $secret = self::random(32);
         $client = new OAuthClient(
@@ -44,6 +46,7 @@ class ClientCredentials
             $name,
             array_values(array_unique(array_map(static fn (OAuthScope $s): string => $s->value, $scopes))),
         );
+        $client->setRedirectUris($redirectUris);
         $this->em->persist($client);
         $this->em->flush();
 
@@ -67,13 +70,15 @@ class ClientCredentials
      *
      * @return string the access token, given to the client only
      */
-    public function issueToken(OAuthClient $client, array $scopes): string
+    public function issueToken(OAuthClient $client, array $scopes, ?User $user = null): string
     {
         $now = new \DateTimeImmutable();
         $this->tokens->purgeExpired($now->modify('-1 day'));
 
         $token = self::random(32);
-        $this->em->persist(new OAuthAccessToken($client, self::hash($token), $scopes, $now->modify('+'.self::TOKEN_TTL.' seconds')));
+        $access = new OAuthAccessToken($client, self::hash($token), $scopes, $now->modify('+'.self::TOKEN_TTL.' seconds'));
+        $access->setUser($user);
+        $this->em->persist($access);
         $client->markUsed();
         $this->em->flush();
 
@@ -106,13 +111,13 @@ class ClientCredentials
         return $this->dummyHash ??= $this->hasher()->hash(self::random(32));
     }
 
-    private static function hash(string $token): string
+    public static function hash(string $token): string
     {
         return hash('sha256', $token);
     }
 
     /** URL-safe random string (base64url, no padding) */
-    private static function random(int $bytes): string
+    public static function random(int $bytes): string
     {
         return rtrim(strtr(base64_encode(random_bytes($bytes)), '+/', '-_'), '=');
     }

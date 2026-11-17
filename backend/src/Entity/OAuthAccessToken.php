@@ -20,6 +20,11 @@ class OAuthAccessToken
     #[ORM\Column]
     private ?int $id = null;
 
+    /** Member who signed in (OpenID Connect), null for a machine token (client credentials) */
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
+    private ?User $user = null;
+
     /**
      * @param list<string> $scopes granted scopes (a subset of the client's)
      */
@@ -55,6 +60,16 @@ class OAuthAccessToken
     public function getExpiresAt(): \DateTimeImmutable
     {
         return $this->expiresAt;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): void
+    {
+        $this->user = $user;
     }
 
     public function isValid(\DateTimeImmutable $now = new \DateTimeImmutable()): bool

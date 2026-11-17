@@ -28,7 +28,8 @@
 	}
 
 	# API: Symfony
-	@api path /api/* /bundles/* /oauth/*
+	# /oauth and the OpenID Connect discovery documents: Symfony too (ADR 0002)
+	@api path /api/* /bundles/* /oauth/* /.well-known/openid-configuration /.well-known/jwks.json
 	handle @api {
 		php_server
 	}

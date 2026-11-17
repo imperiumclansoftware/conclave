@@ -410,6 +410,25 @@ php bin/console app:oauth:client:revoke <n°|client_id>   # révocation immédia
 
 En cas de fuite du secret : révoquez le client, créez-en un nouveau et mettez à jour la stack du portail.
 
+### Connexion au portail avec le compte Conclave (OpenID Connect)
+
+Depuis la 0.8.0, Conclave est aussi **fournisseur d'identité** : le bouton « Se connecter avec Conclave » du
+portail envoie le membre sur Conclave, qui lui demande son accord (page `/autoriser`) puis le renvoie au
+portail. Décision : [ADR 0002](docs/adr/0002-fournisseur-openid-connect.md). Le portail reçoit un identifiant
+stable (le même `sub` que l'export), le nom affiché et les branches : jamais l'e-mail ni l'identifiant de
+connexion.
+
+Ajoutez la connexion au client existant du portail (le secret ne change pas) :
+
+```bash
+docker exec -it conclave-conclave-1 php bin/console app:oauth:client:list   # numéro du client « Portail »
+docker exec -it conclave-conclave-1 php bin/console app:oauth:client:update <n°> \
+  --scope=portal:members --scope=openid --scope=profile \
+  --redirect-uri=https://<adresse du portail>/api/auth/conclave/callback
+```
+
+L'adresse de retour doit être exactement celle du portail (schéma, hôte, chemin).
+
 ## Pages légales et cookies
 
 - **Conditions d'utilisation** : `/conditions-utilisation` ; **politique de confidentialité** :
@@ -534,6 +553,11 @@ Toutes les routes sauf `setup`, `register`, `login`, `password/*` et `health` ex
 | POST    | `/oauth/token`                          | OAuth2 `client_credentials` (HTTP Basic, 10 / min / adresse) → `{access_token, token_type, expires_in, scope}` |
 | GET     | `/api/portal/members`                   | Jeton de client portée `portal:members` : membres consentants `{items: [{sub, pseudo, title, bio, branches, avatarUrl}]}` |
 | GET     | `/api/portal/avatars/{sub}/{signature}.webp` | Avatar Gravatar/Discord d'un membre exporté (public, URL signée, copie locale) |
+| GET     | `/.well-known/openid-configuration`, `/.well-known/jwks.json` | Découverte OpenID Connect et clé publique des jetons d'identité |
+| GET     | `/oauth/authorize`                      | Demande de connexion OpenID Connect (PKCE S256) → page `/autoriser` |
+| GET/POST | `/api/oauth/authorization`             | Page `/autoriser` : détail de la demande / accord ou refus du membre connecté → `{redirect}` |
+| POST    | `/oauth/token` (`authorization_code`)   | Code + `code_verifier` → `{access_token, id_token}` (RS256) |
+| GET     | `/oauth/userinfo`                       | Jeton d'accès d'un membre → `{sub, name, branches}` |
 | GET/POST | `/api/events/{id}/messages[?before=]`  | Discussion de l'événement : lire (tout le clan) / écrire (participants, jusqu'à la fin) |
 | DELETE  | `/api/events/{id}/messages/{messageId}` | Retirer un message (auteur tant que c'est ouvert, dirigeants) |
 | GET     | `/api/films/search?q=`, `/api/films/{movie\|tv}/{tmdbId}` | Recherche (films et séries) et fiche TMDB (Cinéphiles) |
